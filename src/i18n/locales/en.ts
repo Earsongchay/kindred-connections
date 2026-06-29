@@ -555,7 +555,7 @@ export const en = {
   },
   profil: {
     title: "My profile",
-    subtitle: "3 permission levels based on data sensitivity (cf. §4.7).",
+    subtitle: "View and update your personal information.",
     save: "Save changes",
     saveSuccess: "Changes saved ✓",
     completion: "Profile {{pct}}% complete",
