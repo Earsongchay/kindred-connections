@@ -151,6 +151,10 @@
   --color-surface: var(--surface);
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-teal-soft: var(--teal-soft);
+  --color-teal-soft-foreground: var(--teal-soft-foreground);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
