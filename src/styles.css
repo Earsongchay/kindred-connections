@@ -65,6 +65,13 @@
   );
   --shadow-card: var(--shadow-md);
   --shadow-float: var(--shadow-xl);
+
+  /* Patient space — teal identity (cf. prototype 06) */
+  --teal: oklch(0.6 0.0966 184);
+  --teal-foreground: oklch(1 0 0);
+  --teal-soft: oklch(0.95 0.035 184);
+  --teal-soft-foreground: oklch(0.46 0.085 184);
+  --gradient-teal: linear-gradient(168deg, #16a085 0%, #0e7d64 100%);
 }
 
 .dark {
