@@ -1,44 +1,69 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n";
 
-export function Footer() {
+export function SiteFooter() {
+  const { t } = useTranslation();
+  const params = useParams({ strict: false }) as { locale?: string };
+  const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
+
+  const cols = [
+    {
+      title: t("footer.product"),
+      items: t("footer.productItems", { returnObjects: true }) as string[],
+    },
+    {
+      title: t("footer.resources"),
+      items: t("footer.resourceItems", { returnObjects: true }) as string[],
+    },
+    {
+      title: t("footer.legal"),
+      items: t("footer.legalItems", { returnObjects: true }) as string[],
+    },
+  ];
+
   return (
-    <footer className="bg-[oklch(0.18_0.03_260)] text-[oklch(0.85_0.02_260)] mt-24">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8 py-16 grid gap-10 md:grid-cols-4">
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-2.5">
-            <span className="w-9 h-9 rounded-full bg-accent-cyan text-[oklch(0.18_0.03_260)] font-extrabold grid place-items-center">
-              F
-            </span>
-            <span className="font-extrabold text-white text-lg">FUENI</span>
+    <footer className="border-t border-border/60 bg-surface">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-5">
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-2">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-brand)] font-bold text-primary-foreground">
+                F
+              </div>
+              <span className="text-lg font-bold">{t("common.brand")}</span>
+            </div>
+            <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
           </div>
-          <p className="mt-4 text-sm max-w-md leading-relaxed">
-            La plateforme santé numérique pour l'Afrique francophone et l'Europe.
-            Patients, praticiens, pharmacies et hôpitaux, réunis dans un seul écosystème sécurisé.
-          </p>
+          {cols.map((col) => (
+            <div key={col.title}>
+              <h4 className="text-sm font-semibold text-foreground">{col.title}</h4>
+              <ul className="mt-4 space-y-3">
+                {col.items.map((i) => (
+                  <li key={i}>
+                    {/* TODO Sprint 5 — Wire real legal/resource pages */}
+                    <Link
+                      to="/$locale"
+                      params={{ locale }}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {i}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div>
-          <h4 className="text-white font-semibold text-sm mb-3">Produit</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/fonctionnalites" className="hover:text-white">Fonctionnalités</Link></li>
-            <li><Link to="/pour-qui" className="hover:text-white">Pour qui ?</Link></li>
-            <li><Link to="/securite" className="hover:text-white">Sécurité</Link></li>
-          </ul>
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row sm:items-center">
+          <p className="text-xs text-muted-foreground">{t("footer.legalNote")}</p>
+          <p className="text-xs text-muted-foreground">{t("footer.compliance")}</p>
         </div>
-        <div>
-          <h4 className="text-white font-semibold text-sm mb-3">Société</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
-            <li><Link to="/inscription" className="hover:text-white">S'inscrire</Link></li>
-            <li><a href="#" className="hover:text-white">Mentions légales</a></li>
-            <li><a href="#" className="hover:text-white">Confidentialité</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8 py-5 text-xs text-white/60 flex flex-wrap items-center justify-between gap-3">
-          <span>© {new Date().getFullYear()} FUENI. Tous droits réservés.</span>
-          <span>Conforme RGPD · CDP · ARTCI · APDP</span>
-        </div>
+        {/* Draft / provisional banner — TODO remove once content is finalised (Sprint 4-5) */}
+        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-[11px] font-medium text-amber-700">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+          {t("footer.draft")}
+        </p>
       </div>
     </footer>
   );

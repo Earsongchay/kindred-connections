@@ -4,6 +4,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
+import i18nextPlugin from "eslint-plugin-i18next";
 
 export default tseslint.config(
   { ignores: ["dist", ".output", ".vinxi"] },
@@ -17,8 +18,16 @@ export default tseslint.config(
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      i18next: i18nextPlugin,
     },
     rules: {
+      "i18next/no-literal-string": [
+        "warn",
+        {
+          markupOnly: true,
+          onlyAttribute: ["placeholder", "title"],
+        },
+      ],
       ...reactHooks.configs.recommended.rules,
       "no-restricted-imports": [
         "error",

@@ -9,42 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SecuriteRouteImport } from './routes/securite'
-import { Route as PourQuiRouteImport } from './routes/pour-qui'
-import { Route as InscriptionRouteImport } from './routes/inscription'
-import { Route as FonctionnalitesRouteImport } from './routes/fonctionnalites'
-import { Route as ContactRouteImport } from './routes/contact'
+import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LocaleIndexRouteImport } from './routes/$locale.index'
+import { Route as LocaleSignupRouteImport } from './routes/$locale.signup'
+import { Route as LocaleMotDePasseOublieRouteImport } from './routes/$locale.mot-de-passe-oublie'
+import { Route as LocaleLoginRouteImport } from './routes/$locale.login'
+import { Route as LocaleInscriptionRouteImport } from './routes/$locale.inscription'
+import { Route as LocaleEspacePatientRouteImport } from './routes/$locale.espace-patient'
+import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.espace-patient.index'
+import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
+import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SecuriteRoute = SecuriteRouteImport.update({
-  id: '/securite',
-  path: '/securite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PourQuiRoute = PourQuiRouteImport.update({
-  id: '/pour-qui',
-  path: '/pour-qui',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InscriptionRoute = InscriptionRouteImport.update({
-  id: '/inscription',
-  path: '/inscription',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FonctionnalitesRoute = FonctionnalitesRouteImport.update({
-  id: '/fonctionnalites',
-  path: '/fonctionnalites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const LocaleRoute = LocaleRouteImport.update({
+  id: '/$locale',
+  path: '/$locale',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,117 +31,145 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleIndexRoute = LocaleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleSignupRoute = LocaleSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleMotDePasseOublieRoute = LocaleMotDePasseOublieRouteImport.update({
+  id: '/mot-de-passe-oublie',
+  path: '/mot-de-passe-oublie',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleLoginRoute = LocaleLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleInscriptionRoute = LocaleInscriptionRouteImport.update({
+  id: '/inscription',
+  path: '/inscription',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleEspacePatientRoute = LocaleEspacePatientRouteImport.update({
+  id: '/espace-patient',
+  path: '/espace-patient',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleEspacePatientIndexRoute =
+  LocaleEspacePatientIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LocaleEspacePatientRoute,
+  } as any)
+const LocaleEspacePatientSecuriteRoute =
+  LocaleEspacePatientSecuriteRouteImport.update({
+    id: '/securite',
+    path: '/securite',
+    getParentRoute: () => LocaleEspacePatientRoute,
+  } as any)
+const LocaleEspacePatientProfilRoute =
+  LocaleEspacePatientProfilRouteImport.update({
+    id: '/profil',
+    path: '/profil',
+    getParentRoute: () => LocaleEspacePatientRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/contact': typeof ContactRoute
-  '/fonctionnalites': typeof FonctionnalitesRoute
-  '/inscription': typeof InscriptionRoute
-  '/pour-qui': typeof PourQuiRoute
-  '/securite': typeof SecuriteRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$locale': typeof LocaleRouteWithChildren
+  '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
+  '/$locale/inscription': typeof LocaleInscriptionRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
+  '/$locale/signup': typeof LocaleSignupRoute
+  '/$locale/': typeof LocaleIndexRoute
+  '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/contact': typeof ContactRoute
-  '/fonctionnalites': typeof FonctionnalitesRoute
-  '/inscription': typeof InscriptionRoute
-  '/pour-qui': typeof PourQuiRoute
-  '/securite': typeof SecuriteRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$locale/inscription': typeof LocaleInscriptionRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
+  '/$locale/signup': typeof LocaleSignupRoute
+  '/$locale': typeof LocaleIndexRoute
+  '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-patient': typeof LocaleEspacePatientIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/contact': typeof ContactRoute
-  '/fonctionnalites': typeof FonctionnalitesRoute
-  '/inscription': typeof InscriptionRoute
-  '/pour-qui': typeof PourQuiRoute
-  '/securite': typeof SecuriteRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$locale': typeof LocaleRouteWithChildren
+  '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
+  '/$locale/inscription': typeof LocaleInscriptionRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
+  '/$locale/signup': typeof LocaleSignupRoute
+  '/$locale/': typeof LocaleIndexRoute
+  '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/contact'
-    | '/fonctionnalites'
-    | '/inscription'
-    | '/pour-qui'
-    | '/securite'
-    | '/sitemap.xml'
+    | '/$locale'
+    | '/$locale/espace-patient'
+    | '/$locale/inscription'
+    | '/$locale/login'
+    | '/$locale/mot-de-passe-oublie'
+    | '/$locale/signup'
+    | '/$locale/'
+    | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/securite'
+    | '/$locale/espace-patient/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/contact'
-    | '/fonctionnalites'
-    | '/inscription'
-    | '/pour-qui'
-    | '/securite'
-    | '/sitemap.xml'
+    | '/$locale/inscription'
+    | '/$locale/login'
+    | '/$locale/mot-de-passe-oublie'
+    | '/$locale/signup'
+    | '/$locale'
+    | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/securite'
+    | '/$locale/espace-patient'
   id:
     | '__root__'
     | '/'
-    | '/contact'
-    | '/fonctionnalites'
-    | '/inscription'
-    | '/pour-qui'
-    | '/securite'
-    | '/sitemap.xml'
+    | '/$locale'
+    | '/$locale/espace-patient'
+    | '/$locale/inscription'
+    | '/$locale/login'
+    | '/$locale/mot-de-passe-oublie'
+    | '/$locale/signup'
+    | '/$locale/'
+    | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/securite'
+    | '/$locale/espace-patient/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ContactRoute: typeof ContactRoute
-  FonctionnalitesRoute: typeof FonctionnalitesRoute
-  InscriptionRoute: typeof InscriptionRoute
-  PourQuiRoute: typeof PourQuiRoute
-  SecuriteRoute: typeof SecuriteRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  LocaleRoute: typeof LocaleRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/securite': {
-      id: '/securite'
-      path: '/securite'
-      fullPath: '/securite'
-      preLoaderRoute: typeof SecuriteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pour-qui': {
-      id: '/pour-qui'
-      path: '/pour-qui'
-      fullPath: '/pour-qui'
-      preLoaderRoute: typeof PourQuiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inscription': {
-      id: '/inscription'
-      path: '/inscription'
-      fullPath: '/inscription'
-      preLoaderRoute: typeof InscriptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fonctionnalites': {
-      id: '/fonctionnalites'
-      path: '/fonctionnalites'
-      fullPath: '/fonctionnalites'
-      preLoaderRoute: typeof FonctionnalitesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/$locale': {
+      id: '/$locale'
+      path: '/$locale'
+      fullPath: '/$locale'
+      preLoaderRoute: typeof LocaleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -172,18 +179,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/': {
+      id: '/$locale/'
+      path: '/'
+      fullPath: '/$locale/'
+      preLoaderRoute: typeof LocaleIndexRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/signup': {
+      id: '/$locale/signup'
+      path: '/signup'
+      fullPath: '/$locale/signup'
+      preLoaderRoute: typeof LocaleSignupRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/mot-de-passe-oublie': {
+      id: '/$locale/mot-de-passe-oublie'
+      path: '/mot-de-passe-oublie'
+      fullPath: '/$locale/mot-de-passe-oublie'
+      preLoaderRoute: typeof LocaleMotDePasseOublieRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/login': {
+      id: '/$locale/login'
+      path: '/login'
+      fullPath: '/$locale/login'
+      preLoaderRoute: typeof LocaleLoginRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/inscription': {
+      id: '/$locale/inscription'
+      path: '/inscription'
+      fullPath: '/$locale/inscription'
+      preLoaderRoute: typeof LocaleInscriptionRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/espace-patient': {
+      id: '/$locale/espace-patient'
+      path: '/espace-patient'
+      fullPath: '/$locale/espace-patient'
+      preLoaderRoute: typeof LocaleEspacePatientRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/espace-patient/': {
+      id: '/$locale/espace-patient/'
+      path: '/'
+      fullPath: '/$locale/espace-patient/'
+      preLoaderRoute: typeof LocaleEspacePatientIndexRouteImport
+      parentRoute: typeof LocaleEspacePatientRoute
+    }
+    '/$locale/espace-patient/securite': {
+      id: '/$locale/espace-patient/securite'
+      path: '/securite'
+      fullPath: '/$locale/espace-patient/securite'
+      preLoaderRoute: typeof LocaleEspacePatientSecuriteRouteImport
+      parentRoute: typeof LocaleEspacePatientRoute
+    }
+    '/$locale/espace-patient/profil': {
+      id: '/$locale/espace-patient/profil'
+      path: '/profil'
+      fullPath: '/$locale/espace-patient/profil'
+      preLoaderRoute: typeof LocaleEspacePatientProfilRouteImport
+      parentRoute: typeof LocaleEspacePatientRoute
+    }
   }
 }
 
+interface LocaleEspacePatientRouteChildren {
+  LocaleEspacePatientProfilRoute: typeof LocaleEspacePatientProfilRoute
+  LocaleEspacePatientSecuriteRoute: typeof LocaleEspacePatientSecuriteRoute
+  LocaleEspacePatientIndexRoute: typeof LocaleEspacePatientIndexRoute
+}
+
+const LocaleEspacePatientRouteChildren: LocaleEspacePatientRouteChildren = {
+  LocaleEspacePatientProfilRoute: LocaleEspacePatientProfilRoute,
+  LocaleEspacePatientSecuriteRoute: LocaleEspacePatientSecuriteRoute,
+  LocaleEspacePatientIndexRoute: LocaleEspacePatientIndexRoute,
+}
+
+const LocaleEspacePatientRouteWithChildren =
+  LocaleEspacePatientRoute._addFileChildren(LocaleEspacePatientRouteChildren)
+
+interface LocaleRouteChildren {
+  LocaleEspacePatientRoute: typeof LocaleEspacePatientRouteWithChildren
+  LocaleInscriptionRoute: typeof LocaleInscriptionRoute
+  LocaleLoginRoute: typeof LocaleLoginRoute
+  LocaleMotDePasseOublieRoute: typeof LocaleMotDePasseOublieRoute
+  LocaleSignupRoute: typeof LocaleSignupRoute
+  LocaleIndexRoute: typeof LocaleIndexRoute
+}
+
+const LocaleRouteChildren: LocaleRouteChildren = {
+  LocaleEspacePatientRoute: LocaleEspacePatientRouteWithChildren,
+  LocaleInscriptionRoute: LocaleInscriptionRoute,
+  LocaleLoginRoute: LocaleLoginRoute,
+  LocaleMotDePasseOublieRoute: LocaleMotDePasseOublieRoute,
+  LocaleSignupRoute: LocaleSignupRoute,
+  LocaleIndexRoute: LocaleIndexRoute,
+}
+
+const LocaleRouteWithChildren =
+  LocaleRoute._addFileChildren(LocaleRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ContactRoute: ContactRoute,
-  FonctionnalitesRoute: FonctionnalitesRoute,
-  InscriptionRoute: InscriptionRoute,
-  PourQuiRoute: PourQuiRoute,
-  SecuriteRoute: SecuriteRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  LocaleRoute: LocaleRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

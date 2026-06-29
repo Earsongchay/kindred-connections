@@ -1,0 +1,392 @@
+{
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\router.tsx": {
+    "mtime": 1779867814.7844007,
+    "ast_hash": "8f905e713b0eba7fa8148b7995a708c9",
+    "semantic_hash": "8f905e713b0eba7fa8148b7995a708c9"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routeTree.gen.ts": {
+    "mtime": 1779867818.3631625,
+    "ast_hash": "50aafea0022644811f289fa6b1eaa889",
+    "semantic_hash": "50aafea0022644811f289fa6b1eaa889"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\server.ts": {
+    "mtime": 1779867809.872805,
+    "ast_hash": "f092a946e431ec3341256db5c1499657",
+    "semantic_hash": "f092a946e431ec3341256db5c1499657"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\start.ts": {
+    "mtime": 1779867809.8798015,
+    "ast_hash": "dc15eda4f935f0db8392d02ab93cbce4",
+    "semantic_hash": "dc15eda4f935f0db8392d02ab93cbce4"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\site\\Footer.tsx": {
+    "mtime": 1779867808.5383873,
+    "ast_hash": "7e14a05a6105819b33e1057efb76d3d0",
+    "semantic_hash": "7e14a05a6105819b33e1057efb76d3d0"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\site\\Header.tsx": {
+    "mtime": 1779876217.217085,
+    "ast_hash": "593c5058802e9c364a42cd4bed328daf",
+    "semantic_hash": "593c5058802e9c364a42cd4bed328daf"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\site\\OtpVerificationModal.tsx": {
+    "mtime": 1780021200.0251546,
+    "ast_hash": "c5fc50c47c070ea97d069f775216e4ed",
+    "semantic_hash": "c5fc50c47c070ea97d069f775216e4ed"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\site\\PasswordChangeModal.tsx": {
+    "mtime": 1779959311.3970125,
+    "ast_hash": "83598335900700cf44f5500c2ceffb0d",
+    "semantic_hash": "83598335900700cf44f5500c2ceffb0d"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\site\\PasswordStrength.tsx": {
+    "mtime": 1779958025.2163422,
+    "ast_hash": "118c67d02be7fa51c15fdf234372682d",
+    "semantic_hash": "118c67d02be7fa51c15fdf234372682d"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\accordion.tsx": {
+    "mtime": 1779867808.6024213,
+    "ast_hash": "55f9dda62b4e3913c9b23e5015a86aef",
+    "semantic_hash": "55f9dda62b4e3913c9b23e5015a86aef"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\alert-dialog.tsx": {
+    "mtime": 1779867808.6354682,
+    "ast_hash": "96350e949e9b7b674545430a410ab89c",
+    "semantic_hash": "96350e949e9b7b674545430a410ab89c"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\alert.tsx": {
+    "mtime": 1779867808.6514692,
+    "ast_hash": "f993d7e96b1e25ce50e68ed97e11d2a8",
+    "semantic_hash": "f993d7e96b1e25ce50e68ed97e11d2a8"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\aspect-ratio.tsx": {
+    "mtime": 1779867808.6599817,
+    "ast_hash": "c5c364545e1b25a94e9e752cd67ad048",
+    "semantic_hash": "c5c364545e1b25a94e9e752cd67ad048"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\avatar.tsx": {
+    "mtime": 1779867808.6709914,
+    "ast_hash": "72989cd32f72c4122802540ef32525a5",
+    "semantic_hash": "72989cd32f72c4122802540ef32525a5"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\badge.tsx": {
+    "mtime": 1779876859.7443159,
+    "ast_hash": "ef85b3eddef798bcc2f25bc8ab703880",
+    "semantic_hash": "ef85b3eddef798bcc2f25bc8ab703880"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\breadcrumb.tsx": {
+    "mtime": 1779869169.4990485,
+    "ast_hash": "6124340b75b12e8d75910350e5c123f2",
+    "semantic_hash": "6124340b75b12e8d75910350e5c123f2"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\button.tsx": {
+    "mtime": 1779876447.6019783,
+    "ast_hash": "9822d6a79d97bef656dc28bdc4621e86",
+    "semantic_hash": "9822d6a79d97bef656dc28bdc4621e86"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\calendar.tsx": {
+    "mtime": 1779867808.733272,
+    "ast_hash": "415d91d7006d4cc654e27620fca340f6",
+    "semantic_hash": "415d91d7006d4cc654e27620fca340f6"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\card.tsx": {
+    "mtime": 1779867808.744275,
+    "ast_hash": "d6c48ea36221b9cdc3576d305d12d5d5",
+    "semantic_hash": "d6c48ea36221b9cdc3576d305d12d5d5"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\carousel.tsx": {
+    "mtime": 1779869188.675711,
+    "ast_hash": "8cd01b2629fc82b54a037d924063e439",
+    "semantic_hash": "8cd01b2629fc82b54a037d924063e439"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\chart.tsx": {
+    "mtime": 1779867808.8333316,
+    "ast_hash": "6a3baf94f2e89f1f97d4d7a28f3622d2",
+    "semantic_hash": "6a3baf94f2e89f1f97d4d7a28f3622d2"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\checkbox.tsx": {
+    "mtime": 1779867808.8433352,
+    "ast_hash": "f78aac270ca482c8c2cb907ef6260462",
+    "semantic_hash": "f78aac270ca482c8c2cb907ef6260462"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\collapsible.tsx": {
+    "mtime": 1779867808.8473344,
+    "ast_hash": "767631bbc344945c236f185f4078d71d",
+    "semantic_hash": "767631bbc344945c236f185f4078d71d"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\command.tsx": {
+    "mtime": 1779867808.8883688,
+    "ast_hash": "014782599cc838b021ec68b07ad4ea02",
+    "semantic_hash": "014782599cc838b021ec68b07ad4ea02"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\context-menu.tsx": {
+    "mtime": 1779867808.913882,
+    "ast_hash": "e9d689beb53d9adb63165bfe64838bf6",
+    "semantic_hash": "e9d689beb53d9adb63165bfe64838bf6"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\dialog.tsx": {
+    "mtime": 1779869207.0222418,
+    "ast_hash": "9951fba815a11282cbe5d6cde215c30a",
+    "semantic_hash": "9951fba815a11282cbe5d6cde215c30a"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\drawer.tsx": {
+    "mtime": 1779867808.944404,
+    "ast_hash": "8be333e8fd8e42576b1b5f72f07f4337",
+    "semantic_hash": "8be333e8fd8e42576b1b5f72f07f4337"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\dropdown-menu.tsx": {
+    "mtime": 1779867808.962921,
+    "ast_hash": "32156e221f3473280114c80fdb818829",
+    "semantic_hash": "32156e221f3473280114c80fdb818829"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\form.tsx": {
+    "mtime": 1779876644.220818,
+    "ast_hash": "6f7fe52722859363f4f06e1484a4bf80",
+    "semantic_hash": "6f7fe52722859363f4f06e1484a4bf80"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\hover-card.tsx": {
+    "mtime": 1779867808.9904418,
+    "ast_hash": "1442794c5ca2a78d69e4e613b315ed3d",
+    "semantic_hash": "1442794c5ca2a78d69e4e613b315ed3d"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\input-otp.tsx": {
+    "mtime": 1779867809.0079575,
+    "ast_hash": "58cff10c8942cac8483c0bcd65d39d3c",
+    "semantic_hash": "58cff10c8942cac8483c0bcd65d39d3c"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\input.tsx": {
+    "mtime": 1779867809.016965,
+    "ast_hash": "1d4cc52a4cd8afb3e18e45bda942bb8a",
+    "semantic_hash": "1d4cc52a4cd8afb3e18e45bda942bb8a"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\label.tsx": {
+    "mtime": 1779867809.027486,
+    "ast_hash": "7e35df4ca8edd0835efd97ca7937ef92",
+    "semantic_hash": "7e35df4ca8edd0835efd97ca7937ef92"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\menubar.tsx": {
+    "mtime": 1779867809.0574944,
+    "ast_hash": "5870465653e12c3d0e35a2fad6f9faa9",
+    "semantic_hash": "5870465653e12c3d0e35a2fad6f9faa9"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\navigation-menu.tsx": {
+    "mtime": 1779876645.6771793,
+    "ast_hash": "44810165a94e0bd7ebeda4247b3cf894",
+    "semantic_hash": "44810165a94e0bd7ebeda4247b3cf894"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\pagination.tsx": {
+    "mtime": 1779869223.689323,
+    "ast_hash": "3203ec436edf184a24bad29f775d4ef8",
+    "semantic_hash": "3203ec436edf184a24bad29f775d4ef8"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\popover.tsx": {
+    "mtime": 1779867809.1761515,
+    "ast_hash": "f18aa1da2144f25ee60795c539c51bcd",
+    "semantic_hash": "f18aa1da2144f25ee60795c539c51bcd"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\progress.tsx": {
+    "mtime": 1779867809.1921785,
+    "ast_hash": "55c462e5c9dd678dcf2c0c510b014ac4",
+    "semantic_hash": "55c462e5c9dd678dcf2c0c510b014ac4"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\radio-group.tsx": {
+    "mtime": 1779867809.2061892,
+    "ast_hash": "0e1ace237a5da3197e3eb1e6683faba9",
+    "semantic_hash": "0e1ace237a5da3197e3eb1e6683faba9"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\resizable.tsx": {
+    "mtime": 1779867809.2152967,
+    "ast_hash": "d9fcb9203c749fcab4e125a99bb12a86",
+    "semantic_hash": "d9fcb9203c749fcab4e125a99bb12a86"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\scroll-area.tsx": {
+    "mtime": 1779867809.2272255,
+    "ast_hash": "87b65d3eb26f2b02ff35a7acea585ba5",
+    "semantic_hash": "87b65d3eb26f2b02ff35a7acea585ba5"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\select.tsx": {
+    "mtime": 1779867809.2484255,
+    "ast_hash": "31ea1bbd6671833b010b2e852c8a55d0",
+    "semantic_hash": "31ea1bbd6671833b010b2e852c8a55d0"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\separator.tsx": {
+    "mtime": 1779867809.2569022,
+    "ast_hash": "433d163c4ffa00b59398a0c293198b5e",
+    "semantic_hash": "433d163c4ffa00b59398a0c293198b5e"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\sheet.tsx": {
+    "mtime": 1779869235.7244885,
+    "ast_hash": "b974d34db33109ff59c47f5658200e04",
+    "semantic_hash": "b974d34db33109ff59c47f5658200e04"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\sidebar.tsx": {
+    "mtime": 1779876646.7108543,
+    "ast_hash": "d19859282fc2553a39a6fa2753157a47",
+    "semantic_hash": "d19859282fc2553a39a6fa2753157a47"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\skeleton.tsx": {
+    "mtime": 1779867809.3323104,
+    "ast_hash": "41b182e6e2fc3805960d41e767d4a972",
+    "semantic_hash": "41b182e6e2fc3805960d41e767d4a972"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\slider.tsx": {
+    "mtime": 1779867809.3396764,
+    "ast_hash": "4752f1bfa26426988d325599e01c335b",
+    "semantic_hash": "4752f1bfa26426988d325599e01c335b"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\sonner.tsx": {
+    "mtime": 1779867809.34498,
+    "ast_hash": "97f59f60be3413196d095fcbf7383216",
+    "semantic_hash": "97f59f60be3413196d095fcbf7383216"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\switch.tsx": {
+    "mtime": 1779867809.350303,
+    "ast_hash": "82f5d8b0c59bb7ff305caa9f502e79ff",
+    "semantic_hash": "82f5d8b0c59bb7ff305caa9f502e79ff"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\table.tsx": {
+    "mtime": 1779867809.3632593,
+    "ast_hash": "7cc889989d53894b659903c73aded96e",
+    "semantic_hash": "7cc889989d53894b659903c73aded96e"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\tabs.tsx": {
+    "mtime": 1779867809.369259,
+    "ast_hash": "56e725558c2ce72c18243bf51717f385",
+    "semantic_hash": "56e725558c2ce72c18243bf51717f385"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\textarea.tsx": {
+    "mtime": 1779867809.3772705,
+    "ast_hash": "c7aad96fb9545210d53135a96c76ed6b",
+    "semantic_hash": "c7aad96fb9545210d53135a96c76ed6b"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\toggle-group.tsx": {
+    "mtime": 1779867809.3896947,
+    "ast_hash": "ac26383acf721d116ca8e3ab5c5355d5",
+    "semantic_hash": "ac26383acf721d116ca8e3ab5c5355d5"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\toggle.tsx": {
+    "mtime": 1779876448.7825732,
+    "ast_hash": "ad6722472c84be9778df05285cc76870",
+    "semantic_hash": "ad6722472c84be9778df05285cc76870"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\components\\ui\\tooltip.tsx": {
+    "mtime": 1779867809.4017544,
+    "ast_hash": "67d71db5a1ab935695d1def497f5b8a6",
+    "semantic_hash": "67d71db5a1ab935695d1def497f5b8a6"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\hooks\\use-mobile.tsx": {
+    "mtime": 1779867809.4101784,
+    "ast_hash": "c0a0bdd4638c391a1dd06ac82074e60b",
+    "semantic_hash": "c0a0bdd4638c391a1dd06ac82074e60b"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\i18n\\index.ts": {
+    "mtime": 1779867809.4185917,
+    "ast_hash": "e01d1c5ff1bacf68268b771aa5e8ef1e",
+    "semantic_hash": "e01d1c5ff1bacf68268b771aa5e8ef1e"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\i18n\\locales\\en.ts": {
+    "mtime": 1780020823.4737706,
+    "ast_hash": "81c5d61f51c71b146ee8bc439bbbcc0c",
+    "semantic_hash": "81c5d61f51c71b146ee8bc439bbbcc0c"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\i18n\\locales\\fr.ts": {
+    "mtime": 1780020818.7261527,
+    "ast_hash": "509fe2c501f1c3f425af31cc6dd86157",
+    "semantic_hash": "509fe2c501f1c3f425af31cc6dd86157"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\lib\\error-capture.ts": {
+    "mtime": 1779867809.498969,
+    "ast_hash": "00e77bfacfb2d79c0816361e678f1b65",
+    "semantic_hash": "00e77bfacfb2d79c0816361e678f1b65"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\lib\\error-page.ts": {
+    "mtime": 1779867809.5019703,
+    "ast_hash": "8da0ddd7569bac2676b9a5c8edff8a36",
+    "semantic_hash": "8da0ddd7569bac2676b9a5c8edff8a36"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\lib\\phone-rules.ts": {
+    "mtime": 1779874577.7554264,
+    "ast_hash": "c0c929acf82ef67ab914a14bb6b6d2d4",
+    "semantic_hash": "c0c929acf82ef67ab914a14bb6b6d2d4"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\lib\\session-form.ts": {
+    "mtime": 1779876630.830925,
+    "ast_hash": "a2ea30528f08e09575bd8be453be6989",
+    "semantic_hash": "a2ea30528f08e09575bd8be453be6989"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\lib\\utils.ts": {
+    "mtime": 1779867809.509049,
+    "ast_hash": "d9837f38cc05303254571985e3164050",
+    "semantic_hash": "d9837f38cc05303254571985e3164050"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.espace-patient.index.tsx": {
+    "mtime": 1780020832.4950001,
+    "ast_hash": "591c996096fce7ff66dbfea71168aeaa",
+    "semantic_hash": "591c996096fce7ff66dbfea71168aeaa"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.espace-patient.profil.tsx": {
+    "mtime": 1779957427.910422,
+    "ast_hash": "8c2bdda312dc6416a888279c015870b9",
+    "semantic_hash": "8c2bdda312dc6416a888279c015870b9"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.espace-patient.securite.tsx": {
+    "mtime": 1779959325.3155272,
+    "ast_hash": "37346fb996101b0dcb8c264a3e150f95",
+    "semantic_hash": "37346fb996101b0dcb8c264a3e150f95"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.espace-patient.tsx": {
+    "mtime": 1779868846.5963113,
+    "ast_hash": "ac9bf683b07c1eb0b93079f32433acb9",
+    "semantic_hash": "ac9bf683b07c1eb0b93079f32433acb9"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.index.tsx": {
+    "mtime": 1779955586.839262,
+    "ast_hash": "6edcca984efe3f5b56aa4e038f7a7b3c",
+    "semantic_hash": "6edcca984efe3f5b56aa4e038f7a7b3c"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.inscription.tsx": {
+    "mtime": 1780021224.9083853,
+    "ast_hash": "bce8535dcf5909f2ba7b2269e8f75293",
+    "semantic_hash": "bce8535dcf5909f2ba7b2269e8f75293"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.login.tsx": {
+    "mtime": 1779954658.2288918,
+    "ast_hash": "435c1a86b7aa95389a02e8c44449d3ca",
+    "semantic_hash": "435c1a86b7aa95389a02e8c44449d3ca"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.mot-de-passe-oublie.tsx": {
+    "mtime": 1779958301.7552462,
+    "ast_hash": "030ab5a112338841acd45f13c9d5802c",
+    "semantic_hash": "030ab5a112338841acd45f13c9d5802c"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.signup.tsx": {
+    "mtime": 1779957534.32876,
+    "ast_hash": "340e394067ad1da10cadf7c41e6da353",
+    "semantic_hash": "340e394067ad1da10cadf7c41e6da353"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\$locale.tsx": {
+    "mtime": 1779876218.8060331,
+    "ast_hash": "3482303a4770179c18e4559a6e81c28d",
+    "semantic_hash": "3482303a4770179c18e4559a6e81c28d"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\index.tsx": {
+    "mtime": 1779867809.8577933,
+    "ast_hash": "cdd0a000a52ac8f9d4c0fa8b808e6f7b",
+    "semantic_hash": "cdd0a000a52ac8f9d4c0fa8b808e6f7b"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\routes\\__root.tsx": {
+    "mtime": 1779868846.5377963,
+    "ast_hash": "176d2b75823a576be67d5be8cbf77077",
+    "semantic_hash": "176d2b75823a576be67d5be8cbf77077"
+  },
+  "C:\\Allweb\\Fueni\\latest\\heal-joy-flow\\src\\assets\\doctor-hero.jpg": {
+    "mtime": 1779866757.3682003,
+    "ast_hash": "4820cd01327493ed12d2c07d6e488f30",
+    "semantic_hash": "4820cd01327493ed12d2c07d6e488f30"
+  },
+  "c:\\Allweb\\Fueni\\latest\\heal-joy-flow\\UPDATE_NAZOUNKI_SF_PATIENT_REGISTRATION_EN.md": {
+    "mtime": 1780021314.4144788,
+    "ast_hash": "76a015ab2ec0a4e97c1c1f70128343a0",
+    "semantic_hash": "76a015ab2ec0a4e97c1c1f70128343a0"
+  }
+}
