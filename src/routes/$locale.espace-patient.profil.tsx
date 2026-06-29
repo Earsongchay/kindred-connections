@@ -2,503 +2,462 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Lock, Info, AlertCircle, X } from "lucide-react";
+import { IdCard, MapPin, HeartPulse, Bell, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { sessionForm } from "@/lib/session-form";
-import { OtpVerificationModal } from "@/components/site/OtpVerificationModal";
 
 export const Route = createFileRoute("/$locale/espace-patient/profil")({
   head: () => ({ meta: [{ title: "Mon profil — FUENI" }] }),
   component: Profil,
 });
 
-const PROFILE_COUNTRIES = [
-  { code: "SN", label: "🇸🇳 Sénégal" },
-  { code: "CI", label: "🇨🇮 Côte d'Ivoire" },
-  { code: "ML", label: "🇲🇱 Mali" },
-  { code: "BJ", label: "🇧🇯 Bénin" },
-  { code: "TG", label: "🇹🇬 Togo" },
-  { code: "BF", label: "🇧🇫 Burkina Faso" },
-  { code: "NE", label: "🇳🇪 Niger" },
-  { code: "CM", label: "🇨🇲 Cameroun" },
-  { code: "CD", label: "🇨🇩 RDC" },
+const COUNTRIES = [
+  "🇸🇳 Sénégal",
+  "🇨🇮 Côte d'Ivoire",
+  "🇲🇱 Mali",
+  "🇧🇯 Bénin",
+  "🇹🇬 Togo",
+  "🇧🇫 Burkina Faso",
+  "🇳🇪 Niger",
+  "🇨🇲 Cameroun",
+  "🇨🇩 RDC",
 ];
 
-// T16 — optional fields that count towards completion
-const OPTIONAL_FIELDS = [
-  "address",
-  "postalCode",
-  "emergencyName",
-  "emergencyPhone",
-  "emergencyRelation",
-] as const;
-type ProfileKey = (typeof OPTIONAL_FIELDS)[number];
+type LocData = {
+  country: string;
+  region: string;
+  city: string;
+  accountLang: string;
+  spokenLangs: string;
+  address: string;
+};
 
-function computeCompletion(data: Record<ProfileKey, string>): number {
-  const filled = OPTIONAL_FIELDS.filter((f) => !!data[f]).length;
-  return Math.round((filled / OPTIONAL_FIELDS.length) * 100);
-}
+type EmergData = {
+  name: string;
+  relation: string;
+  phone: string;
+};
 
 function Profil() {
   const { t } = useTranslation();
 
-  // Editable L1 fields
-  const [city, setCity] = useState("Dakar");
-  const [address, setAddress] = useState("Sacré-Cœur 3, Villa 12");
-  const [postalCode, setPostalCode] = useState("");
-  const [language, setLanguage] = useState("fr");
-  const [emergencyName, setEmergencyName] = useState("");
-  const [emergencyRelation, setEmergencyRelation] = useState("");
-  const [emergencyPhone, setEmergencyPhone] = useState("");
+  const [loc, setLoc] = useState<LocData>({
+    country: "🇸🇳 Sénégal",
+    region: "Dakar",
+    city: "Dakar",
+    accountLang: "Français",
+    spokenLangs: "Français",
+    address: "",
+  });
+  const [emerg, setEmerg] = useState<EmergData>({ name: "", relation: "", phone: "" });
   const [notifSms, setNotifSms] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Fix #2 — Display values for L2 fields (start as mock, get updated on verified)
-  const [displayEmail, setDisplayEmail] = useState("aissatou.diop@example.com");
-  const [displayPhone, setDisplayPhone] = useState("+221 77 *** ** 67");
-  const [displayCountry, setDisplayCountry] = useState("🇸🇳 Sénégal");
+  const incomplete = !loc.address || !emerg.name || !emerg.phone;
 
-  // Fix #1 — L2 two-step flow: 'input' collects new value, 'otp' verifies it
-  const [l2Modal, setL2Modal] = useState<{
-    field: "email" | "phone" | "country";
-    label: string;
-    channel: string;
-  } | null>(null);
-  const [l2Step, setL2Step] = useState<"input" | "otp">("input");
-  const [l2NewValue, setL2NewValue] = useState("");
-
-  // Fix #4 — Reactive completion (recalculates as fields change)
-  const completionData: Record<ProfileKey, string> = {
-    address,
-    postalCode,
-    emergencyName,
-    emergencyPhone,
-    emergencyRelation,
-  };
-  const completion = computeCompletion(completionData);
-
-  const handleSave = () => {
-    sessionForm.setProfile(completionData);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
-  };
-
-  const openL2Modal = (field: "email" | "phone" | "country", label: string, channel: string) => {
-    setL2NewValue("");
-    setL2Step("input");
-    setL2Modal({ field, label, channel });
-  };
-
-  // Fix #1 — advance from 'input' step to 'otp' step
-  const handleL2NewValueSubmit = (value: string) => {
-    setL2NewValue(value);
-    setL2Step("otp");
-  };
-
-  // Fix #2 — on OTP verified, write the new value back to the display state
-  const handleL2Verified = () => {
-    if (l2Modal?.field === "email") setDisplayEmail(l2NewValue);
-    if (l2Modal?.field === "phone") setDisplayPhone(l2NewValue);
-    if (l2Modal?.field === "country") {
-      const found = PROFILE_COUNTRIES.find((c) => c.code === l2NewValue);
-      setDisplayCountry(found?.label ?? l2NewValue);
-    }
-    setL2Modal(null);
-  };
+  const relations = [
+    { value: "spouse", label: t("profil.fields.relationSpouse") },
+    { value: "child", label: t("profil.fields.relationChild") },
+    { value: "parent", label: t("profil.fields.relationParent") },
+    { value: "friend", label: t("profil.fields.relationFriend") },
+    { value: "other", label: t("profil.fields.relationOther") },
+  ];
+  const relationLabel =
+    relations.find((r) => r.value === emerg.relation)?.label ?? t("profil.v2.notProvided");
 
   return (
     <div className="space-y-6">
       <header>
         <h1 className="text-3xl font-bold tracking-tight">{t("profil.title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("profil.subtitle")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("profil.subtitle", "Consultez et mettez à jour vos informations personnelles.")}
+        </p>
       </header>
 
-      {/* Fix #4 — Profile completion bar */}
-      <div className="rounded-2xl border border-border/60 bg-card/70 p-5">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium">{t("profil.completion", { pct: completion })}</span>
-          <span className="text-xs text-muted-foreground">
-            {OPTIONAL_FIELDS.filter((f) => !!completionData[f]).length}/{OPTIONAL_FIELDS.length}{" "}
-            {t("profil.completionFields")}
-          </span>
+      {incomplete && (
+        <div className="flex items-center gap-3 rounded-2xl border border-teal/30 bg-teal-soft px-5 py-4">
+          <Info className="h-5 w-5 flex-none text-teal" />
+          <span className="text-sm font-medium text-teal-soft-foreground">{t("profil.v2.banner")}</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-primary transition-all duration-500"
-            style={{ width: `${completion}%` }}
-          />
-        </div>
-        {completion < 100 && (
-          <p className="mt-2 text-xs text-muted-foreground">{t("profil.completionHint")}</p>
-        )}
-      </div>
-
-      {/* Niveau 3 — identité légale (Super Admin) */}
-      <Section
-        title={t("profil.sections.legalIdentity")}
-        level={3}
-        hint={t("profil.sections.legalIdentityHint")}
-      >
-        <ReadField label={t("profil.fields.firstName")} value="Aïssatou" />
-        <ReadField label={t("profil.fields.lastName")} value="Diop" />
-        <ReadField label={t("profil.fields.dob")} value="14/03/1992" />
-        <ReadField label={t("profil.fields.sex")} value={t("profil.fields.sexFemale")} />
-      </Section>
-
-      {/* Niveau 2 — canaux (OTP) */}
-      <Section
-        title={t("profil.sections.loginIds")}
-        level={2}
-        hint={t("profil.sections.loginIdsHint")}
-      >
-        <EditField
-          label={t("profil.fields.email")}
-          value={displayEmail}
-          cta={t("profil.fields.emailCta")}
-          onEdit={() => openL2Modal("email", t("profil.fields.email"), "e-mail")}
-        />
-        <EditField
-          label={t("profil.fields.phone")}
-          value={displayPhone}
-          cta={t("profil.fields.phoneCta")}
-          onEdit={() => openL2Modal("phone", t("profil.fields.phone"), "SMS")}
-        />
-      </Section>
-
-      {/* Niveau 2 — zone de service (OTP e-mail) */}
-      <Section
-        title={t("profil.sections.location")}
-        level={2}
-        hint={t("profil.sections.locationHint")}
-      >
-        <EditField
-          label={t("profil.fields.country")}
-          value={displayCountry}
-          cta={t("profil.fields.countryCta")}
-          onEdit={() => openL2Modal("country", t("profil.fields.country"), "e-mail")}
-        />
-      </Section>
-
-      {/* Niveau 1 — libre */}
-      <Section
-        title={t("profil.sections.coordinates")}
-        level={1}
-        hint={t("profil.sections.coordinatesHint")}
-      >
-        <Field label={t("profil.fields.city")}>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} />
-        </Field>
-        <Field label={t("profil.fields.address")}>
-          <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-        </Field>
-        <Field label={t("profil.fields.postalCode")}>
-          <Input
-            placeholder={t("profil.fields.postalCodePlaceholder")}
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-          />
-        </Field>
-        <Field label={t("profil.fields.language")}>
-          <select
-            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          >
-            <option value="fr">{t("profil.fields.langFr")}</option>
-            <option value="en">{t("profil.fields.langEn")}</option>
-          </select>
-        </Field>
-      </Section>
-
-      {/* T01 — emergency contact */}
-      <Section title={t("profil.sections.emergencyContact")} level={1} hint="">
-        <Field label={t("profil.fields.emergencyName")}>
-          <Input
-            placeholder={t("profil.fields.emergencyNamePlaceholder")}
-            value={emergencyName}
-            onChange={(e) => setEmergencyName(e.target.value)}
-          />
-        </Field>
-        <Field label={t("profil.fields.emergencyRelation")}>
-          <select
-            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={emergencyRelation}
-            onChange={(e) => setEmergencyRelation(e.target.value)}
-          >
-            <option value="">{t("inscription.form.sexPlaceholder")}</option>
-            <option value="spouse">{t("profil.fields.relationSpouse")}</option>
-            <option value="child">{t("profil.fields.relationChild")}</option>
-            <option value="parent">{t("profil.fields.relationParent")}</option>
-            <option value="friend">{t("profil.fields.relationFriend")}</option>
-            <option value="other">{t("profil.fields.relationOther")}</option>
-          </select>
-        </Field>
-        <Field label={t("profil.fields.emergencyPhone")}>
-          <Input
-            placeholder="+221 …"
-            value={emergencyPhone}
-            onChange={(e) => setEmergencyPhone(e.target.value)}
-          />
-        </Field>
-      </Section>
-
-      <Section title={t("profil.sections.notifications")} level={1} hint="">
-        <Toggle label={t("profil.fields.notifSms")} checked={notifSms} onChange={setNotifSms} />
-        <Toggle
-          label={t("profil.fields.notifEmail")}
-          checked={notifEmail}
-          onChange={setNotifEmail}
-        />
-      </Section>
-
-      <div className="flex items-center justify-end gap-4">
-        {saveSuccess && <span className="text-sm text-emerald-600">{t("profil.saveSuccess")}</span>}
-        <Button className="rounded-full" onClick={handleSave}>
-          {t("profil.save")}
-        </Button>
-      </div>
-
-      {/* Fix #1 — Step 1: collect new email/phone value */}
-      {l2Modal && l2Step === "input" && (
-        <NewValueModal
-          field={l2Modal.field}
-          label={l2Modal.label}
-          onSubmit={handleL2NewValueSubmit}
-          onClose={() => setL2Modal(null)}
-        />
       )}
 
-      {/* Fix #1 & #2 — Step 2: OTP verification on the new channel */}
-      {l2Modal && l2Step === "otp" && (
-        <OtpVerificationModal
-          title={t("profil.l2Modal.otpTitle", { label: l2Modal.label })}
-          description={t("profil.l2Modal.otpDesc", {
-            channel: l2Modal.channel,
-            value: l2Modal.field === "country" ? displayEmail : l2NewValue,
-          })}
-          validCode="111111"
-          resendCooldownSeconds={60}
-          onVerified={handleL2Verified}
-          onClose={() => setL2Modal(null)}
-          showDevHint
-        />
-      )}
-    </div>
-  );
-}
+      {/* 1 — Identité (lecture seule) */}
+      <Section
+        Icon={IdCard}
+        title={t("profil.v2.secIdentity")}
+        badge="support"
+        note={t("profil.v2.identityNote")}
+      >
+        <ReadRow label={t("profil.fields.firstName")} value="Aïssatou" first />
+        <ReadRow label={t("profil.fields.lastName")} value="Diop" />
+        <ReadRow label={t("profil.fields.dob")} value="02/05/1990" />
+        <ReadRow label={t("profil.fields.sex")} value={t("profil.fields.sexFemale")} />
+      </Section>
 
-// ── Fix #1: New value input modal ──────────────────────────────────────────
-
-function NewValueModal({
-  field,
-  label,
-  onSubmit,
-  onClose,
-}: {
-  field: "email" | "phone" | "country";
-  label: string;
-  onSubmit: (value: string) => void;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const [value, setValue] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const validate = () => {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      setError(t("profil.l2Modal.required"));
-      return;
-    }
-    if (field === "email" && !trimmed.includes("@")) {
-      setError(t("profil.l2Modal.emailInvalid"));
-      return;
-    }
-    if (field === "phone" && !/^\+?\d{6,}$/.test(trimmed.replace(/[\s.-]/g, ""))) {
-      setError(t("profil.l2Modal.phoneInvalid"));
-      return;
-    }
-    onSubmit(trimmed);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-3xl border border-border/60 bg-card p-7 shadow-2xl">
-        <div className="mb-5 flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold">{t("profil.l2Modal.title", { label })}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("profil.l2Modal.desc", { label: label.toLowerCase() })}
-            </p>
-          </div>
-          <button onClick={onClose} className="mt-0.5 text-muted-foreground hover:text-foreground">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium">{label}</Label>
-          {field === "country" ? (
-            <select
-              autoFocus
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              value={value}
-              onChange={(e) => {
-                setValue(e.target.value);
-                setError(null);
-              }}
+      {/* 2 — Localisation & langue */}
+      <EditableSection
+        Icon={MapPin}
+        title={t("profil.v2.secLocation")}
+        data={loc}
+        onSave={(next) => {
+          setLoc(next);
+          sessionForm.setProfile({ address: next.address });
+        }}
+        render={(draft, editing, set) => (
+          <>
+            <FieldRow label={t("profil.v2.countryService")} first>
+              {editing ? (
+                <SelectInput
+                  value={draft.country}
+                  onChange={(v) => set({ country: v })}
+                  options={COUNTRIES.map((c) => ({ value: c, label: c }))}
+                />
+              ) : (
+                <Value>{draft.country}</Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.v2.region")}>
+              {editing ? (
+                <Input value={draft.region} onChange={(e) => set({ region: e.target.value })} />
+              ) : (
+                <Value>{draft.region}</Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.v2.cityLabel")}>
+              {editing ? (
+                <Input value={draft.city} onChange={(e) => set({ city: e.target.value })} />
+              ) : (
+                <Value>{draft.city}</Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.v2.accountLang")}>
+              {editing ? (
+                <SelectInput
+                  value={draft.accountLang}
+                  onChange={(v) => set({ accountLang: v })}
+                  options={[
+                    { value: "Français", label: t("profil.fields.langFr") },
+                    { value: "English", label: t("profil.fields.langEn") },
+                  ]}
+                />
+              ) : (
+                <Value>{draft.accountLang}</Value>
+              )}
+            </FieldRow>
+            <FieldRow
+              label={t("profil.v2.spokenLangs")}
+              optional={t("profil.v2.optional")}
+              hint={t("profil.v2.spokenHint")}
             >
-              <option value="" />
-              {PROFILE_COUNTRIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <Input
-              autoFocus
-              type={field === "email" ? "email" : "tel"}
-              placeholder={
-                field === "email"
-                  ? t("profil.l2Modal.emailPlaceholder")
-                  : t("profil.l2Modal.phonePlaceholder")
-              }
-              value={value}
-              onChange={(e) => {
-                setValue(e.target.value);
-                setError(null);
-              }}
-              onKeyDown={(e) => e.key === "Enter" && validate()}
-            />
-          )}
-          {error && (
-            <p className="flex items-center gap-1.5 text-xs text-destructive">
-              <AlertCircle className="h-3.5 w-3.5" />
-              {error}
-            </p>
-          )}
-        </div>
+              {editing ? (
+                <Input
+                  value={draft.spokenLangs}
+                  onChange={(e) => set({ spokenLangs: e.target.value })}
+                />
+              ) : (
+                <Value>{draft.spokenLangs}</Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.fields.address")}>
+              {editing ? (
+                <Input
+                  placeholder={t("profil.v2.addressPh")}
+                  value={draft.address}
+                  onChange={(e) => set({ address: e.target.value })}
+                />
+              ) : (
+                <Value muted={!draft.address}>
+                  {draft.address || t("profil.v2.notProvided")}
+                </Value>
+              )}
+            </FieldRow>
+          </>
+        )}
+      />
 
-        <p className="mt-3 text-xs text-muted-foreground">{t("profil.l2Modal.otpNote")}</p>
+      {/* 3 — Contact d'urgence */}
+      <EditableSection
+        Icon={HeartPulse}
+        title={t("profil.v2.secEmergency")}
+        optional={t("profil.v2.optional")}
+        data={emerg}
+        onSave={setEmerg}
+        render={(draft, editing, set) => (
+          <>
+            <FieldRow label={t("profil.fields.emergencyName")} first>
+              {editing ? (
+                <Input
+                  placeholder={t("profil.fields.emergencyNamePlaceholder")}
+                  value={draft.name}
+                  onChange={(e) => set({ name: e.target.value })}
+                />
+              ) : (
+                <Value muted={!draft.name}>{draft.name || t("profil.v2.notProvided")}</Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.fields.emergencyRelation")}>
+              {editing ? (
+                <SelectInput
+                  value={draft.relation}
+                  onChange={(v) => set({ relation: v })}
+                  placeholder={t("profil.v2.relationChoose")}
+                  options={relations}
+                />
+              ) : (
+                <Value muted={!draft.relation}>
+                  {draft.relation ? relationLabel : t("profil.v2.notProvided")}
+                </Value>
+              )}
+            </FieldRow>
+            <FieldRow label={t("profil.fields.emergencyPhone")}>
+              {editing ? (
+                <Input
+                  placeholder={t("profil.v2.emergencyPhonePh")}
+                  value={draft.phone}
+                  onChange={(e) => set({ phone: e.target.value })}
+                />
+              ) : (
+                <Value muted={!draft.phone}>{draft.phone || t("profil.v2.notProvided")}</Value>
+              )}
+            </FieldRow>
+          </>
+        )}
+      />
 
-        <div className="mt-6 flex gap-3">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-full">
-            {t("profil.l2Modal.cancel")}
-          </Button>
-          <Button onClick={validate} className="flex-1 rounded-full">
-            {t("profil.l2Modal.sendCode")}
-          </Button>
-        </div>
-      </div>
+      {/* 4 — Préférences de notification */}
+      <Section Icon={Bell} title={t("profil.v2.secNotif")} badge="direct" note={t("profil.v2.notifNote")}>
+        <ToggleRow label={t("profil.v2.notifSms")} checked={notifSms} onChange={setNotifSms} first />
+        <ToggleRow label={t("profil.v2.notifEmail")} checked={notifEmail} onChange={setNotifEmail} />
+        {!notifSms && !notifEmail && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <AlertTriangle className="h-4 w-4 flex-none text-amber-500" />
+            {t("profil.v2.notifBothOff")}
+          </div>
+        )}
+      </Section>
     </div>
   );
 }
 
-// ── Shared layout components ───────────────────────────────────────────────
+// ── Badges ─────────────────────────────────────────────────────────────────
+
+function Badge({ kind }: { kind: "support" | "direct" }) {
+  const { t } = useTranslation();
+  return kind === "support" ? (
+    <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+      {t("profil.v2.badgeSupport")}
+    </span>
+  ) : (
+    <span className="rounded-full bg-teal-soft px-2.5 py-1 text-[11px] font-semibold text-teal-soft-foreground">
+      {t("profil.v2.badgeDirect")}
+    </span>
+  );
+}
+
+// ── Sections ───────────────────────────────────────────────────────────────
 
 function Section({
+  Icon,
   title,
-  level,
-  hint,
+  badge,
+  note,
+  optional,
   children,
 }: {
+  Icon: typeof IdCard;
   title: string;
-  level: 1 | 2 | 3;
-  hint: string;
+  badge?: "support" | "direct";
+  note?: string;
+  optional?: string;
   children: React.ReactNode;
 }) {
-  const { t } = useTranslation();
-  const badge =
-    level === 1
-      ? { label: t("profil.levels.level1"), cls: "bg-emerald-500/10 text-emerald-700" }
-      : level === 2
-        ? { label: t("profil.levels.level2"), cls: "bg-amber-500/10 text-amber-700" }
-        : { label: t("profil.levels.level3"), cls: "bg-red-500/10 text-red-700" };
   return (
-    <section className="rounded-2xl border border-border/60 bg-card/70 p-6">
-      <div className="mb-1 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${badge.cls}`}>
-          {badge.label}
-        </span>
+    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <Icon className="h-5 w-5 text-teal" />
+        <h2 className="text-base font-semibold">{title}</h2>
+        {badge && <Badge kind={badge} />}
+        {optional && <span className="text-xs text-muted-foreground">{optional}</span>}
       </div>
-      {hint && (
-        <p className="mb-4 flex items-start gap-1.5 text-xs text-muted-foreground">
-          <Info className="mt-0.5 h-3 w-3 flex-none" /> {hint}
-        </p>
-      )}
-      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
+      {note && <p className="mb-3 text-xs text-muted-foreground">{note}</p>}
+      <div className={note ? "" : "mt-3"}>{children}</div>
     </section>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <Label className="text-sm">{label}</Label>
-      <div className="mt-1.5">{children}</div>
-    </div>
-  );
-}
+function EditableSection<T extends Record<string, string>>({
+  Icon,
+  title,
+  optional,
+  data,
+  onSave,
+  render,
+}: {
+  Icon: typeof IdCard;
+  title: string;
+  optional?: string;
+  data: T;
+  onSave: (next: T) => void;
+  render: (draft: T, editing: boolean, set: (patch: Partial<T>) => void) => React.ReactNode;
+}) {
+  const { t } = useTranslation();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<T>(data);
 
-function ReadField({ label, value }: { label: string; value: string }) {
+  const start = () => {
+    setDraft(data);
+    setEditing(true);
+  };
+  const cancel = () => setEditing(false);
+  const save = () => {
+    onSave(draft);
+    setEditing(false);
+  };
+  const set = (patch: Partial<T>) => setDraft((d) => ({ ...d, ...patch }));
+
   return (
-    <div>
-      <Label className="text-sm">{label}</Label>
-      <div className="mt-1.5 flex items-center justify-between rounded-md border border-input bg-muted/40 px-3 py-2 text-sm">
-        <span>{value}</span>
-        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <Icon className="h-5 w-5 text-teal" />
+        <h2 className="text-base font-semibold">{title}</h2>
+        <Badge kind="direct" />
+        {optional && <span className="text-xs text-muted-foreground">{optional}</span>}
+        <div className="ml-auto flex gap-2">
+          {editing ? (
+            <>
+              <Button size="sm" variant="ghost" onClick={cancel}>
+                {t("profil.v2.cancelBtn")}
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-full bg-teal text-teal-foreground hover:bg-teal/90"
+                onClick={save}
+              >
+                {t("profil.v2.saveBtn")}
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full border-teal/40 text-teal hover:bg-teal-soft hover:text-teal-soft-foreground"
+              onClick={start}
+            >
+              {t("profil.v2.edit")}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+      <div>{render(editing ? draft : data, editing, set)}</div>
+    </section>
   );
 }
 
-function EditField({
+// ── Rows ───────────────────────────────────────────────────────────────────
+
+function rowCls(first?: boolean) {
+  return cn(
+    "grid grid-cols-1 gap-1 py-3 sm:grid-cols-[14rem_1fr] sm:items-center sm:gap-4",
+    !first && "border-t border-border/50",
+  );
+}
+
+function FieldRow({
   label,
-  value,
-  cta,
-  onEdit,
+  optional,
+  hint,
+  first,
+  children,
 }: {
   label: string;
-  value: string;
-  cta: string;
-  onEdit: () => void;
+  optional?: string;
+  hint?: string;
+  first?: boolean;
+  children: React.ReactNode;
 }) {
   return (
-    <div>
-      <Label className="text-sm">{label}</Label>
-      <div className="mt-1.5 flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
-        <span>{value}</span>
-        <button onClick={onEdit} className="text-xs font-semibold text-primary hover:underline">
-          {cta}
-        </button>
+    <div className={rowCls(first)}>
+      <div className="text-sm text-muted-foreground">
+        {label} {optional && <span className="text-xs text-muted-foreground/70">{optional}</span>}
+      </div>
+      <div>
+        {children}
+        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
       </div>
     </div>
   );
 }
 
-function Toggle({
+function ReadRow({ label, value, first }: { label: string; value: string; first?: boolean }) {
+  return (
+    <div className={rowCls(first)}>
+      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function Value({ children, muted }: { children: React.ReactNode; muted?: boolean }) {
+  return (
+    <span className={cn("text-sm font-semibold", muted ? "italic text-muted-foreground/70" : "text-foreground")}>
+      {children}
+    </span>
+  );
+}
+
+function SelectInput({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+}) {
+  return (
+    <select
+      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      {placeholder && <option value="">{placeholder}</option>}
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function ToggleRow({
   label,
   checked,
   onChange,
+  first,
 }: {
   label: string;
   checked: boolean;
   onChange: (v: boolean) => void;
+  first?: boolean;
 }) {
   return (
-    <label className="relative flex items-center justify-between gap-3 rounded-md border border-input bg-background px-3 py-2.5 text-sm sm:col-span-2">
-      <span>{label}</span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="h-5 w-5 cursor-pointer rounded-full bg-muted transition-all checked:bg-primary"
-      />
+    <label className={cn(rowCls(first), "cursor-pointer sm:grid-cols-[1fr_auto]")}>
+      <span className="text-sm text-foreground">{label}</span>
+      <span className="relative inline-flex">
+        <input
+          type="checkbox"
+          className="peer sr-only"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span className="h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-teal" />
+        <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+      </span>
     </label>
   );
 }
