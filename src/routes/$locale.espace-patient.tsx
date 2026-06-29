@@ -101,7 +101,7 @@ function PatientLayout() {
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-white text-primary shadow-sm"
+                    ? "bg-white text-teal shadow-sm"
                     : "text-primary-foreground/85 hover:bg-white/10 hover:text-primary-foreground",
                 )}
               >
@@ -116,7 +116,7 @@ function PatientLayout() {
   );
 
   const SidebarBody = () => (
-    <div className="flex h-full flex-col bg-[image:var(--gradient-brand)] text-primary-foreground">
+    <div className="flex h-full flex-col bg-[image:var(--gradient-teal)] text-teal-foreground">
       {/* Brand */}
       <div className="px-5 pb-4 pt-6">
         <Link to="/$locale" params={{ locale }} className="flex items-center gap-2.5">
@@ -181,7 +181,7 @@ function PatientLayout() {
           <Menu className="h-5 w-5" />
         </button>
         <Link to="/$locale" params={{ locale }} className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-[image:var(--gradient-brand)] text-sm font-bold text-primary-foreground">
+          <div className="grid h-8 w-8 place-items-center rounded-lg bg-[image:var(--gradient-teal)] text-sm font-bold text-teal-foreground">
             F
           </div>
           <span className="text-base font-bold">FUENI</span>
