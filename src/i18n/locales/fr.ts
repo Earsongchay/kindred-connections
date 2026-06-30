@@ -565,6 +565,8 @@ export const fr = {
     completionFields: "informations optionnelles renseignées",
     completionHint: "Complétez ces informations pour un profil à 100 %.",
     v2: {
+      verified: "Compte vérifié",
+      completeness: "Profil",
       banner: "Complétez les informations complémentaires pour enrichir votre profil.",
       badgeSupport: "Via le support",
       badgeDirect: "Modifiable directement",
