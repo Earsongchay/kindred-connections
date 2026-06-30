@@ -562,6 +562,8 @@ export const en = {
     completionFields: "optional fields filled",
     completionHint: "Fill in these fields to reach 100%.",
     v2: {
+      verified: "Verified account",
+      completeness: "Profile",
       banner: "Complete the additional information to enrich your profile.",
       badgeSupport: "Via support",
       badgeDirect: "Editable directly",
