@@ -17,10 +17,20 @@ const KEYS = {
   langDetected: "fueni_lang_detected",
 } as const;
 
+// SSR-safe accessor — sessionStorage only exists in the browser.
+function store(): Storage | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
 export const sessionForm = {
   getInscription(): InscriptionFormData | null {
     try {
-      const raw = sessionStorage.getItem(KEYS.inscription);
+      const raw = store()?.getItem(KEYS.inscription);
       return raw ? (JSON.parse(raw) as InscriptionFormData) : null;
     } catch {
       return null;
@@ -28,23 +38,23 @@ export const sessionForm = {
   },
   setInscription(data: InscriptionFormData): void {
     try {
-      sessionStorage.setItem(KEYS.inscription, JSON.stringify(data));
+      store()?.setItem(KEYS.inscription, JSON.stringify(data));
     } catch {
       /* noop */
     }
   },
   clearInscription(): void {
-    sessionStorage.removeItem(KEYS.inscription);
+    store()?.removeItem(KEYS.inscription);
   },
   getEmailVerified(): boolean {
-    return sessionStorage.getItem(KEYS.emailVerified) === "true";
+    return store()?.getItem(KEYS.emailVerified) === "true";
   },
   setEmailVerified(value: boolean): void {
-    sessionStorage.setItem(KEYS.emailVerified, String(value));
+    store()?.setItem(KEYS.emailVerified, String(value));
   },
   getProfile(): Record<string, string> | null {
     try {
-      const raw = sessionStorage.getItem(KEYS.profile);
+      const raw = store()?.getItem(KEYS.profile);
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -52,21 +62,21 @@ export const sessionForm = {
   },
   setProfile(data: Record<string, string>): void {
     try {
-      sessionStorage.setItem(KEYS.profile, JSON.stringify(data));
+      store()?.setItem(KEYS.profile, JSON.stringify(data));
     } catch {
       /* noop */
     }
   },
   getFirstName(): string | null {
-    return sessionStorage.getItem(KEYS.firstName);
+    return store()?.getItem(KEYS.firstName) ?? null;
   },
   setFirstName(name: string): void {
-    sessionStorage.setItem(KEYS.firstName, name);
+    store()?.setItem(KEYS.firstName, name);
   },
   isLangDetected(): boolean {
-    return sessionStorage.getItem(KEYS.langDetected) === "true";
+    return store()?.getItem(KEYS.langDetected) === "true";
   },
   setLangDetected(): void {
-    sessionStorage.setItem(KEYS.langDetected, "true");
+    store()?.setItem(KEYS.langDetected, "true");
   },
 };

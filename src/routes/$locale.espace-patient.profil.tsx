@@ -12,6 +12,12 @@ import {
   ShieldCheck,
   Check,
   Pencil,
+  Globe,
+  Languages,
+  CalendarDays,
+  ChevronRight,
+  Sparkles,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +71,9 @@ function Profil() {
   const [notifSms, setNotifSms] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
 
-  const checks = [Boolean(loc.address), Boolean(emerg.name), Boolean(emerg.phone)];
+  const hasAddress = Boolean(loc.address);
+  const hasEmergency = Boolean(emerg.name) && Boolean(emerg.phone);
+  const checks = [hasAddress, hasEmergency];
   const done = checks.filter(Boolean).length;
   const completion = Math.round(((checks.length + done) / (checks.length * 2)) * 100); // identity always done
   const incomplete = done < checks.length;
@@ -81,37 +89,82 @@ function Profil() {
     relations.find((r) => r.value === emerg.relation)?.label ?? t("profil.v2.notProvided");
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="max-w-3xl space-y-6">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl border border-border/60 bg-[image:var(--gradient-teal)] p-6 text-white shadow-lg sm:p-8">
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-white/5 blur-2xl" />
-        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-4">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]" />
+
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             <div className="flex h-20 w-20 flex-none items-center justify-center rounded-2xl bg-white/15 text-2xl font-bold ring-1 ring-white/25 backdrop-blur">
               AD
             </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Aïssatou Diop</h1>
-              <p className="mt-1 text-sm text-white/80">{t("profil.title")}</p>
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold ring-1 ring-white/25">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                {t("profil.v2.verified", "Verified account")}
-              </span>
+            <div className="min-w-0">
+              <h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
+                Aïssatou Diop
+              </h1>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold ring-1 ring-white/25">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {t("profil.v2.verified")}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/85">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {t("profil.v2.memberSince", { date: "2024" })}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="sm:ml-auto">
-            <CompletionRing value={completion} label={t("profil.v2.completeness", "Profile")} />
+          <div className="flex-none">
+            <CompletionRing value={completion} />
           </div>
         </div>
       </section>
 
+      {/* Quick glance */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <QuickStat
+          Icon={Globe}
+          label={t("profil.v2.quickLocation")}
+          value={`${loc.city}, ${loc.country.replace(/^\S+\s/, "")}`}
+        />
+        <QuickStat Icon={Languages} label={t("profil.v2.quickLanguage")} value={loc.accountLang} />
+        <QuickStat
+          Icon={ShieldCheck}
+          label={t("profil.v2.quickAccount")}
+          value={t("profil.v2.quickAccountValue")}
+        />
+      </div>
+
+      {/* Setup checklist */}
       {incomplete && (
-        <div className="flex items-center gap-3 rounded-2xl border border-teal/30 bg-teal-soft px-5 py-4">
-          <Info className="h-5 w-5 flex-none text-teal" />
-          <span className="text-sm font-medium text-teal-soft-foreground">{t("profil.v2.banner")}</span>
-        </div>
+        <section className="overflow-hidden rounded-2xl border border-primary/25 bg-[color-mix(in_oklab,var(--primary)_6%,var(--card))] shadow-sm">
+          <div className="flex items-start gap-3 border-b border-primary/15 px-5 py-4">
+            <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-teal-soft text-teal">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold text-foreground">
+                {t("profil.v2.checklistTitle")}
+              </h2>
+              <p className="text-xs text-muted-foreground">{t("profil.v2.checklistSubtitle")}</p>
+            </div>
+            <span className="ml-auto flex-none rounded-full bg-teal-soft px-2.5 py-1 text-xs font-bold text-teal">
+              {done}/{checks.length}
+            </span>
+          </div>
+          <ul className="divide-y divide-border/50">
+            <ChecklistItem done={hasAddress} label={t("profil.v2.checklistAddress")} targetId="sec-location" />
+            <ChecklistItem
+              done={hasEmergency}
+              label={t("profil.v2.checklistEmergency")}
+              targetId="sec-emergency"
+            />
+          </ul>
+        </section>
       )}
 
       {/* 1 — Identité (lecture seule) */}
@@ -129,6 +182,7 @@ function Profil() {
 
       {/* 2 — Localisation & langue */}
       <EditableSection
+        id="sec-location"
         Icon={MapPin}
         title={t("profil.v2.secLocation")}
         data={loc}
@@ -210,6 +264,7 @@ function Profil() {
 
       {/* 3 — Contact d'urgence */}
       <EditableSection
+        id="sec-emergency"
         Icon={HeartPulse}
         title={t("profil.v2.secEmergency")}
         optional={t("profil.v2.optional")}
@@ -268,13 +323,91 @@ function Profil() {
           </div>
         )}
       </Section>
+
+      {/* Footer meta */}
+      <p className="flex items-center gap-1.5 pl-1 text-xs text-muted-foreground">
+        <Clock className="h-3.5 w-3.5" />
+        {t("profil.v2.lastUpdated", { date: "30/06/2026" })}
+      </p>
     </div>
+  );
+}
+
+// ── Quick stat ───────────────────────────────────────────────────────────────
+
+function QuickStat({
+  Icon,
+  label,
+  value,
+}: {
+  Icon: typeof IdCard;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 shadow-sm transition-shadow hover:shadow-md">
+      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-teal-soft text-teal">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <p className="truncate text-sm font-semibold text-foreground">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Checklist item ───────────────────────────────────────────────────────────
+
+function ChecklistItem({
+  done,
+  label,
+  targetId,
+}: {
+  done: boolean;
+  label: string;
+  targetId: string;
+}) {
+  const { t } = useTranslation();
+  return (
+    <li className="flex items-center gap-3 px-5 py-3">
+      <span
+        className={cn(
+          "flex h-6 w-6 flex-none items-center justify-center rounded-full border transition-colors",
+          done
+            ? "border-transparent bg-teal text-teal-foreground"
+            : "border-dashed border-primary/40 text-transparent",
+        )}
+      >
+        <Check className="h-3.5 w-3.5" />
+      </span>
+      <span
+        className={cn(
+          "text-sm",
+          done ? "text-muted-foreground line-through" : "font-medium text-foreground",
+        )}
+      >
+        {label}
+      </span>
+      {!done && (
+        <a
+          href={`#${targetId}`}
+          className="ml-auto inline-flex items-center gap-1 rounded-full border border-teal/40 px-3 py-1 text-xs font-semibold text-teal transition-colors hover:bg-teal-soft"
+        >
+          {t("profil.v2.jump")}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </a>
+      )}
+    </li>
   );
 }
 
 // ── Completion ring ──────────────────────────────────────────────────────────
 
-function CompletionRing({ value, label }: { value: number; label: string }) {
+function CompletionRing({ value }: { value: number }) {
+  const { t } = useTranslation();
   const r = 34;
   const c = 2 * Math.PI * r;
   const offset = c - (value / 100) * c;
@@ -301,8 +434,10 @@ function CompletionRing({ value, label }: { value: number; label: string }) {
         </span>
       </div>
       <div className="text-sm">
-        <p className="font-semibold">{label}</p>
-        <p className="text-white/75">{value === 100 ? "Complete" : "Almost there"}</p>
+        <p className="font-semibold">{t("profil.v2.completeness")}</p>
+        <p className="text-white/75">
+          {value === 100 ? t("profil.v2.complete") : t("profil.v2.almostThere")}
+        </p>
       </div>
     </div>
   );
@@ -327,9 +462,13 @@ function Badge({ kind }: { kind: "support" | "direct" }) {
 
 // ── Sections ───────────────────────────────────────────────────────────────
 
-function SectionShell({ children }: { children: React.ReactNode }) {
+function SectionShell({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+    <section
+      id={id}
+      className="group relative scroll-mt-20 overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+    >
+      <span className="absolute inset-y-0 left-0 w-1 bg-[image:var(--gradient-teal)] opacity-0 transition-opacity group-hover:opacity-100" />
       {children}
     </section>
   );
@@ -344,6 +483,7 @@ function IconChip({ Icon }: { Icon: typeof IdCard }) {
 }
 
 function Section({
+  id,
   Icon,
   title,
   badge,
@@ -351,6 +491,7 @@ function Section({
   optional,
   children,
 }: {
+  id?: string;
   Icon: typeof IdCard;
   title: string;
   badge?: "support" | "direct";
@@ -359,7 +500,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <SectionShell>
+    <SectionShell id={id}>
       <div className="mb-1 flex flex-wrap items-center gap-2">
         <IconChip Icon={Icon} />
         <h2 className="text-base font-semibold">{title}</h2>
@@ -373,6 +514,7 @@ function Section({
 }
 
 function EditableSection<T extends Record<string, string>>({
+  id,
   Icon,
   title,
   optional,
@@ -380,6 +522,7 @@ function EditableSection<T extends Record<string, string>>({
   onSave,
   render,
 }: {
+  id?: string;
   Icon: typeof IdCard;
   title: string;
   optional?: string;
@@ -403,7 +546,7 @@ function EditableSection<T extends Record<string, string>>({
   const set = (patch: Partial<T>) => setDraft((d) => ({ ...d, ...patch }));
 
   return (
-    <SectionShell>
+    <SectionShell id={id}>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <IconChip Icon={Icon} />
         <h2 className="text-base font-semibold">{title}</h2>
