@@ -2,7 +2,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IdCard, MapPin, HeartPulse, Bell, Info, AlertTriangle } from "lucide-react";
+import {
+  IdCard,
+  MapPin,
+  HeartPulse,
+  Bell,
+  Info,
+  AlertTriangle,
+  ShieldCheck,
+  Check,
+  Pencil,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -55,7 +65,10 @@ function Profil() {
   const [notifSms, setNotifSms] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
 
-  const incomplete = !loc.address || !emerg.name || !emerg.phone;
+  const checks = [Boolean(loc.address), Boolean(emerg.name), Boolean(emerg.phone)];
+  const done = checks.filter(Boolean).length;
+  const completion = Math.round(((checks.length + done) / (checks.length * 2)) * 100); // identity always done
+  const incomplete = done < checks.length;
 
   const relations = [
     { value: "spouse", label: t("profil.fields.relationSpouse") },
@@ -68,13 +81,31 @@ function Profil() {
     relations.find((r) => r.value === emerg.relation)?.label ?? t("profil.v2.notProvided");
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">{t("profil.title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("profil.subtitle", "Consultez et mettez à jour vos informations personnelles.")}
-        </p>
-      </header>
+    <div className="mx-auto max-w-4xl space-y-6">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-3xl border border-border/60 bg-[image:var(--gradient-teal)] p-6 text-white shadow-lg sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-white/5 blur-2xl" />
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-4">
+            <div className="flex h-20 w-20 flex-none items-center justify-center rounded-2xl bg-white/15 text-2xl font-bold ring-1 ring-white/25 backdrop-blur">
+              AD
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Aïssatou Diop</h1>
+              <p className="mt-1 text-sm text-white/80">{t("profil.title")}</p>
+              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold ring-1 ring-white/25">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                {t("profil.v2.verified", "Verified account")}
+              </span>
+            </div>
+          </div>
+
+          <div className="sm:ml-auto">
+            <CompletionRing value={completion} label={t("profil.v2.completeness", "Profile")} />
+          </div>
+        </div>
+      </section>
 
       {incomplete && (
         <div className="flex items-center gap-3 rounded-2xl border border-teal/30 bg-teal-soft px-5 py-4">
@@ -241,22 +272,76 @@ function Profil() {
   );
 }
 
+// ── Completion ring ──────────────────────────────────────────────────────────
+
+function CompletionRing({ value, label }: { value: number; label: string }) {
+  const r = 34;
+  const c = 2 * Math.PI * r;
+  const offset = c - (value / 100) * c;
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative h-[88px] w-[88px]">
+        <svg className="h-full w-full -rotate-90" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="7" />
+          <circle
+            cx="40"
+            cy="40"
+            r={r}
+            fill="none"
+            stroke="white"
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={offset}
+            className="transition-[stroke-dashoffset] duration-700 ease-out"
+          />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center text-lg font-bold">
+          {value}%
+        </span>
+      </div>
+      <div className="text-sm">
+        <p className="font-semibold">{label}</p>
+        <p className="text-white/75">{value === 100 ? "Complete" : "Almost there"}</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Badges ─────────────────────────────────────────────────────────────────
 
 function Badge({ kind }: { kind: "support" | "direct" }) {
   const { t } = useTranslation();
   return kind === "support" ? (
-    <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+      <ShieldCheck className="h-3 w-3" />
       {t("profil.v2.badgeSupport")}
     </span>
   ) : (
-    <span className="rounded-full bg-teal-soft px-2.5 py-1 text-[11px] font-semibold text-teal-soft-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full bg-teal-soft px-2.5 py-1 text-[11px] font-semibold text-teal-soft-foreground">
+      <Check className="h-3 w-3" />
       {t("profil.v2.badgeDirect")}
     </span>
   );
 }
 
 // ── Sections ───────────────────────────────────────────────────────────────
+
+function SectionShell({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+      {children}
+    </section>
+  );
+}
+
+function IconChip({ Icon }: { Icon: typeof IdCard }) {
+  return (
+    <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-teal-soft text-teal">
+      <Icon className="h-5 w-5" />
+    </span>
+  );
+}
 
 function Section({
   Icon,
@@ -274,16 +359,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+    <SectionShell>
       <div className="mb-1 flex flex-wrap items-center gap-2">
-        <Icon className="h-5 w-5 text-teal" />
+        <IconChip Icon={Icon} />
         <h2 className="text-base font-semibold">{title}</h2>
         {badge && <Badge kind={badge} />}
         {optional && <span className="text-xs text-muted-foreground">{optional}</span>}
       </div>
-      {note && <p className="mb-3 text-xs text-muted-foreground">{note}</p>}
+      {note && <p className="mb-3 pl-11 text-xs text-muted-foreground">{note}</p>}
       <div className={note ? "" : "mt-3"}>{children}</div>
-    </section>
+    </SectionShell>
   );
 }
 
@@ -318,9 +403,9 @@ function EditableSection<T extends Record<string, string>>({
   const set = (patch: Partial<T>) => setDraft((d) => ({ ...d, ...patch }));
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+    <SectionShell>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Icon className="h-5 w-5 text-teal" />
+        <IconChip Icon={Icon} />
         <h2 className="text-base font-semibold">{title}</h2>
         <Badge kind="direct" />
         {optional && <span className="text-xs text-muted-foreground">{optional}</span>}
@@ -345,13 +430,14 @@ function EditableSection<T extends Record<string, string>>({
               className="rounded-full border-teal/40 text-teal hover:bg-teal-soft hover:text-teal-soft-foreground"
               onClick={start}
             >
+              <Pencil className="h-3.5 w-3.5" />
               {t("profil.v2.edit")}
             </Button>
           )}
         </div>
       </div>
       <div>{render(editing ? draft : data, editing, set)}</div>
-    </section>
+    </SectionShell>
   );
 }
 
