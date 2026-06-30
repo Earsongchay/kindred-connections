@@ -17,6 +17,16 @@ const KEYS = {
   langDetected: "fueni_lang_detected",
 } as const;
 
+// SSR-safe accessor — sessionStorage only exists in the browser.
+function store(): Storage | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
 export const sessionForm = {
   getInscription(): InscriptionFormData | null {
     try {
