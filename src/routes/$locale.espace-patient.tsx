@@ -60,7 +60,11 @@ function PatientLayout() {
       Icon: CalendarDays,
     },
     { to: "/$locale/espace-patient", label: t("patientLayout.nav.book"), Icon: PlusCircle },
-    { to: "/$locale/espace-patient", label: t("patientLayout.nav.documents"), Icon: FolderOpen },
+    {
+      to: "/$locale/espace-patient/documents",
+      label: t("patientLayout.nav.documents"),
+      Icon: FolderOpen,
+    },
   ];
 
   const accountItems: NavItem[] = [
