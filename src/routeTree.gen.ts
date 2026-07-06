@@ -24,6 +24,7 @@ import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.e
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
 import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
+import { Route as LocaleEspacePatientDocumentsRouteImport } from './routes/$locale.espace-patient.documents'
 
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
@@ -106,6 +107,12 @@ const LocaleEspacePatientProfilRoute =
     path: '/profil',
     getParentRoute: () => LocaleEspacePatientRoute,
   } as any)
+const LocaleEspacePatientDocumentsRoute =
+  LocaleEspacePatientDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => LocaleEspacePatientRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
+  '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale': typeof LocaleIndexRoute
+  '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
+  '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
+    | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale'
+    | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
@@ -203,6 +215,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
+    | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
@@ -325,16 +338,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleEspacePatientProfilRouteImport
       parentRoute: typeof LocaleEspacePatientRoute
     }
+    '/$locale/espace-patient/documents': {
+      id: '/$locale/espace-patient/documents'
+      path: '/documents'
+      fullPath: '/$locale/espace-patient/documents'
+      preLoaderRoute: typeof LocaleEspacePatientDocumentsRouteImport
+      parentRoute: typeof LocaleEspacePatientRoute
+    }
   }
 }
 
 interface LocaleEspacePatientRouteChildren {
+  LocaleEspacePatientDocumentsRoute: typeof LocaleEspacePatientDocumentsRoute
   LocaleEspacePatientProfilRoute: typeof LocaleEspacePatientProfilRoute
   LocaleEspacePatientSecuriteRoute: typeof LocaleEspacePatientSecuriteRoute
   LocaleEspacePatientIndexRoute: typeof LocaleEspacePatientIndexRoute
 }
 
 const LocaleEspacePatientRouteChildren: LocaleEspacePatientRouteChildren = {
+  LocaleEspacePatientDocumentsRoute: LocaleEspacePatientDocumentsRoute,
   LocaleEspacePatientProfilRoute: LocaleEspacePatientProfilRoute,
   LocaleEspacePatientSecuriteRoute: LocaleEspacePatientSecuriteRoute,
   LocaleEspacePatientIndexRoute: LocaleEspacePatientIndexRoute,

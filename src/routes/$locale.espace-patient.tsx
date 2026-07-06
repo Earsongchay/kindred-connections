@@ -30,6 +30,7 @@ export const Route = createFileRoute("/$locale/espace-patient")({
 type NavRoute =
   | "/$locale/espace-patient"
   | "/$locale/espace-patient/profil"
+  | "/$locale/espace-patient/documents"
   | "/$locale/espace-patient/securite";
 
 type NavItem = {
@@ -59,7 +60,11 @@ function PatientLayout() {
       Icon: CalendarDays,
     },
     { to: "/$locale/espace-patient", label: t("patientLayout.nav.book"), Icon: PlusCircle },
-    { to: "/$locale/espace-patient", label: t("patientLayout.nav.documents"), Icon: FolderOpen },
+    {
+      to: "/$locale/espace-patient/documents",
+      label: t("patientLayout.nav.documents"),
+      Icon: FolderOpen,
+    },
   ];
 
   const accountItems: NavItem[] = [
