@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "fueni-mcp",
+      "version": "0.1.0",
+      "title": "FUENI MCP"
+    },
+    "tools": [
+      {
+        "name": "platform_overview",
+        "title": "Platform overview",
+        "description": "Return a high-level overview of the FUENI digital health platform, its mission, and the audiences it serves.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_features",
+        "title": "List features",
+        "description": "List the main features offered by the FUENI platform.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_public_pages",
+        "title": "List public pages",
+        "description": "List the public pages of the FUENI site, optionally resolved for a given locale (fr or en).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "locale": {
+              "description": "Locale to resolve page paths for. Defaults to fr.",
+              "type": "string",
+              "enum": [
+                "fr",
+                "en"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
