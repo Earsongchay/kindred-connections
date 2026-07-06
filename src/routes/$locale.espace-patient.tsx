@@ -30,6 +30,7 @@ export const Route = createFileRoute("/$locale/espace-patient")({
 type NavRoute =
   | "/$locale/espace-patient"
   | "/$locale/espace-patient/profil"
+  | "/$locale/espace-patient/documents"
   | "/$locale/espace-patient/securite";
 
 type NavItem = {
