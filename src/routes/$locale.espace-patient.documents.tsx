@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Activity,
+  Check,
   Download,
   FileText,
   FlaskConical,
@@ -18,13 +18,13 @@ import {
   Trash2,
   Upload,
   UploadCloud,
+  Users,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -50,6 +50,8 @@ export const Route = createFileRoute("/$locale/espace-patient/documents")({
 
 type DocType = "lab" | "prescription" | "imaging" | "report" | "vaccination" | "other";
 
+type Doctor = { id: string; name: string; specialty: string };
+
 type PatientDoc = {
   id: string;
   name: string;
@@ -57,11 +59,23 @@ type PatientDoc = {
   note: string;
   date: string; // ISO yyyy-mm-dd (stable for SSR)
   sizeMb: number;
-  shared: boolean;
+  sharedWith: string[]; // doctor ids
   source: "me" | "practitioner";
 };
 
 const STORAGE_TOTAL_MB = 5120; // 5 GB
+
+const DOCTORS: Doctor[] = [
+  { id: "dr-sow", name: "Dr. Aminata Sow", specialty: "Cardiologie" },
+  { id: "dr-diallo", name: "Dr. Mamadou Diallo", specialty: "Médecine générale" },
+  { id: "dr-kone", name: "Dr. Fatou Koné", specialty: "Dermatologie" },
+  { id: "dr-traore", name: "Dr. Ibrahim Traoré", specialty: "Radiologie" },
+];
+
+function initials(name: string): string {
+  const parts = name.replace(/^Dr\.?\s*/i, "").trim().split(/\s+/);
+  return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
+}
 
 const TYPE_META: Record<
   DocType,
@@ -97,7 +111,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "Traitement tension — 3 mois",
     date: "2026-05-10",
     sizeMb: 0.4,
-    shared: true,
+    sharedWith: ["dr-sow"],
     source: "practitioner",
   },
   {
@@ -107,7 +121,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "Bilan lipidique + glycémie",
     date: "2026-05-05",
     sizeMb: 1.2,
-    shared: false,
+    sharedWith: [],
     source: "me",
   },
   {
@@ -117,7 +131,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "",
     date: "2026-04-28",
     sizeMb: 8.6,
-    shared: true,
+    sharedWith: ["dr-sow", "dr-traore"],
     source: "practitioner",
   },
   {
@@ -127,7 +141,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "Suivi cardiologie",
     date: "2026-04-20",
     sizeMb: 0.3,
-    shared: true,
+    sharedWith: ["dr-diallo"],
     source: "practitioner",
   },
   {
@@ -137,7 +151,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "Rappel DTP à jour",
     date: "2026-03-15",
     sizeMb: 2.1,
-    shared: false,
+    sharedWith: [],
     source: "me",
   },
 ];
@@ -162,6 +176,7 @@ function DocumentsPage() {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<DocType | "all">("all");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [shareDocId, setShareDocId] = useState<string | null>(null);
 
   const usedMb = useMemo(() => docs.reduce((sum, d) => sum + d.sizeMb, 0), [docs]);
   const usedPct = Math.min(100, Math.round((usedMb / STORAGE_TOTAL_MB) * 100));
@@ -180,15 +195,17 @@ function DocumentsPage() {
     });
   }, [docs, query, typeFilter, t]);
 
-  const toggleShare = (id: string) =>
-    setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, shared: !d.shared } : d)));
-
   const removeDoc = (id: string) => setDocs((prev) => prev.filter((d) => d.id !== id));
+
+  const setSharedWith = (id: string, sharedWith: string[]) =>
+    setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, sharedWith } : d)));
 
   const addDoc = (doc: PatientDoc) => {
     setDocs((prev) => [doc, ...prev]);
     setUploadOpen(false);
   };
+
+  const shareDoc = docs.find((d) => d.id === shareDocId) ?? null;
 
   return (
     <div className="space-y-6">
@@ -278,6 +295,8 @@ function DocumentsPage() {
         <ul className="space-y-3">
           {filtered.map((doc) => {
             const meta = TYPE_META[doc.type];
+            const sharedDoctors = DOCTORS.filter((dr) => doc.sharedWith.includes(dr.id));
+            const isShared = sharedDoctors.length > 0;
             return (
               <li
                 key={doc.id}
@@ -293,9 +312,10 @@ function DocumentsPage() {
                     <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                       {t(`patientDocs.types.${doc.type}`)}
                     </span>
-                    {doc.shared ? (
+                    {isShared ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-                        <ShieldCheck className="h-3 w-3" /> {t("patientDocs.shared")}
+                        <ShieldCheck className="h-3 w-3" />{" "}
+                        {t("patientDocs.share.withCount", { n: sharedDoctors.length })}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
@@ -307,6 +327,22 @@ function DocumentsPage() {
                     {t(`patientDocs.addedBy.${doc.source}`)} · {formatDate(doc.date, locale)} ·{" "}
                     {formatSize(doc.sizeMb)}
                   </div>
+                  {isShared && (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      {sharedDoctors.map((dr) => (
+                        <span
+                          key={dr.id}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 py-0.5 pl-0.5 pr-2 text-[11px] font-medium"
+                          title={`${dr.name} · ${dr.specialty}`}
+                        >
+                          <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
+                            {initials(dr.name)}
+                          </span>
+                          {dr.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {doc.note && (
                     <p className="mt-1 truncate text-xs italic text-muted-foreground/80">
                       “{doc.note}”
@@ -317,15 +353,15 @@ function DocumentsPage() {
                 <div className="flex flex-none items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => toggleShare(doc.id)}
+                    onClick={() => setShareDocId(doc.id)}
                     className={cn(
                       "grid h-9 w-9 place-items-center rounded-full transition-colors",
-                      doc.shared
+                      isShared
                         ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
-                    aria-label={doc.shared ? t("patientDocs.actions.unshare") : t("patientDocs.actions.share")}
-                    title={doc.shared ? t("patientDocs.actions.unshare") : t("patientDocs.actions.share")}
+                    aria-label={t("patientDocs.share.manage")}
+                    title={t("patientDocs.share.manage")}
                   >
                     <Share2 className="h-4 w-4" />
                   </button>
@@ -354,7 +390,107 @@ function DocumentsPage() {
       )}
 
       <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} onAdd={addDoc} />
+      <ShareDialog
+        doc={shareDoc}
+        onOpenChange={(v) => !v && setShareDocId(null)}
+        onChange={setSharedWith}
+      />
     </div>
+  );
+}
+
+function DoctorPicker({
+  selected,
+  onToggle,
+}: {
+  selected: string[];
+  onToggle: (id: string) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-2">
+      {DOCTORS.map((dr) => {
+        const checked = selected.includes(dr.id);
+        return (
+          <button
+            key={dr.id}
+            type="button"
+            onClick={() => onToggle(dr.id)}
+            aria-pressed={checked}
+            className={cn(
+              "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+              checked
+                ? "border-primary/50 bg-primary/5"
+                : "border-border/60 bg-card/40 hover:border-border hover:bg-muted/40",
+            )}
+          >
+            <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {initials(dr.name)}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">{dr.name}</span>
+              <span className="block truncate text-xs text-muted-foreground">{dr.specialty}</span>
+            </span>
+            <span
+              className={cn(
+                "grid h-5 w-5 flex-none place-items-center rounded-full border transition",
+                checked
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background",
+              )}
+            >
+              {checked && <Check className="h-3 w-3" />}
+            </span>
+          </button>
+        );
+      })}
+      <p className="pt-1 text-xs text-muted-foreground">{t("patientDocs.share.hint")}</p>
+    </div>
+  );
+}
+
+function ShareDialog({
+  doc,
+  onOpenChange,
+  onChange,
+}: {
+  doc: PatientDoc | null;
+  onOpenChange: (v: boolean) => void;
+  onChange: (id: string, sharedWith: string[]) => void;
+}) {
+  const { t } = useTranslation();
+  if (!doc) return null;
+
+  const toggle = (drId: string) => {
+    const next = doc.sharedWith.includes(drId)
+      ? doc.sharedWith.filter((x) => x !== drId)
+      : [...doc.sharedWith, drId];
+    onChange(doc.id, next);
+  };
+
+  return (
+    <Dialog open={!!doc} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" /> {t("patientDocs.share.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("patientDocs.share.description", { name: doc.name })}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="py-2">
+          <DoctorPicker selected={doc.sharedWith} onToggle={toggle} />
+        </div>
+
+        <DialogFooter>
+          <Button className="rounded-full" onClick={() => onOpenChange(false)}>
+            {t("patientDocs.share.done")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -372,7 +508,7 @@ function UploadDialog({
   const [name, setName] = useState("");
   const [type, setType] = useState<DocType>("lab");
   const [note, setNote] = useState("");
-  const [shared, setShared] = useState(true);
+  const [sharedWith, setSharedWith] = useState<string[]>([]);
   const [fileName, setFileName] = useState("");
   const [sizeMb, setSizeMb] = useState(0);
 
@@ -380,7 +516,7 @@ function UploadDialog({
     setName("");
     setType("lab");
     setNote("");
-    setShared(true);
+    setSharedWith([]);
     setFileName("");
     setSizeMb(0);
     if (fileRef.current) fileRef.current.value = "";
@@ -393,6 +529,9 @@ function UploadDialog({
     setSizeMb(Math.max(0.1, file.size / (1024 * 1024)));
     if (!name) setName(file.name.replace(/\.[^.]+$/, ""));
   };
+
+  const toggleDoctor = (id: string) =>
+    setSharedWith((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const canSubmit = name.trim().length > 0;
 
@@ -409,7 +548,7 @@ function UploadDialog({
       note: note.trim(),
       date: iso,
       sizeMb: sizeMb || 0.3,
-      shared,
+      sharedWith,
       source: "me",
     });
     reset();
@@ -497,15 +636,15 @@ function UploadDialog({
             />
           </div>
 
-          <div className="flex items-start justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 p-3">
-            <div className="flex items-start gap-2">
-              <Activity className="mt-0.5 h-4 w-4 flex-none text-primary" />
+          <div className="space-y-2 rounded-xl border border-border/60 bg-muted/20 p-3">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 flex-none text-primary" />
               <div>
                 <div className="text-sm font-medium">{t("patientDocs.upload.share")}</div>
                 <p className="text-xs text-muted-foreground">{t("patientDocs.upload.shareHint")}</p>
               </div>
             </div>
-            <Switch checked={shared} onCheckedChange={setShared} />
+            <DoctorPicker selected={sharedWith} onToggle={toggleDoctor} />
           </div>
         </div>
 
