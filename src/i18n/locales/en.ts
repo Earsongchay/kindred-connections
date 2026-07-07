@@ -718,6 +718,14 @@ export const en = {
       me: "My upload",
       practitioner: "Shared by practitioner",
     },
+    share: {
+      manage: "Manage sharing",
+      title: "Share document",
+      description: "Choose which doctors can view “{{name}}”.",
+      withCount: "Shared with {{n}}",
+      hint: "Only the doctors you select can view this document. You can change this anytime.",
+      done: "Done",
+    },
     actions: {
       share: "Share with my doctors",
       unshare: "Stop sharing",

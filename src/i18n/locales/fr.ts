@@ -721,6 +721,14 @@ export const fr = {
       me: "Mon upload",
       practitioner: "Partagé par praticien",
     },
+    share: {
+      manage: "Gérer le partage",
+      title: "Partager le document",
+      description: "Choisissez quels médecins peuvent consulter « {{name}} ».",
+      withCount: "Partagé avec {{n}}",
+      hint: "Seuls les médecins sélectionnés peuvent consulter ce document. Vous pouvez le modifier à tout moment.",
+      done: "Terminé",
+    },
     actions: {
       share: "Partager avec mes médecins",
       unshare: "Arrêter le partage",
