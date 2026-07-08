@@ -705,8 +705,18 @@ export const fr = {
     search: "Rechercher par nom, note ou type…",
     filterAll: "Tous les types",
     count: "{{n}} document(s)",
+    showing: "{{shown}} sur {{total}} affichés",
+    loadMore: "Voir plus",
+    sort: {
+      label: "Trier",
+      recent: "Plus récents",
+      oldest: "Plus anciens",
+      name: "Nom (A–Z)",
+      size: "Plus volumineux",
+    },
     shared: "Partagé",
     private: "Privé",
+    moreDoctors: "+{{n}}",
     empty: "Aucun document trouvé.",
     emptyHint: "Essayez de modifier votre recherche ou votre filtre.",
     types: {
