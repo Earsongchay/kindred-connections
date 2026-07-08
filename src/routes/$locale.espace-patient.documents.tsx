@@ -1,6 +1,6 @@
 // TODO Sprint 3-4 — Wire to backend storage & sharing. Pure UI prototype (cf. §4.4).
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Check,
@@ -49,6 +49,7 @@ export const Route = createFileRoute("/$locale/espace-patient/documents")({
 });
 
 type DocType = "lab" | "prescription" | "imaging" | "report" | "vaccination" | "other";
+type SortKey = "recent" | "oldest" | "name" | "size";
 
 type Doctor = { id: string; name: string; specialty: string };
 
@@ -64,12 +65,22 @@ type PatientDoc = {
 };
 
 const STORAGE_TOTAL_MB = 5120; // 5 GB
+const PAGE_SIZE = 8; // documents shown per "page" before Load more
+const MAX_CHIPS = 3; // shared-doctor chips shown before "+N"
 
 const DOCTORS: Doctor[] = [
   { id: "dr-sow", name: "Dr. Aminata Sow", specialty: "Cardiologie" },
   { id: "dr-diallo", name: "Dr. Mamadou Diallo", specialty: "Médecine générale" },
   { id: "dr-kone", name: "Dr. Fatou Koné", specialty: "Dermatologie" },
   { id: "dr-traore", name: "Dr. Ibrahim Traoré", specialty: "Radiologie" },
+  { id: "dr-ba", name: "Dr. Awa Ba", specialty: "Gynécologie" },
+  { id: "dr-cisse", name: "Dr. Ousmane Cissé", specialty: "Pédiatrie" },
+  { id: "dr-ndiaye", name: "Dr. Khady Ndiaye", specialty: "Endocrinologie" },
+  { id: "dr-fall", name: "Dr. Cheikh Fall", specialty: "Neurologie" },
+  { id: "dr-camara", name: "Dr. Mariam Camara", specialty: "Ophtalmologie" },
+  { id: "dr-toure", name: "Dr. Seydou Touré", specialty: "Gastro-entérologie" },
+  { id: "dr-bah", name: "Dr. Aïssatou Bah", specialty: "Pneumologie" },
+  { id: "dr-sy", name: "Dr. Moussa Sy", specialty: "Rhumatologie" },
 ];
 
 function initials(name: string): string {
@@ -103,7 +114,7 @@ const TYPE_META: Record<
 
 const TYPE_ORDER: DocType[] = ["lab", "prescription", "imaging", "report", "vaccination", "other"];
 
-const INITIAL_DOCS: PatientDoc[] = [
+const BASE_DOCS: PatientDoc[] = [
   {
     id: "d1",
     name: "Ordonnance Dr. Sow",
@@ -131,7 +142,7 @@ const INITIAL_DOCS: PatientDoc[] = [
     note: "",
     date: "2026-04-28",
     sizeMb: 8.6,
-    sharedWith: ["dr-sow", "dr-traore"],
+    sharedWith: ["dr-sow", "dr-traore", "dr-diallo", "dr-fall"],
     source: "practitioner",
   },
   {
@@ -156,6 +167,45 @@ const INITIAL_DOCS: PatientDoc[] = [
   },
 ];
 
+// Generate a larger, stable dataset so the list scales realistically (demo).
+const SAMPLE_NAMES: Record<DocType, string[]> = {
+  lab: ["Bilan sanguin", "Test glycémie", "Analyse d'urine", "Bilan thyroïdien"],
+  prescription: ["Ordonnance renouvellement", "Ordonnance antibiotiques", "Ordonnance vitamines"],
+  imaging: ["Échographie abdominale", "IRM genou", "Scanner cérébral", "Mammographie"],
+  report: ["Compte-rendu opératoire", "Compte-rendu suivi", "Lettre de sortie"],
+  vaccination: ["Certificat COVID-19", "Rappel vaccinal", "Vaccin grippe"],
+  other: ["Justificatif mutuelle", "Feuille de soins", "Certificat médical"],
+};
+
+function buildDocs(): PatientDoc[] {
+  const generated: PatientDoc[] = [];
+  let n = 0;
+  for (let i = 0; i < 60; i++) {
+    const type = TYPE_ORDER[i % TYPE_ORDER.length];
+    const names = SAMPLE_NAMES[type];
+    const name = `${names[i % names.length]} ${Math.floor(i / names.length) + 1}`;
+    const day = String((i % 27) + 1).padStart(2, "0");
+    const month = String((i % 12) + 1).padStart(2, "0");
+    const shareCount = i % 4; // 0..3 doctors
+    const sharedWith = DOCTORS.slice((i * 3) % DOCTORS.length)
+      .slice(0, shareCount)
+      .map((d) => d.id);
+    generated.push({
+      id: `g${n++}`,
+      name,
+      type,
+      note: i % 3 === 0 ? "Document importé automatiquement" : "",
+      date: `2026-${month}-${day}`,
+      sizeMb: Math.round(((i % 10) + 0.3) * 10) / 10,
+      sharedWith,
+      source: i % 2 === 0 ? "me" : "practitioner",
+    });
+  }
+  return [...BASE_DOCS, ...generated];
+}
+
+const INITIAL_DOCS: PatientDoc[] = buildDocs();
+
 function formatSize(mb: number): string {
   if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
   if (mb >= 1) return `${mb.toFixed(1)} MB`;
@@ -175,6 +225,8 @@ function DocumentsPage() {
   const [docs, setDocs] = useState<PatientDoc[]>(INITIAL_DOCS);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<DocType | "all">("all");
+  const [sort, setSort] = useState<SortKey>("recent");
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [shareDocId, setShareDocId] = useState<string | null>(null);
 
@@ -184,7 +236,7 @@ function DocumentsPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return docs.filter((d) => {
+    const list = docs.filter((d) => {
       const matchesType = typeFilter === "all" || d.type === typeFilter;
       const matchesQuery =
         q === "" ||
@@ -193,7 +245,30 @@ function DocumentsPage() {
         t(`patientDocs.types.${d.type}`).toLowerCase().includes(q);
       return matchesType && matchesQuery;
     });
-  }, [docs, query, typeFilter, t]);
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      switch (sort) {
+        case "oldest":
+          return a.date.localeCompare(b.date);
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "size":
+          return b.sizeMb - a.sizeMb;
+        case "recent":
+        default:
+          return b.date.localeCompare(a.date);
+      }
+    });
+    return sorted;
+  }, [docs, query, typeFilter, sort, t]);
+
+  // Reset pagination whenever the result set changes.
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [query, typeFilter, sort]);
+
+  const shown = filtered.slice(0, visible);
+  const hasMore = visible < filtered.length;
 
   const removeDoc = (id: string) => setDocs((prev) => prev.filter((d) => d.id !== id));
 
@@ -210,12 +285,14 @@ function DocumentsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <header className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("patientDocs.title")}</h1>
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
+            {t("patientDocs.title")}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("patientDocs.subtitle")}</p>
         </div>
-        <Button className="rounded-full" onClick={() => setUploadOpen(true)}>
+        <Button className="shrink-0 rounded-full" onClick={() => setUploadOpen(true)}>
           <Upload className="mr-2 h-4 w-4" /> {t("patientDocs.upload.cta")}
         </Button>
       </header>
@@ -226,10 +303,10 @@ function DocumentsPage() {
           <div className="grid h-10 w-10 flex-none place-items-center rounded-xl bg-primary/10 text-primary">
             <HardDrive className="h-5 w-5" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-bold">{t("patientDocs.storage.title")}</h2>
-              <span className="text-xs font-semibold text-muted-foreground">
+              <span className="shrink-0 text-xs font-semibold text-muted-foreground">
                 {t("patientDocs.storage.used", {
                   used: formatSize(usedMb),
                   total: formatSize(STORAGE_TOTAL_MB),
@@ -254,7 +331,7 @@ function DocumentsPage() {
         </div>
       </section>
 
-      {/* Toolbar: search + filter */}
+      {/* Toolbar: search + filter + sort */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -266,7 +343,7 @@ function DocumentsPage() {
           />
         </div>
         <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as DocType | "all")}>
-          <SelectTrigger className="w-full rounded-full sm:w-56">
+          <SelectTrigger className="w-full rounded-full sm:w-44">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -278,10 +355,21 @@ function DocumentsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+          <SelectTrigger className="w-full rounded-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recent">{t("patientDocs.sort.recent")}</SelectItem>
+            <SelectItem value="oldest">{t("patientDocs.sort.oldest")}</SelectItem>
+            <SelectItem value="name">{t("patientDocs.sort.name")}</SelectItem>
+            <SelectItem value="size">{t("patientDocs.sort.size")}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <p className="text-xs font-medium text-muted-foreground">
-        {t("patientDocs.count", { n: filtered.length })}
+        {t("patientDocs.showing", { shown: shown.length, total: filtered.length })}
       </p>
 
       {/* Documents list */}
@@ -292,101 +380,135 @@ function DocumentsPage() {
           <p className="mt-1 text-xs text-muted-foreground">{t("patientDocs.emptyHint")}</p>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {filtered.map((doc) => {
-            const meta = TYPE_META[doc.type];
-            const sharedDoctors = DOCTORS.filter((dr) => doc.sharedWith.includes(dr.id));
-            const isShared = sharedDoctors.length > 0;
-            return (
-              <li
-                key={doc.id}
-                className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/70 p-4 transition hover:border-primary/40 hover:shadow-sm sm:flex-row sm:items-center"
-              >
-                <div className={cn("grid h-11 w-11 flex-none place-items-center rounded-xl", meta.className)}>
-                  <meta.Icon className="h-5 w-5" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate text-sm font-semibold">{doc.name}</span>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t(`patientDocs.types.${doc.type}`)}
-                    </span>
-                    {isShared ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-                        <ShieldCheck className="h-3 w-3" />{" "}
-                        {t("patientDocs.share.withCount", { n: sharedDoctors.length })}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                        {t("patientDocs.private")}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 truncate text-xs text-muted-foreground">
-                    {t(`patientDocs.addedBy.${doc.source}`)} · {formatDate(doc.date, locale)} ·{" "}
-                    {formatSize(doc.sizeMb)}
-                  </div>
-                  {isShared && (
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      {sharedDoctors.map((dr) => (
-                        <span
-                          key={dr.id}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 py-0.5 pl-0.5 pr-2 text-[11px] font-medium"
-                          title={`${dr.name} · ${dr.specialty}`}
-                        >
-                          <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
-                            {initials(dr.name)}
-                          </span>
-                          {dr.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {doc.note && (
-                    <p className="mt-1 truncate text-xs italic text-muted-foreground/80">
-                      “{doc.note}”
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-none items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setShareDocId(doc.id)}
+        <>
+          <ul className="space-y-3">
+            {shown.map((doc) => {
+              const meta = TYPE_META[doc.type];
+              const sharedDoctors = DOCTORS.filter((dr) => doc.sharedWith.includes(dr.id));
+              const isShared = sharedDoctors.length > 0;
+              const chips = sharedDoctors.slice(0, MAX_CHIPS);
+              const extra = sharedDoctors.length - chips.length;
+              return (
+                <li
+                  key={doc.id}
+                  className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/70 p-4 transition hover:border-primary/40 hover:shadow-sm sm:flex-row sm:items-center"
+                >
+                  <div
                     className={cn(
-                      "grid h-9 w-9 place-items-center rounded-full transition-colors",
-                      isShared
-                        ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      "grid h-11 w-11 flex-none place-items-center rounded-xl",
+                      meta.className,
                     )}
-                    aria-label={t("patientDocs.share.manage")}
-                    title={t("patientDocs.share.manage")}
                   >
-                    <Share2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    aria-label={t("patientDocs.actions.download")}
-                    title={t("patientDocs.actions.download")}
-                  >
-                    <Download className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeDoc(doc.id)}
-                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
-                    aria-label={t("patientDocs.actions.delete")}
-                    title={t("patientDocs.actions.delete")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                    <meta.Icon className="h-5 w-5" />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate text-sm font-semibold">{doc.name}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t(`patientDocs.types.${doc.type}`)}
+                      </span>
+                      {isShared ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                          <ShieldCheck className="h-3 w-3" />{" "}
+                          {t("patientDocs.share.withCount", { n: sharedDoctors.length })}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                          {t("patientDocs.private")}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 truncate text-xs text-muted-foreground">
+                      {t(`patientDocs.addedBy.${doc.source}`)} · {formatDate(doc.date, locale)} ·{" "}
+                      {formatSize(doc.sizeMb)}
+                    </div>
+                    {isShared && (
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        {chips.map((dr) => (
+                          <span
+                            key={dr.id}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 py-0.5 pl-0.5 pr-2 text-[11px] font-medium"
+                            title={`${dr.name} · ${dr.specialty}`}
+                          >
+                            <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
+                              {initials(dr.name)}
+                            </span>
+                            {dr.name}
+                          </span>
+                        ))}
+                        {extra > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setShareDocId(doc.id)}
+                            className="grid h-6 min-w-6 place-items-center rounded-full border border-border/60 bg-muted px-1.5 text-[11px] font-semibold text-muted-foreground transition hover:text-foreground"
+                            title={sharedDoctors
+                              .slice(MAX_CHIPS)
+                              .map((dr) => dr.name)
+                              .join(", ")}
+                          >
+                            {t("patientDocs.moreDoctors", { n: extra })}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {doc.note && (
+                      <p className="mt-1 truncate text-xs italic text-muted-foreground/80">
+                        “{doc.note}”
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-none items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setShareDocId(doc.id)}
+                      className={cn(
+                        "grid h-9 w-9 place-items-center rounded-full transition-colors",
+                        isShared
+                          ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                      aria-label={t("patientDocs.share.manage")}
+                      title={t("patientDocs.share.manage")}
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      aria-label={t("patientDocs.actions.download")}
+                      title={t("patientDocs.actions.download")}
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeDoc(doc.id)}
+                      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
+                      aria-label={t("patientDocs.actions.delete")}
+                      title={t("patientDocs.actions.delete")}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          {hasMore && (
+            <div className="flex justify-center pt-1">
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => setVisible((v) => v + PAGE_SIZE)}
+              >
+                {t("patientDocs.loadMore")}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} onAdd={addDoc} />
@@ -402,49 +524,98 @@ function DocumentsPage() {
 function DoctorPicker({
   selected,
   onToggle,
+  onClear,
 }: {
   selected: string[];
   onToggle: (id: string) => void;
+  onClear?: () => void;
 }) {
   const { t } = useTranslation();
+  const [q, setQ] = useState("");
+
+  const results = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return DOCTORS;
+    return DOCTORS.filter(
+      (dr) =>
+        dr.name.toLowerCase().includes(needle) ||
+        dr.specialty.toLowerCase().includes(needle),
+    );
+  }, [q]);
+
   return (
-    <div className="space-y-2">
-      {DOCTORS.map((dr) => {
-        const checked = selected.includes(dr.id);
-        return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-muted-foreground">
+          {t("patientDocs.share.selectedCount", { n: selected.length })}
+        </span>
+        {onClear && selected.length > 0 && (
           <button
-            key={dr.id}
             type="button"
-            onClick={() => onToggle(dr.id)}
-            aria-pressed={checked}
-            className={cn(
-              "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
-              checked
-                ? "border-primary/50 bg-primary/5"
-                : "border-border/60 bg-card/40 hover:border-border hover:bg-muted/40",
-            )}
+            onClick={onClear}
+            className="text-xs font-semibold text-primary hover:underline"
           >
-            <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-              {initials(dr.name)}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold">{dr.name}</span>
-              <span className="block truncate text-xs text-muted-foreground">{dr.specialty}</span>
-            </span>
-            <span
-              className={cn(
-                "grid h-5 w-5 flex-none place-items-center rounded-full border transition",
-                checked
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background",
-              )}
-            >
-              {checked && <Check className="h-3 w-3" />}
-            </span>
+            {t("patientDocs.share.clear")}
           </button>
-        );
-      })}
-      <p className="pt-1 text-xs text-muted-foreground">{t("patientDocs.share.hint")}</p>
+        )}
+      </div>
+
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("patientDocs.share.search")}
+          className="rounded-full pl-9"
+        />
+      </div>
+
+      <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+        {results.length === 0 ? (
+          <p className="py-6 text-center text-xs text-muted-foreground">
+            {t("patientDocs.share.noResults")}
+          </p>
+        ) : (
+          results.map((dr) => {
+            const checked = selected.includes(dr.id);
+            return (
+              <button
+                key={dr.id}
+                type="button"
+                onClick={() => onToggle(dr.id)}
+                aria-pressed={checked}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+                  checked
+                    ? "border-primary/50 bg-primary/5"
+                    : "border-border/60 bg-card/40 hover:border-border hover:bg-muted/40",
+                )}
+              >
+                <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                  {initials(dr.name)}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{dr.name}</span>
+                  <span className="block truncate text-xs text-muted-foreground">
+                    {dr.specialty}
+                  </span>
+                </span>
+                <span
+                  className={cn(
+                    "grid h-5 w-5 flex-none place-items-center rounded-full border transition",
+                    checked
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background",
+                  )}
+                >
+                  {checked && <Check className="h-3 w-3" />}
+                </span>
+              </button>
+            );
+          })
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("patientDocs.share.hint")}</p>
     </div>
   );
 }
@@ -481,7 +652,11 @@ function ShareDialog({
         </DialogHeader>
 
         <div className="py-2">
-          <DoctorPicker selected={doc.sharedWith} onToggle={toggle} />
+          <DoctorPicker
+            selected={doc.sharedWith}
+            onToggle={toggle}
+            onClear={() => onChange(doc.id, [])}
+          />
         </div>
 
         <DialogFooter>
@@ -568,7 +743,7 @@ function UploadDialog({
           <DialogDescription>{t("patientDocs.upload.description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <div className="max-h-[70vh] space-y-4 overflow-y-auto py-2 pr-1">
           {/* File dropzone */}
           <div>
             <button
@@ -644,7 +819,11 @@ function UploadDialog({
                 <p className="text-xs text-muted-foreground">{t("patientDocs.upload.shareHint")}</p>
               </div>
             </div>
-            <DoctorPicker selected={sharedWith} onToggle={toggleDoctor} />
+            <DoctorPicker
+              selected={sharedWith}
+              onToggle={toggleDoctor}
+              onClear={() => setSharedWith([])}
+            />
           </div>
         </div>
 
