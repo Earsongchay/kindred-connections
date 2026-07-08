@@ -737,6 +737,10 @@ export const fr = {
       description: "Choisissez quels médecins peuvent consulter « {{name}} ».",
       withCount: "Partagé avec {{n}}",
       hint: "Seuls les médecins sélectionnés peuvent consulter ce document. Vous pouvez le modifier à tout moment.",
+      search: "Rechercher un médecin…",
+      noResults: "Aucun médecin ne correspond à votre recherche.",
+      selectedCount: "{{n}} sélectionné(s)",
+      clear: "Effacer",
       done: "Terminé",
     },
     actions: {
