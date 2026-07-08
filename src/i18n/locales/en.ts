@@ -702,8 +702,18 @@ export const en = {
     search: "Search by name, note or type…",
     filterAll: "All types",
     count: "{{n}} document(s)",
+    showing: "Showing {{shown}} of {{total}}",
+    loadMore: "Load more",
+    sort: {
+      label: "Sort",
+      recent: "Most recent",
+      oldest: "Oldest",
+      name: "Name (A–Z)",
+      size: "Largest",
+    },
     shared: "Shared",
     private: "Private",
+    moreDoctors: "+{{n}}",
     empty: "No documents found.",
     emptyHint: "Try adjusting your search or filter.",
     types: {
