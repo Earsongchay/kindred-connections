@@ -734,6 +734,10 @@ export const en = {
       description: "Choose which doctors can view “{{name}}”.",
       withCount: "Shared with {{n}}",
       hint: "Only the doctors you select can view this document. You can change this anytime.",
+      search: "Search a doctor…",
+      noResults: "No doctor matches your search.",
+      selectedCount: "{{n}} selected",
+      clear: "Clear",
       done: "Done",
     },
     actions: {
