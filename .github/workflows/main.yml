@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+run: |
+    git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
+
+    
 jobs:
   mirror:
     if: github.actor != 'github-actions[bot]'
@@ -15,7 +19,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push mirror
+      - name: Test mirror access
         run: |
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
-          git push mirror main --force
+           git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
