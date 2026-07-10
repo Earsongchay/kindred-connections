@@ -121,9 +121,8 @@ function ProLayout() {
 
       <div className="border-t border-white/10 p-3">
         <Link
-          to="/$locale/login"
+          to="/$locale/login-pro"
           params={{ locale }}
-          search={{ audience: "pro" }}
           onClick={() => setMobileOpen(false)}
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-primary-foreground/85 transition-colors hover:bg-white/10 hover:text-primary-foreground"
         >
