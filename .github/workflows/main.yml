@@ -1,4 +1,4 @@
-name: Mirror to kindred-connections
+name: Mirror to hello-sparkle-world-31
 on:
   push:
     branches:
@@ -18,5 +18,5 @@ jobs:
         env:
           MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
         run: |
-          git remote add mirror https://x-access-token:${MIRROR_TOKEN}@github.com/Earsongchay/kindred-connections.git
+          git remote add mirror https://x-access-token:${MIRROR_TOKEN}@github.com/Earsongchay/hello-sparkle-world-31.git
           git push mirror main --force
