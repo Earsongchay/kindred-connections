@@ -126,7 +126,7 @@ const T = {
     demoOr: "or phone",
     demoPwd: "password",
     phoneNote:
-      "By phone → MFA with generic message (\"if verified, code sent\"), no OTP.",
+      "By phone → MFA with generic message (\"if verified, code sent\"), no OTP",
     errRequired: "Enter your identifier and password.",
     errEmail: "Invalid email.",
     errPhone: "Invalid number for the selected country.",
