@@ -1,20 +1,13 @@
-name: Mirror to kindred-connections
+name: Test mirror access
 
 on:
-  push:
-    branches:
-      - main
-    
+  workflow_dispatch:
+
 jobs:
-  mirror:
-    if: github.actor != 'github-actions[bot]'
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Test mirror access
+      - name: Test repository access
         run: |
           git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
