@@ -1,22 +1,49 @@
-name: Mirror to hello-sparkle-world-31
+name: Bidirectional Mirror Sync
+
 on:
   push:
     branches:
       - main
+
 permissions:
   contents: read
+
 jobs:
-  mirror:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout local repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false # CRITICAL: Prevents default token override
+          persist-credentials: false # Prevents local token from overriding your PAT
 
-      - name: Push mirror
+      - name: Check hash and push to mirror
         env:
           MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          
+          # 👇 CONFIGURATION: Set this to the target repository you want to push TO
+          # For Repo A, set this to Repo B. For Repo B, set this to Repo A.
+          TARGET_REPO: ${{ vars.TARGET_REPO }}
+          
         run: |
-          git remote add mirror https://x-access-token:${MIRROR_TOKEN}@github.com/Earsongchay/hello-sparkle-world-31.git
-          git push mirror main --force
+          TARGET_URL="https://x-access-token:${MIRROR_TOKEN}@github.com/${TARGET_REPO}.git"
+          
+          # 1. Get the local commit hash
+          LOCAL_HASH=$(git rev-parse HEAD)
+          
+          # 2. Fetch the remote commit hash without downloading history
+          REMOTE_HASH=$(git ls-remote $TARGET_URL refs/heads/main | awk '{print $1}')
+          
+          echo "Local commit hash:  $LOCAL_HASH"
+          echo "Remote commit hash: $REMOTE_HASH"
+          
+          # 3. Compare and execute
+          if [ "$LOCAL_HASH" = "$REMOTE_HASH" ]; then
+            echo "✅ Hashes match! The other repository is already up to date."
+            echo "Stopping execution here to prevent an infinite sync loop."
+          else
+            echo "🚀 Hashes differ. Syncing changes..."
+            git remote add mirror "$TARGET_URL"
+            git push mirror main --force
+          fi
