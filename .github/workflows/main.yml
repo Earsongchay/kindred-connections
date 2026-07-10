@@ -5,9 +5,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   mirror:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
@@ -16,6 +18,8 @@ jobs:
           fetch-depth: 0
 
       - name: Push mirror
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
         run: |
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
+          git remote add mirror https://x-access-token:${MIRROR_TOKEN}@github.com/Earsongchay/kindred-connections.git
           git push mirror main --force
