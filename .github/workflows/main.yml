@@ -21,4 +21,4 @@ jobs:
 
       - name: Test mirror access
         run: |
-           git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
+          git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
