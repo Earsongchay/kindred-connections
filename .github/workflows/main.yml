@@ -1,21 +1,18 @@
 name: Mirror to kindred-connections
-
 on:
   push:
     branches:
       - main
-
 permissions:
   contents: read
-
 jobs:
   mirror:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false # CRITICAL: Prevents default token override
 
       - name: Push mirror
         env:
