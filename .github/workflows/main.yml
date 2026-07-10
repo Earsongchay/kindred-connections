@@ -1,0 +1,21 @@
+name: Mirror to kindred-connections
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push mirror
+        run: |
+          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
+          git push mirror main --force
