@@ -17,6 +17,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as LocaleSignupRouteImport } from './routes/$locale.signup'
 import { Route as LocaleMotDePasseOublieRouteImport } from './routes/$locale.mot-de-passe-oublie'
+import { Route as LocaleLoginProRouteImport } from './routes/$locale.login-pro'
 import { Route as LocaleLoginRouteImport } from './routes/$locale.login'
 import { Route as LocaleInscriptionRouteImport } from './routes/$locale.inscription'
 import { Route as LocaleEspaceProRouteImport } from './routes/$locale.espace-pro'
@@ -68,6 +69,11 @@ const LocaleSignupRoute = LocaleSignupRouteImport.update({
 const LocaleMotDePasseOublieRoute = LocaleMotDePasseOublieRouteImport.update({
   id: '/mot-de-passe-oublie',
   path: '/mot-de-passe-oublie',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleLoginProRoute = LocaleLoginProRouteImport.update({
+  id: '/login-pro',
+  path: '/login-pro',
   getParentRoute: () => LocaleRoute,
 } as any)
 const LocaleLoginRoute = LocaleLoginRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
+    | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/$locale/inscription'
     | '/$locale/login'
+    | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
+    | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       path: '/mot-de-passe-oublie'
       fullPath: '/$locale/mot-de-passe-oublie'
       preLoaderRoute: typeof LocaleMotDePasseOublieRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/login-pro': {
+      id: '/$locale/login-pro'
+      path: '/login-pro'
+      fullPath: '/$locale/login-pro'
+      preLoaderRoute: typeof LocaleLoginProRouteImport
       parentRoute: typeof LocaleRoute
     }
     '/$locale/login': {
@@ -418,6 +437,7 @@ interface LocaleRouteChildren {
   LocaleEspaceProRoute: typeof LocaleEspaceProRouteWithChildren
   LocaleInscriptionRoute: typeof LocaleInscriptionRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
+  LocaleLoginProRoute: typeof LocaleLoginProRoute
   LocaleMotDePasseOublieRoute: typeof LocaleMotDePasseOublieRoute
   LocaleSignupRoute: typeof LocaleSignupRoute
   LocaleIndexRoute: typeof LocaleIndexRoute
@@ -428,6 +448,7 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleEspaceProRoute: LocaleEspaceProRouteWithChildren,
   LocaleInscriptionRoute: LocaleInscriptionRoute,
   LocaleLoginRoute: LocaleLoginRoute,
+  LocaleLoginProRoute: LocaleLoginProRoute,
   LocaleMotDePasseOublieRoute: LocaleMotDePasseOublieRoute,
   LocaleSignupRoute: LocaleSignupRoute,
   LocaleIndexRoute: LocaleIndexRoute,
