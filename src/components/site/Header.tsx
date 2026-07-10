@@ -104,7 +104,7 @@ export function SiteHeader() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/$locale/login" params={{ locale }} search={{ audience: "pro" }}>
+                <Link to="/$locale/login-pro" params={{ locale }}>
                   <Stethoscope className="mr-2 h-4 w-4" /> {t("header.signInPro")}
                 </Link>
               </DropdownMenuItem>
@@ -177,9 +177,8 @@ export function SiteHeader() {
               <User className="h-4 w-4" /> {t("header.signInPatient")}
             </Link>
             <Link
-              to="/$locale/login"
+              to="/$locale/login-pro"
               params={{ locale }}
-              search={{ audience: "pro" }}
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-sm font-medium hover:bg-muted"
             >

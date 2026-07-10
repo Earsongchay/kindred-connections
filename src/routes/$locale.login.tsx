@@ -302,17 +302,17 @@ function LoginPage() {
               </Link>
             </p>
 
-            {/* Audience switch — moved out of the main form */}
+            {/* Audience switch → dedicated pro login route */}
             <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/30 px-4 py-3 text-center text-xs text-muted-foreground">
               {isPro ? t("login.patientSwitchPrompt") : t("login.proSwitchPrompt")}{" "}
               <button
                 type="button"
                 onClick={() =>
-                  navigate({
-                    to: "/$locale/login",
-                    params: { locale },
-                    search: { audience: isPro ? "patient" : "pro" },
-                  })
+                  navigate(
+                    isPro
+                      ? { to: "/$locale/login", params: { locale }, search: { audience: "patient" } }
+                      : { to: "/$locale/login-pro", params: { locale } },
+                  )
                 }
                 className="font-semibold text-primary hover:underline"
               >
