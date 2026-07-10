@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-
-run: |
-    git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/Earsongchay/kindred-connections.git
-
     
 jobs:
   mirror:
