@@ -19,7 +19,9 @@ import { Route as LocaleSignupRouteImport } from './routes/$locale.signup'
 import { Route as LocaleMotDePasseOublieRouteImport } from './routes/$locale.mot-de-passe-oublie'
 import { Route as LocaleLoginRouteImport } from './routes/$locale.login'
 import { Route as LocaleInscriptionRouteImport } from './routes/$locale.inscription'
+import { Route as LocaleEspaceProRouteImport } from './routes/$locale.espace-pro'
 import { Route as LocaleEspacePatientRouteImport } from './routes/$locale.espace-patient'
+import { Route as LocaleEspaceProIndexRouteImport } from './routes/$locale.espace-pro.index'
 import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.espace-patient.index'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
@@ -78,10 +80,20 @@ const LocaleInscriptionRoute = LocaleInscriptionRouteImport.update({
   path: '/inscription',
   getParentRoute: () => LocaleRoute,
 } as any)
+const LocaleEspaceProRoute = LocaleEspaceProRouteImport.update({
+  id: '/espace-pro',
+  path: '/espace-pro',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleEspacePatientRoute = LocaleEspacePatientRouteImport.update({
   id: '/espace-patient',
   path: '/espace-patient',
   getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleEspaceProIndexRoute = LocaleEspaceProIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LocaleEspaceProRoute,
 } as any)
 const LocaleEspacePatientIndexRoute =
   LocaleEspacePatientIndexRouteImport.update({
@@ -119,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/$locale': typeof LocaleRouteWithChildren
   '/mcp': typeof McpRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
+  '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
@@ -131,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
+  '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,6 +161,7 @@ export interface FileRoutesByTo {
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientIndexRoute
+  '/$locale/espace-pro': typeof LocaleEspaceProIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,6 +169,7 @@ export interface FileRoutesById {
   '/$locale': typeof LocaleRouteWithChildren
   '/mcp': typeof McpRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
+  '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
@@ -166,6 +182,7 @@ export interface FileRoutesById {
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
+  '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -174,6 +191,7 @@ export interface FileRouteTypes {
     | '/$locale'
     | '/mcp'
     | '/$locale/espace-patient'
+    | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
     | '/$locale/mot-de-passe-oublie'
@@ -186,6 +204,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient/'
+    | '/$locale/espace-pro/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -202,12 +221,14 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient'
+    | '/$locale/espace-pro'
   id:
     | '__root__'
     | '/'
     | '/$locale'
     | '/mcp'
     | '/$locale/espace-patient'
+    | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
     | '/$locale/mot-de-passe-oublie'
@@ -220,6 +241,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/securite'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient/'
+    | '/$locale/espace-pro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -303,12 +325,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleInscriptionRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/espace-pro': {
+      id: '/$locale/espace-pro'
+      path: '/espace-pro'
+      fullPath: '/$locale/espace-pro'
+      preLoaderRoute: typeof LocaleEspaceProRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/espace-patient': {
       id: '/$locale/espace-patient'
       path: '/espace-patient'
       fullPath: '/$locale/espace-patient'
       preLoaderRoute: typeof LocaleEspacePatientRouteImport
       parentRoute: typeof LocaleRoute
+    }
+    '/$locale/espace-pro/': {
+      id: '/$locale/espace-pro/'
+      path: '/'
+      fullPath: '/$locale/espace-pro/'
+      preLoaderRoute: typeof LocaleEspaceProIndexRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
     }
     '/$locale/espace-patient/': {
       id: '/$locale/espace-patient/'
@@ -365,8 +401,21 @@ const LocaleEspacePatientRouteChildren: LocaleEspacePatientRouteChildren = {
 const LocaleEspacePatientRouteWithChildren =
   LocaleEspacePatientRoute._addFileChildren(LocaleEspacePatientRouteChildren)
 
+interface LocaleEspaceProRouteChildren {
+  LocaleEspaceProIndexRoute: typeof LocaleEspaceProIndexRoute
+}
+
+const LocaleEspaceProRouteChildren: LocaleEspaceProRouteChildren = {
+  LocaleEspaceProIndexRoute: LocaleEspaceProIndexRoute,
+}
+
+const LocaleEspaceProRouteWithChildren = LocaleEspaceProRoute._addFileChildren(
+  LocaleEspaceProRouteChildren,
+)
+
 interface LocaleRouteChildren {
   LocaleEspacePatientRoute: typeof LocaleEspacePatientRouteWithChildren
+  LocaleEspaceProRoute: typeof LocaleEspaceProRouteWithChildren
   LocaleInscriptionRoute: typeof LocaleInscriptionRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
   LocaleMotDePasseOublieRoute: typeof LocaleMotDePasseOublieRoute
@@ -376,6 +425,7 @@ interface LocaleRouteChildren {
 
 const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleEspacePatientRoute: LocaleEspacePatientRouteWithChildren,
+  LocaleEspaceProRoute: LocaleEspaceProRouteWithChildren,
   LocaleInscriptionRoute: LocaleInscriptionRoute,
   LocaleLoginRoute: LocaleLoginRoute,
   LocaleMotDePasseOublieRoute: LocaleMotDePasseOublieRoute,

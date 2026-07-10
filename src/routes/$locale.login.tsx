@@ -79,7 +79,7 @@ function LoginPage() {
         return;
       }
     }
-    window.location.href = `/${locale}/espace-patient`;
+    window.location.href = `/${locale}/${isPro ? "espace-pro" : "espace-patient"}`;
   };
 
   const trustPoints = [
