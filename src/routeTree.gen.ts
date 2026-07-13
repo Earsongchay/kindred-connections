@@ -25,6 +25,7 @@ import { Route as LocaleEspacePatientRouteImport } from './routes/$locale.espace
 import { Route as LocaleEspaceProIndexRouteImport } from './routes/$locale.espace-pro.index'
 import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.espace-patient.index'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as LocaleEspaceProAbonnementRouteImport } from './routes/$locale.espace-pro.abonnement'
 import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
 import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
 import { Route as LocaleEspacePatientDocumentsRouteImport } from './routes/$locale.espace-patient.documents'
@@ -113,6 +114,12 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LocaleEspaceProAbonnementRoute =
+  LocaleEspaceProAbonnementRouteImport.update({
+    id: '/abonnement',
+    path: '/abonnement',
+    getParentRoute: () => LocaleEspaceProRoute,
+  } as any)
 const LocaleEspacePatientSecuriteRoute =
   LocaleEspacePatientSecuriteRouteImport.update({
     id: '/securite',
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro': typeof LocaleEspaceProIndexRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
+  '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
+    | '/$locale/espace-pro/abonnement'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient/'
     | '/$locale/espace-pro/'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
+    | '/$locale/espace-pro/abonnement'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient'
     | '/$locale/espace-pro'
@@ -251,6 +263,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
+    | '/$locale/espace-pro/abonnement'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/espace-patient/'
     | '/$locale/espace-pro/'
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/espace-pro/abonnement': {
+      id: '/$locale/espace-pro/abonnement'
+      path: '/abonnement'
+      fullPath: '/$locale/espace-pro/abonnement'
+      preLoaderRoute: typeof LocaleEspaceProAbonnementRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
+    }
     '/$locale/espace-patient/securite': {
       id: '/$locale/espace-patient/securite'
       path: '/securite'
@@ -421,10 +441,12 @@ const LocaleEspacePatientRouteWithChildren =
   LocaleEspacePatientRoute._addFileChildren(LocaleEspacePatientRouteChildren)
 
 interface LocaleEspaceProRouteChildren {
+  LocaleEspaceProAbonnementRoute: typeof LocaleEspaceProAbonnementRoute
   LocaleEspaceProIndexRoute: typeof LocaleEspaceProIndexRoute
 }
 
 const LocaleEspaceProRouteChildren: LocaleEspaceProRouteChildren = {
+  LocaleEspaceProAbonnementRoute: LocaleEspaceProAbonnementRoute,
   LocaleEspaceProIndexRoute: LocaleEspaceProIndexRoute,
 }
 
