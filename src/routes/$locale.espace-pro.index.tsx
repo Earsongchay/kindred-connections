@@ -1,12 +1,32 @@
 // TODO Sprint 3-4 — Wire actual data. Pure UI prototype (pro dashboard).
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarPlus, FileText, Phone, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarPlus,
+  Check,
+  FileText,
+  LifeBuoy,
+  Loader2,
+  Mail,
+  Phone,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
 
+type KycState = "pending" | "incomplete" | "revision" | "validated" | "ok";
+
 export const Route = createFileRoute("/$locale/espace-pro/")({
   head: () => ({ meta: [{ title: "Tableau de bord praticien — FUENI" }] }),
+  validateSearch: (search: Record<string, unknown>): { state?: KycState } => {
+    const s = search.state;
+    if (s === "pending" || s === "incomplete" || s === "revision" || s === "validated" || s === "ok") {
+      return { state: s };
+    }
+    return {};
+  },
   component: ProDashboard,
 });
 
