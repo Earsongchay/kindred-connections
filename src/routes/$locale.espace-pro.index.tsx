@@ -1,12 +1,32 @@
 // TODO Sprint 3-4 — Wire actual data. Pure UI prototype (pro dashboard).
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarPlus, FileText, Phone, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarPlus,
+  Check,
+  FileText,
+  LifeBuoy,
+  Loader2,
+  Mail,
+  Phone,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
 
+type KycState = "pending" | "incomplete" | "revision" | "validated" | "ok";
+
 export const Route = createFileRoute("/$locale/espace-pro/")({
   head: () => ({ meta: [{ title: "Tableau de bord praticien — FUENI" }] }),
+  validateSearch: (search: Record<string, unknown>): { state?: KycState } => {
+    const s = search.state;
+    if (s === "pending" || s === "incomplete" || s === "revision" || s === "validated" || s === "ok") {
+      return { state: s };
+    }
+    return {};
+  },
   component: ProDashboard,
 });
 
@@ -37,12 +57,19 @@ const RECENT_PATIENTS = [
 
 function ProDashboard() {
   const params = Route.useParams();
+  const search = Route.useSearch();
   const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const isEn = locale === "en";
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const [kyc, setKyc] = useState<KycState>(search.state ?? "pending");
+
+  const showKycGate = kyc !== "ok";
 
   return (
-    <div className="space-y-5">
+    <div className="relative space-y-5">
+      {showKycGate && (
+        <KycGate state={kyc} isEn={isEn} locale={locale} onChange={setKyc} />
+      )}
       {!phoneVerified && (
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-amber-300/70 bg-amber-50/80 p-4 text-sm text-amber-900 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:bg-amber-950/30 dark:text-amber-200">
           <div className="flex items-start gap-3">
@@ -212,3 +239,232 @@ function StatCard({
     </div>
   );
 }
+
+function KycGate({
+  state,
+  isEn,
+  locale,
+  onChange,
+}: {
+  state: KycState;
+  isEn: boolean;
+  locale: Locale;
+  onChange: (s: KycState) => void;
+}) {
+  const isIncomplete = state === "incomplete";
+  const isRevision = state === "revision";
+  const isValidated = state === "validated";
+  const isPending = state === "pending";
+
+  const title = isIncomplete
+    ? isEn ? "Finish your verification" : "Finalisez votre vérification"
+    : isRevision
+      ? isEn ? "Your file needs updates" : "Votre dossier doit être complété"
+      : isValidated
+        ? isEn ? "File validated — activate your Solo plan" : "Dossier validé — activez votre plan Solo"
+        : isEn ? "Verification in progress" : "Vérification en cours";
+
+  const description = isIncomplete
+    ? isEn
+      ? "Your account is created. Complete your KYC file to activate your practitioner space."
+      : "Votre compte est créé. Complétez votre dossier de vérification (justificatifs KYC) pour activer votre espace médecin."
+    : isRevision
+      ? isEn
+        ? "One or more documents were flagged « To correct ». Fix them to restart the review."
+        : "Une ou plusieurs pièces ont été signalées « À corriger ». Corrigez-les pour relancer la vérification."
+      : isValidated
+        ? isEn
+          ? "Congratulations, your profile is verified. Pay your first term to activate Solo and unlock all features. Meanwhile you can use the Free plan."
+          : "Félicitations, votre profil est vérifié. Réglez votre premier terme pour activer le plan Solo et débloquer toutes les fonctionnalités. En attendant, vous pouvez utiliser le plan Free."
+        : isEn
+          ? "Your account is created, but medical features stay disabled while we verify your health professional profile."
+          : "Votre compte est créé, mais les fonctionnalités médicales restent désactivées le temps de vérifier votre profil de professionnel de santé.";
+
+  const iconTone = isRevision
+    ? "bg-rose-100 text-rose-600"
+    : isValidated
+      ? "bg-emerald-100 text-emerald-600"
+      : isIncomplete
+        ? "bg-amber-100 text-amber-600"
+        : "bg-amber-100 text-amber-600";
+
+  const Icon = isRevision ? AlertTriangle : isValidated ? ShieldCheck : isIncomplete ? FileText : ShieldCheck;
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-foreground/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-3xl border border-border/60 bg-background p-6 shadow-2xl sm:p-8">
+        <div className="flex flex-col items-center text-center">
+          <div className={`grid h-14 w-14 place-items-center rounded-2xl ${iconTone}`}>
+            <Icon className="h-6 w-6" />
+          </div>
+          <h2 className="mt-4 text-xl font-bold tracking-tight">{title}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+        </div>
+
+        {isPending && (
+          <ol className="mt-6 space-y-3">
+            <StepRow
+              status="done"
+              title={isEn ? "Account created" : "Compte créé"}
+              caption={isEn ? "Signup confirmed" : "Inscription confirmée"}
+            />
+            <StepRow
+              status="done"
+              title={isEn ? "Plan subscribed" : "Plan souscrit"}
+              caption={isEn ? "Solo plan — active" : "Plan Solo — actif"}
+            />
+            <StepRow
+              status="pending"
+              title={isEn ? "Practitioner profile review" : "Vérification du profil médecin"}
+              caption={
+                isEn
+                  ? "Checking your license number and documents"
+                  : "Contrôle du numéro d'Ordre et des justificatifs"
+              }
+              badge={isEn ? "Max delay: 48h" : "Délai max : 48 h"}
+            />
+          </ol>
+        )}
+
+        {isPending && (
+          <div className="mt-5 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/50 p-3 text-xs text-muted-foreground">
+            <Mail className="mt-0.5 h-4 w-4 flex-none" />
+            <span>
+              {isEn
+                ? "You'll receive an email as soon as your profile is validated."
+                : "Vous recevrez un e-mail dès que votre profil est validé."}
+            </span>
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col gap-2">
+          {isIncomplete && (
+            <Button className="w-full rounded-full">
+              {isEn ? "Complete my file" : "Compléter mon dossier de vérification"}
+            </Button>
+          )}
+          {isRevision && (
+            <Button className="w-full rounded-full">
+              {isEn ? "Fix my file" : "Corriger mon dossier"}
+            </Button>
+          )}
+          {isValidated && (
+            <>
+              <Button className="w-full rounded-full">
+                {isEn ? "Pay and activate Solo" : "Payer et activer Solo"}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full"
+                onClick={() => onChange("ok")}
+              >
+                {isEn ? "Stay on Free for now" : "Rester sur Free pour l'instant"}
+              </Button>
+            </>
+          )}
+          {!isValidated && (
+            <a
+              href="mailto:support@fueni.com"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-semibold hover:bg-muted"
+            >
+              <LifeBuoy className="h-4 w-4" /> {isEn ? "Contact support" : "Contacter le support"}
+            </a>
+          )}
+        </div>
+
+        <div className="mt-6 border-t border-border/60 pt-4">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            {isEn ? "Demo — preview states" : "Démo — aperçu des états"}
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            <DemoChip active={state === "pending"} onClick={() => onChange("pending")}>
+              {isEn ? "In review" : "En attente"}
+            </DemoChip>
+            <DemoChip active={state === "incomplete"} onClick={() => onChange("incomplete")}>
+              {isEn ? "To complete" : "À compléter"}
+            </DemoChip>
+            <DemoChip active={state === "revision"} onClick={() => onChange("revision")}>
+              {isEn ? "To correct" : "À corriger"}
+            </DemoChip>
+            <DemoChip active={state === "validated"} onClick={() => onChange("validated")}>
+              {isEn ? "Validated" : "Validé"}
+            </DemoChip>
+            <DemoChip active={false} onClick={() => onChange("ok")}>
+              {isEn ? "Skip (demo)" : "Ignorer (démo)"}
+            </DemoChip>
+          </div>
+          <div className="mt-2 text-[11px] text-muted-foreground">
+            <Link
+              to="/$locale/espace-pro"
+              params={{ locale }}
+              search={{ state: "ok" }}
+              className="underline hover:text-foreground"
+            >
+              {isEn ? "Open full dashboard" : "Voir le tableau de bord complet"}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepRow({
+  status,
+  title,
+  caption,
+  badge,
+}: {
+  status: "done" | "pending";
+  title: string;
+  caption: string;
+  badge?: string;
+}) {
+  return (
+    <li className="flex items-start gap-3">
+      <div
+        className={`mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-full ${
+          status === "done"
+            ? "bg-emerald-100 text-emerald-600"
+            : "bg-amber-100 text-amber-600"
+        }`}
+      >
+        {status === "done" ? <Check className="h-3.5 w-3.5" /> : <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-semibold">{title}</div>
+        <div className="text-xs text-muted-foreground">{caption}</div>
+        {badge && (
+          <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+            <AlertTriangle className="h-3 w-3" /> {badge}
+          </div>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function DemoChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-2.5 py-1 font-medium transition ${
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
