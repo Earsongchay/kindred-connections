@@ -57,13 +57,19 @@ const RECENT_PATIENTS = [
 
 function ProDashboard() {
   const params = Route.useParams();
+  const search = Route.useSearch();
   const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const isEn = locale === "en";
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const [kyc, setKyc] = useState<KycState>(search.state ?? "pending");
+
+  const showKycGate = kyc !== "ok";
 
   return (
-    <div className="space-y-5">
-      {!phoneVerified && (
+    <div className="relative space-y-5">
+      {showKycGate && (
+        <KycGate state={kyc} isEn={isEn} locale={locale} onChange={setKyc} />
+      )}
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-amber-300/70 bg-amber-50/80 p-4 text-sm text-amber-900 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:bg-amber-950/30 dark:text-amber-200">
           <div className="flex items-start gap-3">
             <Phone className="mt-0.5 h-5 w-5 flex-none text-amber-600" />
