@@ -70,6 +70,7 @@ function ProDashboard() {
       {showKycGate && (
         <KycGate state={kyc} isEn={isEn} locale={locale} onChange={setKyc} />
       )}
+      {!phoneVerified && (
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-amber-300/70 bg-amber-50/80 p-4 text-sm text-amber-900 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:bg-amber-950/30 dark:text-amber-200">
           <div className="flex items-start gap-3">
             <Phone className="mt-0.5 h-5 w-5 flex-none text-amber-600" />
