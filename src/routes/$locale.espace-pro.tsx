@@ -21,7 +21,7 @@ export const Route = createFileRoute("/$locale/espace-pro")({
   component: ProLayout,
 });
 
-type ProRoute = "/$locale/espace-pro";
+type ProRoute = "/$locale/espace-pro" | "/$locale/espace-pro/abonnement";
 
 type NavItem = {
   to: ProRoute;
@@ -45,13 +45,13 @@ function ProLayout() {
   ];
 
   const accountItems: NavItem[] = [
-    { to: "/$locale/espace-pro", label: isEn ? "My subscription" : "Mon abonnement", Icon: Star },
+    { to: "/$locale/espace-pro/abonnement", label: isEn ? "My subscription" : "Mon abonnement", Icon: Star },
     { to: "/$locale/espace-pro", label: isEn ? "Settings" : "Paramètres", Icon: Settings },
   ];
 
   const isActive = (item: NavItem) => {
     if (item.exact) return pathname === `/${locale}/espace-pro`;
-    return false;
+    return pathname === `/${locale}${item.to.replace("/$locale", "")}`;
   };
 
   const Group = ({ label, items }: { label: string; items: NavItem[] }) => (
