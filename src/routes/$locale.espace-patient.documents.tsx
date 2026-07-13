@@ -99,7 +99,7 @@ const TYPE_META: Record<
   },
   imaging: {
     Icon: ImageIcon,
-    className: "bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300",
+    className: "bg-violet-100  text-violet-600 dark:bg-violet-500/15 dark:text-violet-300",
   },
   report: {
     Icon: Stethoscope,
