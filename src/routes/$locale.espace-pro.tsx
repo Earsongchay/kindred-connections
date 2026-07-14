@@ -188,7 +188,10 @@ function ProLayout() {
 
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-border/40 bg-background/70 px-6 backdrop-blur-xl lg:flex">
-            <h1 className="text-lg font-bold">{isEn ? "Dashboard" : "Tableau de bord"}</h1>
+            <h1 className="text-lg font-bold">
+              {[...spaceItems, ...accountItems].find((it) => isActive(it))?.label ??
+                (isEn ? "Dashboard" : "Tableau de bord")}
+            </h1>
           </header>
 
           <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
