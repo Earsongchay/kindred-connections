@@ -18,22 +18,21 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as LocaleSignupRouteImport } from './routes/$locale.signup'
 import { Route as LocaleMotDePasseOublieRouteImport } from './routes/$locale.mot-de-passe-oublie'
 import { Route as LocaleLoginProRouteImport } from './routes/$locale.login-pro'
-import { Route as LocaleLoginAdminRouteImport } from './routes/$locale.login-admin'
 import { Route as LocaleLoginRouteImport } from './routes/$locale.login'
 import { Route as LocaleInscriptionRouteImport } from './routes/$locale.inscription'
 import { Route as LocaleEspaceProRouteImport } from './routes/$locale.espace-pro'
 import { Route as LocaleEspacePatientRouteImport } from './routes/$locale.espace-patient'
-import { Route as LocaleAdminRouteImport } from './routes/$locale.admin'
 import { Route as LocaleEspaceProIndexRouteImport } from './routes/$locale.espace-pro.index'
 import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.espace-patient.index'
-import { Route as LocaleAdminIndexRouteImport } from './routes/$locale.admin.index'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as LocaleEspaceProProfilPublicRouteImport } from './routes/$locale.espace-pro.profil-public'
+import { Route as LocaleEspaceProPatientsRouteImport } from './routes/$locale.espace-pro.patients'
+import { Route as LocaleEspaceProDossiersRouteImport } from './routes/$locale.espace-pro.dossiers'
 import { Route as LocaleEspaceProAbonnementRouteImport } from './routes/$locale.espace-pro.abonnement'
 import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
 import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
 import { Route as LocaleEspacePatientDocumentsRouteImport } from './routes/$locale.espace-patient.documents'
 import { Route as LocaleAdminVerificationsRouteImport } from './routes/$locale.admin.verifications'
-import { Route as LocaleAdminAuditRouteImport } from './routes/$locale.admin.audit'
 
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
@@ -82,11 +81,6 @@ const LocaleLoginProRoute = LocaleLoginProRouteImport.update({
   path: '/login-pro',
   getParentRoute: () => LocaleRoute,
 } as any)
-const LocaleLoginAdminRoute = LocaleLoginAdminRouteImport.update({
-  id: '/login-admin',
-  path: '/login-admin',
-  getParentRoute: () => LocaleRoute,
-} as any)
 const LocaleLoginRoute = LocaleLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -107,11 +101,6 @@ const LocaleEspacePatientRoute = LocaleEspacePatientRouteImport.update({
   path: '/espace-patient',
   getParentRoute: () => LocaleRoute,
 } as any)
-const LocaleAdminRoute = LocaleAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => LocaleRoute,
-} as any)
 const LocaleEspaceProIndexRoute = LocaleEspaceProIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -123,17 +112,28 @@ const LocaleEspacePatientIndexRoute =
     path: '/',
     getParentRoute: () => LocaleEspacePatientRoute,
   } as any)
-const LocaleAdminIndexRoute = LocaleAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LocaleAdminRoute,
-} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LocaleEspaceProProfilPublicRoute =
+  LocaleEspaceProProfilPublicRouteImport.update({
+    id: '/profil-public',
+    path: '/profil-public',
+    getParentRoute: () => LocaleEspaceProRoute,
+  } as any)
+const LocaleEspaceProPatientsRoute = LocaleEspaceProPatientsRouteImport.update({
+  id: '/patients',
+  path: '/patients',
+  getParentRoute: () => LocaleEspaceProRoute,
+} as any)
+const LocaleEspaceProDossiersRoute = LocaleEspaceProDossiersRouteImport.update({
+  id: '/dossiers',
+  path: '/dossiers',
+  getParentRoute: () => LocaleEspaceProRoute,
+} as any)
 const LocaleEspaceProAbonnementRoute =
   LocaleEspaceProAbonnementRouteImport.update({
     id: '/abonnement',
@@ -160,40 +160,34 @@ const LocaleEspacePatientDocumentsRoute =
   } as any)
 const LocaleAdminVerificationsRoute =
   LocaleAdminVerificationsRouteImport.update({
-    id: '/verifications',
-    path: '/verifications',
-    getParentRoute: () => LocaleAdminRoute,
+    id: '/admin/verifications',
+    path: '/admin/verifications',
+    getParentRoute: () => LocaleRoute,
   } as any)
-const LocaleAdminAuditRoute = LocaleAdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => LocaleAdminRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/mcp': typeof McpRoute
-  '/$locale/admin': typeof LocaleAdminRouteWithChildren
   '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
   '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
-  '/$locale/login-admin': typeof LocaleLoginAdminRoute
   '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
-  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
+  '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
+  '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/$locale/admin/': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
 }
@@ -202,21 +196,21 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
-  '/$locale/login-admin': typeof LocaleLoginAdminRoute
   '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale': typeof LocaleIndexRoute
-  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
+  '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
+  '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/$locale/admin': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro': typeof LocaleEspaceProIndexRoute
 }
@@ -225,26 +219,25 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/mcp': typeof McpRoute
-  '/$locale/admin': typeof LocaleAdminRouteWithChildren
   '/$locale/espace-patient': typeof LocaleEspacePatientRouteWithChildren
   '/$locale/espace-pro': typeof LocaleEspaceProRouteWithChildren
   '/$locale/inscription': typeof LocaleInscriptionRoute
   '/$locale/login': typeof LocaleLoginRoute
-  '/$locale/login-admin': typeof LocaleLoginAdminRoute
   '/$locale/login-pro': typeof LocaleLoginProRoute
   '/$locale/mot-de-passe-oublie': typeof LocaleMotDePasseOublieRoute
   '/$locale/signup': typeof LocaleSignupRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
-  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
+  '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
+  '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/$locale/admin/': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
   '/$locale/espace-pro/': typeof LocaleEspaceProIndexRoute
 }
@@ -254,26 +247,25 @@ export interface FileRouteTypes {
     | '/'
     | '/$locale'
     | '/mcp'
-    | '/$locale/admin'
     | '/$locale/espace-patient'
     | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
-    | '/$locale/login-admin'
     | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
-    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
+    | '/$locale/espace-pro/dossiers'
+    | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/profil-public'
     | '/.mcp/invoke-tool/$tool'
-    | '/$locale/admin/'
     | '/$locale/espace-patient/'
     | '/$locale/espace-pro/'
   fileRoutesByTo: FileRoutesByTo
@@ -282,21 +274,21 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/$locale/inscription'
     | '/$locale/login'
-    | '/$locale/login-admin'
     | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale'
-    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
+    | '/$locale/espace-pro/dossiers'
+    | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/profil-public'
     | '/.mcp/invoke-tool/$tool'
-    | '/$locale/admin'
     | '/$locale/espace-patient'
     | '/$locale/espace-pro'
   id:
@@ -304,26 +296,25 @@ export interface FileRouteTypes {
     | '/'
     | '/$locale'
     | '/mcp'
-    | '/$locale/admin'
     | '/$locale/espace-patient'
     | '/$locale/espace-pro'
     | '/$locale/inscription'
     | '/$locale/login'
-    | '/$locale/login-admin'
     | '/$locale/login-pro'
     | '/$locale/mot-de-passe-oublie'
     | '/$locale/signup'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
-    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
+    | '/$locale/espace-pro/dossiers'
+    | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/profil-public'
     | '/.mcp/invoke-tool/$tool'
-    | '/$locale/admin/'
     | '/$locale/espace-patient/'
     | '/$locale/espace-pro/'
   fileRoutesById: FileRoutesById
@@ -402,13 +393,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleLoginProRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/$locale/login-admin': {
-      id: '/$locale/login-admin'
-      path: '/login-admin'
-      fullPath: '/$locale/login-admin'
-      preLoaderRoute: typeof LocaleLoginAdminRouteImport
-      parentRoute: typeof LocaleRoute
-    }
     '/$locale/login': {
       id: '/$locale/login'
       path: '/login'
@@ -437,13 +421,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleEspacePatientRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/$locale/admin': {
-      id: '/$locale/admin'
-      path: '/admin'
-      fullPath: '/$locale/admin'
-      preLoaderRoute: typeof LocaleAdminRouteImport
-      parentRoute: typeof LocaleRoute
-    }
     '/$locale/espace-pro/': {
       id: '/$locale/espace-pro/'
       path: '/'
@@ -458,19 +435,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleEspacePatientIndexRouteImport
       parentRoute: typeof LocaleEspacePatientRoute
     }
-    '/$locale/admin/': {
-      id: '/$locale/admin/'
-      path: '/'
-      fullPath: '/$locale/admin/'
-      preLoaderRoute: typeof LocaleAdminIndexRouteImport
-      parentRoute: typeof LocaleAdminRoute
-    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
       fullPath: '/.mcp/invoke-tool/$tool'
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/espace-pro/profil-public': {
+      id: '/$locale/espace-pro/profil-public'
+      path: '/profil-public'
+      fullPath: '/$locale/espace-pro/profil-public'
+      preLoaderRoute: typeof LocaleEspaceProProfilPublicRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
+    }
+    '/$locale/espace-pro/patients': {
+      id: '/$locale/espace-pro/patients'
+      path: '/patients'
+      fullPath: '/$locale/espace-pro/patients'
+      preLoaderRoute: typeof LocaleEspaceProPatientsRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
+    }
+    '/$locale/espace-pro/dossiers': {
+      id: '/$locale/espace-pro/dossiers'
+      path: '/dossiers'
+      fullPath: '/$locale/espace-pro/dossiers'
+      preLoaderRoute: typeof LocaleEspaceProDossiersRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
     }
     '/$locale/espace-pro/abonnement': {
       id: '/$locale/espace-pro/abonnement'
@@ -502,36 +493,13 @@ declare module '@tanstack/react-router' {
     }
     '/$locale/admin/verifications': {
       id: '/$locale/admin/verifications'
-      path: '/verifications'
+      path: '/admin/verifications'
       fullPath: '/$locale/admin/verifications'
       preLoaderRoute: typeof LocaleAdminVerificationsRouteImport
-      parentRoute: typeof LocaleAdminRoute
-    }
-    '/$locale/admin/audit': {
-      id: '/$locale/admin/audit'
-      path: '/audit'
-      fullPath: '/$locale/admin/audit'
-      preLoaderRoute: typeof LocaleAdminAuditRouteImport
-      parentRoute: typeof LocaleAdminRoute
+      parentRoute: typeof LocaleRoute
     }
   }
 }
-
-interface LocaleAdminRouteChildren {
-  LocaleAdminAuditRoute: typeof LocaleAdminAuditRoute
-  LocaleAdminVerificationsRoute: typeof LocaleAdminVerificationsRoute
-  LocaleAdminIndexRoute: typeof LocaleAdminIndexRoute
-}
-
-const LocaleAdminRouteChildren: LocaleAdminRouteChildren = {
-  LocaleAdminAuditRoute: LocaleAdminAuditRoute,
-  LocaleAdminVerificationsRoute: LocaleAdminVerificationsRoute,
-  LocaleAdminIndexRoute: LocaleAdminIndexRoute,
-}
-
-const LocaleAdminRouteWithChildren = LocaleAdminRoute._addFileChildren(
-  LocaleAdminRouteChildren,
-)
 
 interface LocaleEspacePatientRouteChildren {
   LocaleEspacePatientDocumentsRoute: typeof LocaleEspacePatientDocumentsRoute
@@ -552,11 +520,17 @@ const LocaleEspacePatientRouteWithChildren =
 
 interface LocaleEspaceProRouteChildren {
   LocaleEspaceProAbonnementRoute: typeof LocaleEspaceProAbonnementRoute
+  LocaleEspaceProDossiersRoute: typeof LocaleEspaceProDossiersRoute
+  LocaleEspaceProPatientsRoute: typeof LocaleEspaceProPatientsRoute
+  LocaleEspaceProProfilPublicRoute: typeof LocaleEspaceProProfilPublicRoute
   LocaleEspaceProIndexRoute: typeof LocaleEspaceProIndexRoute
 }
 
 const LocaleEspaceProRouteChildren: LocaleEspaceProRouteChildren = {
   LocaleEspaceProAbonnementRoute: LocaleEspaceProAbonnementRoute,
+  LocaleEspaceProDossiersRoute: LocaleEspaceProDossiersRoute,
+  LocaleEspaceProPatientsRoute: LocaleEspaceProPatientsRoute,
+  LocaleEspaceProProfilPublicRoute: LocaleEspaceProProfilPublicRoute,
   LocaleEspaceProIndexRoute: LocaleEspaceProIndexRoute,
 }
 
@@ -565,29 +539,27 @@ const LocaleEspaceProRouteWithChildren = LocaleEspaceProRoute._addFileChildren(
 )
 
 interface LocaleRouteChildren {
-  LocaleAdminRoute: typeof LocaleAdminRouteWithChildren
   LocaleEspacePatientRoute: typeof LocaleEspacePatientRouteWithChildren
   LocaleEspaceProRoute: typeof LocaleEspaceProRouteWithChildren
   LocaleInscriptionRoute: typeof LocaleInscriptionRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
-  LocaleLoginAdminRoute: typeof LocaleLoginAdminRoute
   LocaleLoginProRoute: typeof LocaleLoginProRoute
   LocaleMotDePasseOublieRoute: typeof LocaleMotDePasseOublieRoute
   LocaleSignupRoute: typeof LocaleSignupRoute
   LocaleIndexRoute: typeof LocaleIndexRoute
+  LocaleAdminVerificationsRoute: typeof LocaleAdminVerificationsRoute
 }
 
 const LocaleRouteChildren: LocaleRouteChildren = {
-  LocaleAdminRoute: LocaleAdminRouteWithChildren,
   LocaleEspacePatientRoute: LocaleEspacePatientRouteWithChildren,
   LocaleEspaceProRoute: LocaleEspaceProRouteWithChildren,
   LocaleInscriptionRoute: LocaleInscriptionRoute,
   LocaleLoginRoute: LocaleLoginRoute,
-  LocaleLoginAdminRoute: LocaleLoginAdminRoute,
   LocaleLoginProRoute: LocaleLoginProRoute,
   LocaleMotDePasseOublieRoute: LocaleMotDePasseOublieRoute,
   LocaleSignupRoute: LocaleSignupRoute,
   LocaleIndexRoute: LocaleIndexRoute,
+  LocaleAdminVerificationsRoute: LocaleAdminVerificationsRoute,
 }
 
 const LocaleRouteWithChildren =
@@ -605,3 +577,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

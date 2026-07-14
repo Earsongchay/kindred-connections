@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   CalendarDays,
   FileText,
+  IdCard,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -21,7 +22,12 @@ export const Route = createFileRoute("/$locale/espace-pro")({
   component: ProLayout,
 });
 
-type ProRoute = "/$locale/espace-pro" | "/$locale/espace-pro/abonnement";
+type ProRoute =
+  | "/$locale/espace-pro"
+  | "/$locale/espace-pro/abonnement"
+  | "/$locale/espace-pro/patients"
+  | "/$locale/espace-pro/dossiers"
+  | "/$locale/espace-pro/profil-public";
 
 type NavItem = {
   to: ProRoute;
@@ -39,9 +45,10 @@ function ProLayout() {
 
   const spaceItems: NavItem[] = [
     { to: "/$locale/espace-pro", label: isEn ? "Dashboard" : "Tableau de bord", Icon: LayoutDashboard, exact: true },
-    { to: "/$locale/espace-pro", label: isEn ? "Patients" : "Patients", Icon: Users },
-    { to: "/$locale/espace-pro", label: isEn ? "Appointments" : "Rendez-vous", Icon: CalendarDays },
-    { to: "/$locale/espace-pro", label: isEn ? "Medical records" : "Dossiers médicaux", Icon: FileText },
+    { to: "/$locale/espace-pro/profil-public", label: isEn ? "My public profile" : "Mon profil public", Icon: IdCard },
+    { to: "/$locale/espace-pro/patients", label: isEn ? "Patients" : "Mes patients", Icon: Users },
+    { to: "/$locale/espace-pro", label: isEn ? "Schedule" : "Mon planning", Icon: CalendarDays },
+    { to: "/$locale/espace-pro/dossiers", label: isEn ? "Medical records" : "Dossiers médicaux", Icon: FileText },
   ];
 
   const accountItems: NavItem[] = [
@@ -51,6 +58,8 @@ function ProLayout() {
 
   const isActive = (item: NavItem) => {
     if (item.exact) return pathname === `/${locale}/espace-pro`;
+    // Placeholder links pointing back to the dashboard should not glow.
+    if (item.to === "/$locale/espace-pro") return false;
     return pathname === `/${locale}${item.to.replace("/$locale", "")}`;
   };
 
@@ -179,7 +188,10 @@ function ProLayout() {
 
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-border/40 bg-background/70 px-6 backdrop-blur-xl lg:flex">
-            <h1 className="text-lg font-bold">{isEn ? "Dashboard" : "Tableau de bord"}</h1>
+            <h1 className="text-lg font-bold">
+              {[...spaceItems, ...accountItems].find((it) => isActive(it))?.label ??
+                (isEn ? "Dashboard" : "Tableau de bord")}
+            </h1>
           </header>
 
           <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
