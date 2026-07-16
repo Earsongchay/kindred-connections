@@ -36,6 +36,7 @@ import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$local
 import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
 import { Route as LocaleEspacePatientDocumentsRouteImport } from './routes/$locale.espace-patient.documents'
 import { Route as LocaleAdminVerificationsRouteImport } from './routes/$locale.admin.verifications'
+import { Route as LocaleAdminAuditRouteImport } from './routes/$locale.admin.audit'
 
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
@@ -182,6 +183,11 @@ const LocaleAdminVerificationsRoute =
     path: '/verifications',
     getParentRoute: () => LocaleAdminRoute,
   } as any)
+const LocaleAdminAuditRoute = LocaleAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => LocaleAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
+  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale': typeof LocaleIndexRoute
+  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/$locale/': typeof LocaleIndexRoute
+  '/$locale/admin/audit': typeof LocaleAdminAuditRoute
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
+    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale'
+    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/$locale/'
+    | '/$locale/admin/audit'
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
@@ -553,15 +565,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleAdminVerificationsRouteImport
       parentRoute: typeof LocaleAdminRoute
     }
+    '/$locale/admin/audit': {
+      id: '/$locale/admin/audit'
+      path: '/audit'
+      fullPath: '/$locale/admin/audit'
+      preLoaderRoute: typeof LocaleAdminAuditRouteImport
+      parentRoute: typeof LocaleAdminRoute
+    }
   }
 }
 
 interface LocaleAdminRouteChildren {
+  LocaleAdminAuditRoute: typeof LocaleAdminAuditRoute
   LocaleAdminVerificationsRoute: typeof LocaleAdminVerificationsRoute
   LocaleAdminIndexRoute: typeof LocaleAdminIndexRoute
 }
 
 const LocaleAdminRouteChildren: LocaleAdminRouteChildren = {
+  LocaleAdminAuditRoute: LocaleAdminAuditRoute,
   LocaleAdminVerificationsRoute: LocaleAdminVerificationsRoute,
   LocaleAdminIndexRoute: LocaleAdminIndexRoute,
 }
