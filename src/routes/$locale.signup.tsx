@@ -348,73 +348,129 @@ function EligibilityStep({
 }
 
 /* ─── STEP 2 — PROFESSION ───────────────────────────────────────────────── */
-function DoctorIcon({ className }: { className?: string }) {
-  // Stethoscope — clinical blue (#2563eb)
+
+/* Person avatars — each role in its own accessibility color.
+   Shared geometry: head + shoulders bust; role signalled by attire & accessory. */
+
+function PersonBase({
+  skin,
+  hair,
+  coat,
+  coatShade,
+  accent,
+  children,
+  className,
+}: {
+  skin: string;
+  hair: string;
+  coat: string;
+  coatShade: string;
+  accent: string;
+  children?: React.ReactNode;
+  className?: string;
+}) {
   return (
     <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
+      {/* Shoulders / coat */}
       <path
-        d="M18 10v14a10 10 0 0 0 20 0V10"
-        stroke="#2563eb"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-      />
-      <circle cx="18" cy="10" r="3" fill="#2563eb" />
-      <circle cx="38" cy="10" r="3" fill="#2563eb" />
-      <path
-        d="M28 34v8a10 10 0 0 0 10 10h4a8 8 0 0 0 8-8v-4"
-        stroke="#1d4ed8"
-        strokeWidth="3.5"
-        strokeLinecap="round"
+        d="M6 60c2-12 12-18 26-18s24 6 26 18z"
+        fill={coat}
+        stroke={coatShade}
+        strokeWidth="2"
         strokeLinejoin="round"
       />
-      <circle cx="50" cy="36" r="5" fill="#3b82f6" stroke="#1e40af" strokeWidth="2.5" />
-      <circle cx="50" cy="36" r="1.6" fill="#1e3a8a" />
+      {/* Neck */}
+      <rect x="28" y="30" width="8" height="8" rx="2" fill={skin} />
+      {/* Head */}
+      <circle cx="32" cy="22" r="11" fill={skin} stroke={coatShade} strokeWidth="1.2" />
+      {/* Hair */}
+      <path
+        d="M22 20c0-7 5-11 10-11s10 4 10 11c-3-3-6-4-10-4s-7 1-10 4z"
+        fill={hair}
+      />
+      {/* Eyes */}
+      <circle cx="28.5" cy="23" r="1" fill="#1f2937" />
+      <circle cx="35.5" cy="23" r="1" fill="#1f2937" />
+      {/* Smile */}
+      <path d="M29 27c1 1.2 2 1.8 3 1.8s2-.6 3-1.8" stroke="#1f2937" strokeWidth="1.2" strokeLinecap="round" />
+      {/* Collar V */}
+      <path d="M26 42l6 6 6-6" stroke={accent} strokeWidth="2" strokeLinecap="round" fill="none" />
+      {children}
     </svg>
+  );
+}
+
+function DoctorIcon({ className }: { className?: string }) {
+  // Doctor — clinical blue. White coat + stethoscope loop around neck.
+  return (
+    <PersonBase
+      className={className}
+      skin="#f4c9a8"
+      hair="#1f2937"
+      coat="#ffffff"
+      coatShade="#93c5fd"
+      accent="#2563eb"
+    >
+      {/* Stethoscope */}
+      <path
+        d="M24 40c-4 4-4 10 0 13s10 2 12-2"
+        stroke="#1e3a8a"
+        strokeWidth="1.8"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <circle cx="37" cy="50" r="2.4" fill="#2563eb" stroke="#1e3a8a" strokeWidth="1.2" />
+      {/* Coat lapels */}
+      <path d="M26 44l-4 14M38 44l4 14" stroke="#93c5fd" strokeWidth="1.4" />
+    </PersonBase>
   );
 }
 
 function PharmacistIcon({ className }: { className?: string }) {
-  // Pill capsule — apothecary green (#059669)
+  // Pharmacist — apothecary green. Lab coat + green cross badge.
   return (
-    <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
-      <g transform="rotate(-40 32 32)">
-        <rect x="10" y="24" width="44" height="18" rx="9" fill="#a7f3d0" stroke="#059669" strokeWidth="3" />
-        <path d="M32 24v18" stroke="#059669" strokeWidth="3" />
-        <rect x="10" y="24" width="22" height="18" rx="9" fill="#059669" />
-        <circle cx="18" cy="30" r="1.8" fill="#ecfdf5" opacity="0.9" />
-        <circle cx="24" cy="36" r="1.4" fill="#ecfdf5" opacity="0.7" />
+    <PersonBase
+      className={className}
+      skin="#e9b98a"
+      hair="#4b2e1e"
+      coat="#ffffff"
+      coatShade="#6ee7b7"
+      accent="#059669"
+    >
+      {/* Green cross badge on lapel */}
+      <g transform="translate(40 46)">
+        <rect x="-1.5" y="-4" width="3" height="8" rx="0.6" fill="#059669" />
+        <rect x="-4" y="-1.5" width="8" height="3" rx="0.6" fill="#059669" />
       </g>
-    </svg>
+      {/* Coat opening */}
+      <path d="M26 48l-3 12M38 48l3 12" stroke="#6ee7b7" strokeWidth="1.4" />
+    </PersonBase>
   );
 }
 
 function NurseIcon({ className }: { className?: string }) {
-  // Syringe — care rose (#e11d48)
+  // Nurse — care rose. Scrubs top + nurse cap with heart.
   return (
-    <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
-      <path d="M8 56l8-8" stroke="#e11d48" strokeWidth="3.5" strokeLinecap="round" />
+    <PersonBase
+      className={className}
+      skin="#f2c7a4"
+      hair="#3f2a1d"
+      coat="#fda4af"
+      coatShade="#be123c"
+      accent="#e11d48"
+    >
+      {/* Nurse cap */}
+      <path d="M22 15h20l-2-6H24z" fill="#ffffff" stroke="#be123c" strokeWidth="1.2" />
+      {/* Heart on cap */}
       <path
-        d="M16 48l14-14 12 12-14 14z"
-        fill="#fecdd3"
-        stroke="#e11d48"
-        strokeWidth="3"
-        strokeLinejoin="round"
+        d="M32 13.5c-1.6-2.2-4.5-1.2-4.5.9 0 1.6 2 3 4.5 4.6 2.5-1.6 4.5-3 4.5-4.6 0-2.1-2.9-3.1-4.5-.9z"
+        fill="#e11d48"
       />
-      <path d="M22 42l8 8" stroke="#be123c" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M26 38l8 8" stroke="#be123c" strokeWidth="2.5" strokeLinecap="round" />
-      <rect
-        x="34"
-        y="18"
-        width="18"
-        height="14"
-        rx="3"
-        transform="rotate(45 34 18)"
-        fill="#fda4af"
-        stroke="#e11d48"
-        strokeWidth="3"
-      />
-      <path d="M50 10l6 6" stroke="#e11d48" strokeWidth="3.5" strokeLinecap="round" />
-    </svg>
+      {/* V-neck scrub trim */}
+      <path d="M26 42l6 8 6-8" stroke="#ffffff" strokeWidth="1.6" fill="none" />
+      {/* Pocket */}
+      <rect x="40" y="50" width="6" height="5" rx="0.8" fill="#fecdd3" stroke="#be123c" strokeWidth="1" />
+    </PersonBase>
   );
 }
 
@@ -430,6 +486,7 @@ const PROFESSIONS: {
   { id: "pharmacist", Icon: PharmacistIcon, accent: "#059669", ring: "ring-[#059669]", bg: "bg-[#059669]/5", available: false },
   { id: "nurse", Icon: NurseIcon, accent: "#e11d48", ring: "ring-[#e11d48]", bg: "bg-[#e11d48]/5", available: false },
 ];
+
 
 function ProfessionStep({
   profession,
