@@ -66,11 +66,13 @@ const COUNTRIES = [
 ];
 
 type Plan = "free" | "solo";
-type Step = "eligibility" | "form" | "otp" | "plan" | "done";
-const STEP_IDS: Step[] = ["eligibility", "form", "otp", "plan"];
+type Profession = "doctor" | "pharmacist" | "nurse";
+type Step = "eligibility" | "profession" | "form" | "otp" | "plan" | "done";
+const STEP_IDS: Step[] = ["eligibility", "profession", "form", "otp", "plan"];
 
 type SignupForm = {
   country: string;
+  profession: Profession | "";
   first: string;
   last: string;
   dob: string;
@@ -79,6 +81,7 @@ type SignupForm = {
   phone: string;
   password: string;
 };
+
 
 import { fr } from "@/i18n/locales/fr";
 import { en } from "@/i18n/locales/en";
