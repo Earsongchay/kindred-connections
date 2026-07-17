@@ -99,6 +99,7 @@ function SignupPage() {
   const [plan, setPlan] = useState<Plan>("solo");
   const [form, setForm] = useState<SignupForm>({
     country: "",
+    profession: "",
     first: "",
     last: "",
     dob: "",
@@ -107,6 +108,7 @@ function SignupPage() {
     phone: "",
     password: "",
   });
+
 
   const update = (patch: Partial<SignupForm>) => setForm((f) => ({ ...f, ...patch }));
 
