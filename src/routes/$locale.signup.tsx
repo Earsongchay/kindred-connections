@@ -420,7 +420,7 @@ function NurseIcon({ className }: { className?: string }) {
 
 const PROFESSIONS: {
   id: Profession;
-  Icon: (p: { className?: string }) => JSX.Element;
+  Icon: (p: { className?: string }) => React.ReactElement;
   accent: string;
   ring: string;
   bg: string;
