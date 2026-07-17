@@ -347,7 +347,186 @@ function EligibilityStep({
   );
 }
 
-/* ─── STEP 2 — SIGN-UP FORM (§4.1 / §6.1) ───────────────────────────────── */
+/* ─── STEP 2 — PROFESSION ───────────────────────────────────────────────── */
+function DoctorIcon({ className }: { className?: string }) {
+  // Stethoscope — clinical blue (#2563eb)
+  return (
+    <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
+      <path
+        d="M18 10v14a10 10 0 0 0 20 0V10"
+        stroke="#2563eb"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+      />
+      <circle cx="18" cy="10" r="3" fill="#2563eb" />
+      <circle cx="38" cy="10" r="3" fill="#2563eb" />
+      <path
+        d="M28 34v8a10 10 0 0 0 10 10h4a8 8 0 0 0 8-8v-4"
+        stroke="#1d4ed8"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="50" cy="36" r="5" fill="#3b82f6" stroke="#1e40af" strokeWidth="2.5" />
+      <circle cx="50" cy="36" r="1.6" fill="#1e3a8a" />
+    </svg>
+  );
+}
+
+function PharmacistIcon({ className }: { className?: string }) {
+  // Pill capsule — apothecary green (#059669)
+  return (
+    <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
+      <g transform="rotate(-40 32 32)">
+        <rect x="10" y="24" width="44" height="18" rx="9" fill="#a7f3d0" stroke="#059669" strokeWidth="3" />
+        <path d="M32 24v18" stroke="#059669" strokeWidth="3" />
+        <rect x="10" y="24" width="22" height="18" rx="9" fill="#059669" />
+        <circle cx="18" cy="30" r="1.8" fill="#ecfdf5" opacity="0.9" />
+        <circle cx="24" cy="36" r="1.4" fill="#ecfdf5" opacity="0.7" />
+      </g>
+    </svg>
+  );
+}
+
+function NurseIcon({ className }: { className?: string }) {
+  // Syringe — care rose (#e11d48)
+  return (
+    <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
+      <path d="M8 56l8-8" stroke="#e11d48" strokeWidth="3.5" strokeLinecap="round" />
+      <path
+        d="M16 48l14-14 12 12-14 14z"
+        fill="#fecdd3"
+        stroke="#e11d48"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M22 42l8 8" stroke="#be123c" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M26 38l8 8" stroke="#be123c" strokeWidth="2.5" strokeLinecap="round" />
+      <rect
+        x="34"
+        y="18"
+        width="18"
+        height="14"
+        rx="3"
+        transform="rotate(45 34 18)"
+        fill="#fda4af"
+        stroke="#e11d48"
+        strokeWidth="3"
+      />
+      <path d="M50 10l6 6" stroke="#e11d48" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const PROFESSIONS: {
+  id: Profession;
+  Icon: (p: { className?: string }) => JSX.Element;
+  accent: string;
+  ring: string;
+  bg: string;
+  available: boolean;
+}[] = [
+  { id: "doctor", Icon: DoctorIcon, accent: "#2563eb", ring: "ring-[#2563eb]", bg: "bg-[#2563eb]/5", available: true },
+  { id: "pharmacist", Icon: PharmacistIcon, accent: "#059669", ring: "ring-[#059669]", bg: "bg-[#059669]/5", available: false },
+  { id: "nurse", Icon: NurseIcon, accent: "#e11d48", ring: "ring-[#e11d48]", bg: "bg-[#e11d48]/5", available: false },
+];
+
+function ProfessionStep({
+  profession,
+  setProfession,
+  onBack,
+  onNext,
+}: {
+  profession: Profession | "";
+  setProfession: (p: Profession) => void;
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="glass rounded-3xl p-6 sm:p-9">
+      <div className="mb-5 flex justify-center">
+        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <Stethoscope className="h-7 w-7" />
+        </div>
+      </div>
+      <span className="mx-auto block w-fit rounded-full bg-primary/10 px-3 py-1 text-center text-xs font-semibold text-primary">
+        {t("signup.profession.tag")}
+      </span>
+      <h1 className="mt-4 text-center text-2xl font-bold tracking-tight sm:text-3xl">
+        {t("signup.profession.title")}
+      </h1>
+      <p className="mt-2 text-center text-sm text-muted-foreground">
+        {t("signup.profession.subtitle")}
+      </p>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {PROFESSIONS.map(({ id, Icon, accent, ring, bg, available }) => {
+          const selected = profession === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              disabled={!available}
+              onClick={() => available && setProfession(id)}
+              className={cn(
+                "group relative flex flex-col items-center gap-3 rounded-2xl border border-border/60 p-5 text-center transition-all",
+                available && "hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]",
+                selected && `ring-2 ${ring} ${bg} border-transparent`,
+                !available && "cursor-not-allowed opacity-60",
+              )}
+              aria-pressed={selected}
+            >
+              <div
+                className="grid h-16 w-16 place-items-center rounded-2xl"
+                style={{ backgroundColor: `${accent}14` }}
+              >
+                <Icon className="h-10 w-10" />
+              </div>
+              <div className="text-sm font-semibold" style={{ color: available ? accent : undefined }}>
+                {t(`signup.profession.${id}`)}
+              </div>
+              {!available && (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("signup.profession.comingSoon")}
+                </span>
+              )}
+              {selected && (
+                <span
+                  className="absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full text-white"
+                  style={{ backgroundColor: accent }}
+                >
+                  <Check className="h-3 w-3" />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border/60 bg-muted/40 p-4 text-xs text-muted-foreground">
+        <ShieldCheck className="mt-0.5 h-4 w-4 flex-none text-primary" />
+        <p>{t("signup.profession.note")}</p>
+      </div>
+
+      <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+        <Button variant="ghost" onClick={onBack} className="h-12 rounded-full">
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t("signup.common.back")}
+        </Button>
+        <Button
+          className="h-12 flex-1 rounded-full bg-[image:var(--gradient-brand)] text-base font-semibold text-primary-foreground shadow-[var(--shadow-lg)] transition-transform hover:scale-[1.01] hover:opacity-95 sm:flex-none sm:px-10"
+          disabled={!profession}
+          onClick={onNext}
+        >
+          {t("signup.eligibility.next")} <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── STEP 3 — SIGN-UP FORM (§4.1 / §6.1) ───────────────────────────────── */
+
 function FormStep({
   form,
   update,
