@@ -207,7 +207,18 @@ export const fr = {
       description:
         "Créez votre compte praticien FUENI en moins de 5 minutes. Accès gratuit dès la validation de votre dossier.",
     },
-    steps: ["Éligibilité", "Inscription", "Vérification", "Plan"],
+    steps: ["Éligibilité", "Profession", "Inscription", "Vérification", "Plan"],
+    profession: {
+      tag: "Étape 2 — Profession",
+      title: "Quelle est votre profession ?",
+      subtitle: "Sélectionnez votre profession de santé. Seuls les médecins peuvent s'inscrire pour l'instant.",
+      doctor: "Médecin",
+      pharmacist: "Pharmacien",
+      nurse: "Infirmier·ère",
+      comingSoon: "Bientôt disponible",
+      note: "Les profils pharmaciens et infirmiers arrivent prochainement. Inscrivez-vous à la liste d'attente depuis votre espace.",
+    },
+
     common: {
       back: "Retour",
       or: "ou",
