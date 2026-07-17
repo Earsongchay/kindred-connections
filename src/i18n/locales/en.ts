@@ -207,7 +207,18 @@ export const en = {
       description:
         "Create your FUENI practitioner account in under 5 minutes. Free access as soon as your file is verified.",
     },
-    steps: ["Eligibility", "Sign-up", "Verification", "Plan"],
+    steps: ["Eligibility", "Profession", "Sign-up", "Verification", "Plan"],
+    profession: {
+      tag: "Step 2 — Profession",
+      title: "What is your profession?",
+      subtitle: "Choose your healthcare profession. Only doctors can sign up for now.",
+      doctor: "Doctor",
+      pharmacist: "Pharmacist",
+      nurse: "Nurse",
+      comingSoon: "Coming soon",
+      note: "Pharmacist and nurse profiles are coming soon. Join the waitlist from your dashboard.",
+    },
+
     common: {
       back: "Back",
       or: "or",
