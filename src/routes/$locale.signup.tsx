@@ -148,8 +148,17 @@ function SignupPage() {
           <EligibilityStep
             country={form.country}
             setCountry={(c) => update({ country: c })}
-            onNext={() => setStep("form")}
+            onNext={() => setStep("profession")}
             locale={locale}
+          />
+        )}
+
+        {step === "profession" && (
+          <ProfessionStep
+            profession={form.profession}
+            setProfession={(p) => update({ profession: p })}
+            onBack={() => setStep("eligibility")}
+            onNext={() => setStep("form")}
           />
         )}
 
@@ -157,11 +166,12 @@ function SignupPage() {
           <FormStep
             form={form}
             update={update}
-            onBack={() => setStep("eligibility")}
+            onBack={() => setStep("profession")}
             onNext={() => setStep("otp")}
             locale={locale}
           />
         )}
+
 
         {step === "otp" && (
           <EmailOtpStep
