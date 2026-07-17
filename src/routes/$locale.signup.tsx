@@ -3,7 +3,7 @@
 // (account created PENDING_KYC) → Plan choice (Free/Solo, NO payment) → Verification landing.
 // Pure UI prototype — wire to Keycloak + Brevo email OTP in a later sprint.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Check,
