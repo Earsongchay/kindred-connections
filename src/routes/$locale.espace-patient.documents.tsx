@@ -50,6 +50,7 @@ export const Route = createFileRoute("/$locale/espace-patient/documents")({
 
 type DocType = "lab" | "prescription" | "imaging" | "report" | "vaccination" | "other";
 type SortKey = "recent" | "oldest" | "name" | "size";
+type SourceFilter = "all" | "me" | "practitioner";
 
 type Doctor = { id: string; name: string; specialty: string };
 
@@ -225,6 +226,7 @@ function DocumentsPage() {
   const [docs, setDocs] = useState<PatientDoc[]>(INITIAL_DOCS);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<DocType | "all">("all");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [sort, setSort] = useState<SortKey>("recent");
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -238,12 +240,13 @@ function DocumentsPage() {
     const q = query.trim().toLowerCase();
     const list = docs.filter((d) => {
       const matchesType = typeFilter === "all" || d.type === typeFilter;
+      const matchesSource = sourceFilter === "all" || d.source === sourceFilter;
       const matchesQuery =
         q === "" ||
         d.name.toLowerCase().includes(q) ||
         d.note.toLowerCase().includes(q) ||
         t(`patientDocs.types.${d.type}`).toLowerCase().includes(q);
-      return matchesType && matchesQuery;
+      return matchesType && matchesSource && matchesQuery;
     });
     const sorted = [...list];
     sorted.sort((a, b) => {
@@ -260,12 +263,12 @@ function DocumentsPage() {
       }
     });
     return sorted;
-  }, [docs, query, typeFilter, sort, t]);
+  }, [docs, query, typeFilter, sourceFilter, sort, t]);
 
   // Reset pagination whenever the result set changes.
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [query, typeFilter, sort]);
+  }, [query, typeFilter, sourceFilter, sort]);
 
   const shown = filtered.slice(0, visible);
   const hasMore = visible < filtered.length;
@@ -331,6 +334,34 @@ function DocumentsPage() {
         </div>
       </section>
 
+      {/* Source tabs */}
+      <div className="overflow-x-auto border-b border-border" role="tablist" aria-label={t("patientDocs.tabs.label")}>
+        <div className="flex min-w-max gap-6">
+          {(["all", "me", "practitioner"] as const).map((tab) => {
+            const active = sourceFilter === tab;
+            const count = tab === "all" ? docs.length : docs.filter((doc) => doc.source === tab).length;
+            return (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSourceFilter(tab)}
+                className={cn(
+                  "relative flex h-11 items-center gap-2 whitespace-nowrap border-b-2 px-1 text-sm font-semibold transition-colors",
+                  active
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t(`patientDocs.tabs.${tab}`)}
+                <span className={cn("rounded-full px-2 py-0.5 text-xs", active ? "bg-primary/10" : "bg-muted")}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Toolbar: search + filter + sort */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -372,7 +403,7 @@ function DocumentsPage() {
         {t("patientDocs.showing", { shown: shown.length, total: filtered.length })}
       </p>
 
-      {/* Documents list */}
+      {/* Documents table */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border/70 bg-card/40 p-12 text-center">
           <FileText className="mx-auto h-8 w-8 text-muted-foreground/50" />
@@ -381,7 +412,20 @@ function DocumentsPage() {
         </div>
       ) : (
         <>
-          <ul className="space-y-3">
+          <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[940px] table-fixed text-left">
+                <thead className="border-b border-border bg-muted/50 text-xs font-semibold uppercase text-muted-foreground">
+                  <tr>
+                    <th className="w-[34%] px-4 py-3">{t("patientDocs.table.document")}</th>
+                    <th className="w-[14%] px-4 py-3">{t("patientDocs.table.type")}</th>
+                    <th className="w-[13%] px-4 py-3">{t("patientDocs.table.addedBy")}</th>
+                    <th className="w-[11%] px-4 py-3">{t("patientDocs.table.date")}</th>
+                    <th className="w-[18%] px-4 py-3">{t("patientDocs.table.sharing")}</th>
+                    <th className="w-[10%] px-4 py-3 text-right">{t("patientDocs.table.actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
             {shown.map((doc) => {
               const meta = TYPE_META[doc.type];
               const sharedDoctors = DOCTORS.filter((dr) => doc.sharedWith.includes(dr.id));
@@ -389,59 +433,46 @@ function DocumentsPage() {
               const chips = sharedDoctors.slice(0, MAX_CHIPS);
               const extra = sharedDoctors.length - chips.length;
               return (
-                <li
+                <tr
                   key={doc.id}
-                  className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/70 p-4 transition hover:border-primary/40 hover:shadow-sm sm:flex-row sm:items-center"
+                  className="group transition-colors hover:bg-muted/30"
                 >
-                  <div
-                    className={cn(
-                      "grid h-11 w-11 flex-none place-items-center rounded-xl",
-                      meta.className,
-                    )}
-                  >
-                    <meta.Icon className="h-5 w-5" />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="truncate text-sm font-semibold">{doc.name}</span>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        {t(`patientDocs.types.${doc.type}`)}
-                      </span>
-                      {isShared ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-                          <ShieldCheck className="h-3 w-3" />{" "}
-                          {t("patientDocs.share.withCount", { n: sharedDoctors.length })}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                          {t("patientDocs.private")}
-                        </span>
-                      )}
+                  <td className="px-4 py-3.5 align-middle">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className={cn("grid h-10 w-10 flex-none place-items-center rounded-lg", meta.className)}>
+                        <meta.Icon className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-semibold">{doc.name}</div>
+                        <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{formatSize(doc.sizeMb)}</span>
+                          {doc.note && <span className="truncate">· {doc.note}</span>}
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-1 truncate text-xs text-muted-foreground">
-                      {t(`patientDocs.addedBy.${doc.source}`)} · {formatDate(doc.date, locale)} ·{" "}
-                      {formatSize(doc.sizeMb)}
-                    </div>
-                    {isShared && (
-                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  </td>
+                  <td className="px-4 py-3.5 align-middle">
+                    <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">{t(`patientDocs.types.${doc.type}`)}</span>
+                  </td>
+                  <td className="px-4 py-3.5 align-middle text-xs font-medium text-foreground">{t(`patientDocs.addedBy.${doc.source}`)}</td>
+                  <td className="px-4 py-3.5 align-middle text-xs text-muted-foreground">{formatDate(doc.date, locale)}</td>
+                  <td className="px-4 py-3.5 align-middle">
+                    {isShared ? (
+                      <div className="flex items-center gap-1.5">
                         {chips.map((dr) => (
                           <span
                             key={dr.id}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 py-0.5 pl-0.5 pr-2 text-[11px] font-medium"
+                            className="grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-[9px] font-bold text-primary"
                             title={`${dr.name} · ${dr.specialty}`}
                           >
-                            <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
-                              {initials(dr.name)}
-                            </span>
-                            {dr.name}
+                            {initials(dr.name)}
                           </span>
                         ))}
                         {extra > 0 && (
                           <button
                             type="button"
                             onClick={() => setShareDocId(doc.id)}
-                            className="grid h-6 min-w-6 place-items-center rounded-full border border-border/60 bg-muted px-1.5 text-[11px] font-semibold text-muted-foreground transition hover:text-foreground"
+                            className="grid h-7 min-w-7 place-items-center rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground transition hover:text-foreground"
                             title={sharedDoctors
                               .slice(MAX_CHIPS)
                               .map((dr) => dr.name)
@@ -451,15 +482,12 @@ function DocumentsPage() {
                           </button>
                         )}
                       </div>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" />{t("patientDocs.private")}</span>
                     )}
-                    {doc.note && (
-                      <p className="mt-1 truncate text-xs italic text-muted-foreground/80">
-                        “{doc.note}”
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-none items-center gap-1">
+                  </td>
+                  <td className="px-3 py-3.5 align-middle">
+                    <div className="flex items-center justify-end gap-0.5">
                     <button
                       type="button"
                       onClick={() => setShareDocId(doc.id)}
@@ -491,11 +519,15 @@ function DocumentsPage() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                  </div>
-                </li>
+                    </div>
+                  </td>
+                </tr>
               );
             })}
-          </ul>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
           {hasMore && (
             <div className="flex justify-center pt-1">
