@@ -1,7 +1,8 @@
 // TODO Sprint 3-4 — Validate marketing wording with Nazounki team.
 // TODO Sprint 4-5 — Replace prototype photo with brand-validated photography.
 // TODO Sprint 4-5 — Replace illustrative testimonials with real, consented ones.
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Search,
@@ -77,6 +78,9 @@ function useLocale(): Locale {
 function Hero() {
   const { t } = useTranslation();
   const locale = useLocale();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [city, setCity] = useState("");
   return (
     <section className="relative overflow-hidden bg-[var(--gradient-hero)]">
       <div className="absolute -right-32 -top-32 h-[480px] w-[480px] rounded-full bg-primary/20 blur-3xl" />
