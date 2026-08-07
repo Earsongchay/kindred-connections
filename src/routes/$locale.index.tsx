@@ -110,24 +110,38 @@ function Hero() {
 
           <form
             className="glass mt-8 rounded-2xl p-2 shadow-[var(--shadow-float)]"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void navigate({
+                to: "/$locale/recherche",
+                params: { locale },
+                search: { q: query, city },
+              });
+            }}
           >
             <div className="grid gap-2 md:grid-cols-[1.4fr_1fr_auto]">
               <label className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-muted/60">
                 <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                   placeholder={t("home.hero.searchName")}
+                  aria-label={t("home.hero.searchName")}
                 />
               </label>
               <label className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-muted/60 md:border-l md:border-border">
                 <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <input
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                   placeholder={t("home.hero.searchCity")}
+                  aria-label={t("home.hero.searchCity")}
                 />
               </label>
               <Button
+                type="submit"
                 size="lg"
                 className="h-12 rounded-xl bg-[image:var(--gradient-brand)] px-6 text-base font-semibold text-primary-foreground shadow-[var(--shadow-card)] hover:opacity-95"
               >
@@ -135,6 +149,7 @@ function Hero() {
               </Button>
             </div>
           </form>
+
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
