@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/Footer";
-import { getDoctor } from "@/lib/doctors";
+import { getDoctor, type Doctor } from "@/lib/doctors";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
 
 export const Route = createFileRoute("/$locale/medecin/$doctorId")({
@@ -55,7 +55,7 @@ function DoctorDetailPage() {
   const params = Route.useParams();
   const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const en = locale === "en";
-  const { doctor } = Route.useLoaderData();
+  const { doctor } = Route.useLoaderData() as { doctor: Doctor };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
