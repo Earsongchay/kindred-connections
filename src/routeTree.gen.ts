@@ -28,6 +28,7 @@ import { Route as LocaleEspaceProIndexRouteImport } from './routes/$locale.espac
 import { Route as LocaleEspacePatientIndexRouteImport } from './routes/$locale.espace-patient.index'
 import { Route as LocaleAdminIndexRouteImport } from './routes/$locale.admin.index'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as LocaleMedecinSlugRouteImport } from './routes/$locale.medecin.$slug'
 import { Route as LocaleEspaceProProfilPublicRouteImport } from './routes/$locale.espace-pro.profil-public'
 import { Route as LocaleEspaceProPatientsRouteImport } from './routes/$locale.espace-pro.patients'
 import { Route as LocaleEspaceProDossiersRouteImport } from './routes/$locale.espace-pro.dossiers'
@@ -137,6 +138,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LocaleMedecinSlugRoute = LocaleMedecinSlugRouteImport.update({
+  id: '/medecin/$slug',
+  path: '/medecin/$slug',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleEspaceProProfilPublicRoute =
   LocaleEspaceProProfilPublicRouteImport.update({
     id: '/profil-public',
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
+  '/$locale/medecin/$slug': typeof LocaleMedecinSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/admin/': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
+  '/$locale/medecin/$slug': typeof LocaleMedecinSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/admin': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient': typeof LocaleEspacePatientIndexRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
+  '/$locale/medecin/$slug': typeof LocaleMedecinSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/$locale/admin/': typeof LocaleAdminIndexRoute
   '/$locale/espace-patient/': typeof LocaleEspacePatientIndexRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
     | '/$locale/espace-pro/profil-public'
+    | '/$locale/medecin/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/admin/'
     | '/$locale/espace-patient/'
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
     | '/$locale/espace-pro/profil-public'
+    | '/$locale/medecin/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/admin'
     | '/$locale/espace-patient'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
     | '/$locale/espace-pro/profil-public'
+    | '/$locale/medecin/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/$locale/admin/'
     | '/$locale/espace-patient/'
@@ -509,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/medecin/$slug': {
+      id: '/$locale/medecin/$slug'
+      path: '/medecin/$slug'
+      fullPath: '/$locale/medecin/$slug'
+      preLoaderRoute: typeof LocaleMedecinSlugRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/espace-pro/profil-public': {
       id: '/$locale/espace-pro/profil-public'
       path: '/profil-public'
@@ -639,6 +658,7 @@ interface LocaleRouteChildren {
   LocaleMotDePasseOublieRoute: typeof LocaleMotDePasseOublieRoute
   LocaleSignupRoute: typeof LocaleSignupRoute
   LocaleIndexRoute: typeof LocaleIndexRoute
+  LocaleMedecinSlugRoute: typeof LocaleMedecinSlugRoute
 }
 
 const LocaleRouteChildren: LocaleRouteChildren = {
@@ -652,6 +672,7 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleMotDePasseOublieRoute: LocaleMotDePasseOublieRoute,
   LocaleSignupRoute: LocaleSignupRoute,
   LocaleIndexRoute: LocaleIndexRoute,
+  LocaleMedecinSlugRoute: LocaleMedecinSlugRoute,
 }
 
 const LocaleRouteWithChildren =
