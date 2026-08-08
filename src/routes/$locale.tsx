@@ -4,11 +4,11 @@ import i18n, { isLocale, type Locale, DEFAULT_LOCALE } from "@/i18n";
 import { sessionForm } from "@/lib/session-form";
 
 export const Route = createFileRoute("/$locale")({
-  beforeLoad: async ({ params }) => {
+  beforeLoad: ({ params }) => {
     if (!isLocale(params.locale)) throw notFound();
     // Sync i18next on both client and server before render.
     if (i18n.language !== params.locale) {
-      await i18n.changeLanguage(params.locale);
+      void i18n.changeLanguage(params.locale);
     }
   },
   component: LocaleLayout,
