@@ -6,6 +6,33 @@ export interface DoctorSlot {
   times: string[];
 }
 
+export interface DoctorPractice {
+  name: string;
+  kind: { fr: string; en: string };
+  address: string;
+}
+
+export interface DoctorHours {
+  day: { fr: string; en: string };
+  ranges: string[]; // empty = closed
+}
+
+export interface DoctorPrice {
+  label: { fr: string; en: string };
+  duration: number; // minutes
+  amount: string;
+}
+
+export interface DoctorMilestone {
+  year: string;
+  label: { fr: string; en: string };
+}
+
+export interface DoctorLegal {
+  licenseNumber: string;
+  board: { fr: string; en: string };
+}
+
 export interface Doctor {
   id: string;
   name: string;
@@ -24,10 +51,86 @@ export interface Doctor {
   bio: { fr: string; en: string };
   services: { fr: string; en: string }[];
   slots: DoctorSlot[];
+  expertise: { fr: string; en: string }[];
+  practices: DoctorPractice[];
+  accessibility: { fr: string; en: string }[];
+  hours: DoctorHours[];
+  timezone: string;
+  prices: DoctorPrice[];
+  education: DoctorMilestone[];
+  legal: DoctorLegal;
 }
 
-export const DOCTORS: Doctor[] = [
+type RawDoctor = Omit<
+  Doctor,
+  "expertise" | "practices" | "accessibility" | "hours" | "timezone" | "prices" | "education" | "legal"
+> &
+  Partial<Doctor>;
+
+const WEEK: { day: { fr: string; en: string }; ranges: string[] }[] = [
+  { day: { fr: "Lundi", en: "Monday" }, ranges: ["09:00–13:00", "15:00–18:00"] },
+  { day: { fr: "Mardi", en: "Tuesday" }, ranges: ["09:00–13:00", "15:00–18:00"] },
+  { day: { fr: "Mercredi", en: "Wednesday" }, ranges: ["09:00–13:00"] },
+  { day: { fr: "Jeudi", en: "Thursday" }, ranges: ["09:00–13:00", "15:00–18:00"] },
+  { day: { fr: "Vendredi", en: "Friday" }, ranges: ["09:00–13:00"] },
+  { day: { fr: "Samedi", en: "Saturday" }, ranges: [] },
+  { day: { fr: "Dimanche", en: "Sunday" }, ranges: [] },
+];
+
+const ACCESSIBILITY = [
+  { fr: "Accès fauteuil roulant", en: "Wheelchair access" },
+  { fr: "Parking à proximité", en: "Parking nearby" },
+];
+
+function withDefaults(d: RawDoctor): Doctor {
+  const startYear = new Date().getFullYear() - d.experience;
+  return {
+    ...d,
+    expertise: d.expertise ?? [
+      d.specialty,
+      { fr: "Suivi des maladies chroniques", en: "Chronic disease follow-up" },
+      { fr: "Médecine préventive et dépistage", en: "Preventive medicine & screening" },
+      { fr: "Vaccination", en: "Vaccination" },
+    ],
+    practices:
+      d.practices ?? [
+        {
+          name: d.address.split(",")[0]!.trim(),
+          kind: { fr: "Cabinet privé", en: "Private practice" },
+          address: `${d.address}, ${d.city}, ${d.country}`,
+        },
+      ],
+    accessibility: d.accessibility ?? ACCESSIBILITY,
+    hours: d.hours ?? WEEK,
+    timezone: d.timezone ?? "WAT (UTC+1)",
+    prices:
+      d.prices ?? [
+        { label: { fr: "Consultation générale", en: "General consultation" }, duration: 30, amount: d.fee },
+        { label: { fr: "Suivi / renouvellement", en: "Follow-up / renewal" }, duration: 20, amount: d.fee },
+      ],
+    education:
+      d.education ?? [
+        { year: String(startYear), label: { fr: "Doctorat en médecine", en: "Doctor of Medicine" } },
+        {
+          year: String(startYear + 3),
+          label: { fr: `Assistant hospitalier — ${d.city}`, en: `Hospital registrar — ${d.city}` },
+        },
+        {
+          year: String(startYear + 5),
+          label: { fr: `Cabinet privé — ${d.city}`, en: `Private practice — ${d.city}` },
+        },
+      ],
+    legal:
+      d.legal ?? {
+        licenseNumber: `ONM-2024-00${(d.reviews % 900) + 100}`,
+        board: { fr: `Ordre des Médecins — ${d.country}`, en: `Medical Council — ${d.country}` },
+      },
+  };
+}
+
+const RAW_DOCTORS: RawDoctor[] = [
   {
+
     id: "amina-sow",
     name: "Dr Amina Sow",
     initials: "AS",
