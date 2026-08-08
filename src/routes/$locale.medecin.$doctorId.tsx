@@ -10,7 +10,10 @@ import {
   BriefcaseMedical,
   Check,
   Clock,
+  Accessibility,
+  Image as ImageIcon,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/Footer";
