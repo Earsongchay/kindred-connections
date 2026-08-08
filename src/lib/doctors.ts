@@ -293,6 +293,9 @@ const RAW_DOCTORS: RawDoctor[] = [
   },
 ];
 
+export const DOCTORS: Doctor[] = RAW_DOCTORS.map(withDefaults);
+
+
 export function getDoctor(id: string): Doctor | undefined {
   return DOCTORS.find((d) => d.id === id);
 }
