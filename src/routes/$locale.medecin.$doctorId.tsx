@@ -138,7 +138,163 @@ function DoctorDetailPage() {
               ))}
             </ul>
           </div>
+
+          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <h2 className="text-xl font-bold">{en ? "Areas of expertise" : "Domaines d'expertise"}</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {doctor.expertise.map((e) => (
+                <span
+                  key={e.fr}
+                  className="rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-brand-deep"
+                >
+                  {en ? e.en : e.fr}
+                </span>
+              ))}
+            </div>
+
+            <h2 className="mt-8 text-xl font-bold">{en ? "Languages spoken" : "Langues parlées"}</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {doctor.languages.map((l) => (
+                <span
+                  key={l}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-medium"
+                >
+                  <Languages className="h-3.5 w-3.5 text-brand-deep" />
+                  {l}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <h2 className="text-xl font-bold">{en ? "Location" : "Localisation"}</h2>
+            <div className="mt-4 space-y-3">
+              {doctor.practices.map((p) => (
+                <div key={p.name} className="rounded-2xl border border-border p-4">
+                  <p className="text-sm font-semibold">{p.name}</p>
+                  <p className="text-xs text-muted-foreground">{en ? p.kind.en : p.kind.fr}</p>
+                  <p className="mt-2 inline-flex items-start gap-1.5 text-sm text-muted-foreground">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                    {p.address}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 grid h-44 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
+              {en ? "Practice map" : "Carte du cabinet"}
+            </div>
+
+            <h3 className="mt-6 text-sm font-semibold">{en ? "Accessibility" : "Accessibilité"}</h3>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {doctor.accessibility.map((a) => (
+                <li
+                  key={a.fr}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm"
+                >
+                  <Accessibility className="h-4 w-4 text-brand-deep" />
+                  {en ? a.en : a.fr}
+                </li>
+              ))}
+            </ul>
+
+            <h3 className="mt-6 text-sm font-semibold">{en ? "Practice photos" : "Photos du cabinet"}</h3>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="grid aspect-4/3 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground"
+                >
+                  <ImageIcon className="h-5 w-5" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <h2 className="text-xl font-bold">
+              {en ? "Consultation hours" : "Horaires de consultation"}
+            </h2>
+            <ul className="mt-4 divide-y divide-border">
+              {doctor.hours.map((h) => (
+                <li key={h.day.fr} className="flex items-center justify-between gap-4 py-2.5 text-sm">
+                  <span className="font-medium">{en ? h.day.en : h.day.fr}</span>
+                  <span className={h.ranges.length ? "text-muted-foreground" : "text-muted-foreground/70"}>
+                    {h.ranges.length ? h.ranges.join(", ") : en ? "Closed" : "Fermé"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs text-muted-foreground">
+              {en ? "Local time at the practice" : "Heure locale du lieu"} · {doctor.timezone}
+            </p>
+          </div>
+
+          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <h2 className="text-xl font-bold">{en ? "Consultation fees" : "Tarifs des consultations"}</h2>
+            <ul className="mt-4 divide-y divide-border">
+              {doctor.prices.map((p) => (
+                <li key={p.label.fr} className="flex items-center justify-between gap-4 py-3">
+                  <div>
+                    <p className="text-sm font-semibold">{en ? p.label.en : p.label.fr}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {p.duration} min
+                    </p>
+                  </div>
+                  <p className="text-sm font-bold">{p.amount}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <h2 className="text-xl font-bold">
+              {en ? "Training & experience" : "Formation & expériences"}
+            </h2>
+            <ol className="mt-5 space-y-5 border-l border-border pl-6">
+              {doctor.education.map((m) => (
+                <li key={`${m.year}-${m.label.fr}`} className="relative">
+                  <span className="absolute -left-[1.9rem] top-1.5 h-2.5 w-2.5 rounded-full bg-primary" />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {m.year}
+                  </p>
+                  <p className="text-sm">{en ? m.label.en : m.label.fr}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="mt-6 mb-4 rounded-3xl border border-border bg-card p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-bold">
+                {en ? "Legal information" : "Informations légales"}
+              </h2>
+              {doctor.verified && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-brand-deep">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {en ? "FUENI verified" : "Vérifié FUENI"}
+                </span>
+              )}
+            </div>
+            <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs text-muted-foreground">
+                  {en ? "Medical license number" : "N° d'ordre médical"}
+                </dt>
+                <dd className="text-sm font-semibold">{doctor.legal.licenseNumber}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">
+                  {en ? "Registration board" : "Ordre d'inscription"}
+                </dt>
+                <dd className="text-sm font-semibold">
+                  {en ? doctor.legal.board.en : doctor.legal.board.fr}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
+
 
         <aside className="lg:col-span-4">
           <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-float)]">
