@@ -2,7 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
-  Calendar,
+  Calendar as CalendarIcon,
+
   Check,
   ChevronLeft,
   Clock,
@@ -19,8 +20,75 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { Doctor } from "@/lib/doctors";
+
+const WEEKDAYS: Record<string, number> = {
+  dimanche: 0,
+  sunday: 0,
+  lundi: 1,
+  monday: 1,
+  mardi: 2,
+  tuesday: 2,
+  mercredi: 3,
+  wednesday: 3,
+  jeudi: 4,
+  thursday: 4,
+  vendredi: 5,
+  friday: 5,
+  samedi: 6,
+  saturday: 6,
+};
+
+function dateKey(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
+
+function addDays(date: Date, days: number) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function formatDay(date: Date, en: boolean) {
+  return date.toLocaleDateString(en ? "en-GB" : "fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+/** Turns the doctor's weekly slot pattern into concrete upcoming dates. */
+function buildAvailability(doctor: Doctor) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const map = new Map<string, string[]>();
+
+  doctor.slots.forEach((slot, index) => {
+    if (!slot.times.length) return;
+    const label = slot.day.fr.toLowerCase();
+    let base: Date;
+    if (label.includes("aujourd")) base = today;
+    else if (label.includes("demain")) base = addDays(today, 1);
+    else {
+      const weekday = Object.entries(WEEKDAYS).find(([name]) => label.includes(name))?.[1];
+      if (weekday === undefined) base = addDays(today, index + 1);
+      else {
+        const diff = (weekday - today.getDay() + 7) % 7;
+        base = addDays(today, diff);
+      }
+    }
+    for (let week = 0; week < 8; week++) {
+      const date = addDays(base, week * 7);
+      map.set(dateKey(date), slot.times);
+    }
+  });
+
+  return map;
+}
+
 
 type Mode = "office" | "video";
 
@@ -64,22 +132,47 @@ export function BookingDialog({ doctor, en, open, onOpenChange, initialSlot }: P
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
+
+  const availability = useMemo<Map<string, string[]>>(
+    () => (open ? buildAvailability(doctor) : new Map()),
+    [open, doctor],
+  );
+
+
+  const availableDates = useMemo(
+    () =>
+      [...availability.keys()]
+        .map((k) => {
+          const [y, m, d] = k.split("-").map(Number);
+          return new Date(y, m - 1, d);
+        })
+        .sort((a, b) => a.getTime() - b.getTime()),
+    [availability],
+  );
+  const firstAvailable = availableDates[0];
 
   useEffect(() => {
     if (!open) return;
     setStep(1);
     setDone(false);
     setSubmitting(false);
+    const preset = initialSlot?.time
+      ? availableDates.find((d) => (availability.get(dateKey(d)) ?? []).includes(initialSlot.time))
+      : undefined;
+    setSelectedDate(preset);
     setDraft({
       ...EMPTY,
       reason: en ? doctor.services[0]?.en ?? "" : doctor.services[0]?.fr ?? "",
-      day: initialSlot?.day ?? "",
-      time: initialSlot?.time ?? "",
+      day: preset ? formatDay(preset, en) : "",
+      time: preset ? initialSlot?.time ?? "" : "",
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialSlot, doctor, en]);
+
 
   const price = doctor.prices[draft.priceIndex];
 
@@ -258,67 +351,66 @@ export function BookingDialog({ doctor, en, open, onOpenChange, initialSlot }: P
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <Field label={en ? "Pick a day" : "Choisissez un jour"}>
-                    <div className="flex flex-wrap gap-2">
-                      {doctor.slots.map((slot) => {
-                        const value = en ? slot.day.en : slot.day.fr;
-                        const selected = draft.day === value;
-                        return (
-                          <button
-                            key={slot.day.fr}
-                            type="button"
-                            onClick={() => setDraft((d) => ({ ...d, day: value, time: "" }))}
-                            className={cn(
-                              "min-w-[7rem] rounded-2xl border px-4 py-3 text-left transition-colors",
-                              selected
-                                ? "border-primary bg-primary/10"
-                                : "border-border hover:bg-muted",
-                            )}
-                          >
-                            <span className="block text-sm font-semibold">{value}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {slot.times.length} {en ? "slots" : "créneaux"}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </Field>
-
-                  <Field label={en ? "Available times" : "Créneaux disponibles"}>
-                    {draft.day ? (
-                      <div className="flex flex-wrap gap-2">
-                        {(
-                          doctor.slots.find((s) => (en ? s.day.en : s.day.fr) === draft.day)?.times ??
-                          []
-                        ).map((time) => (
-                          <button
-                            key={time}
-                            type="button"
-                            onClick={() => set("time", time)}
-                            className={cn(
-                              "rounded-xl border px-4 py-2 text-sm font-semibold transition-colors",
-                              draft.time === time
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-border hover:border-primary/50 hover:bg-muted",
-                            )}
-                          >
-                            {time}
-                          </button>
-                        ))}
+                  <div className="grid gap-6 md:grid-cols-[auto_1fr]">
+                    <Field label={en ? "Pick a date" : "Choisissez une date"}>
+                      <div className="rounded-2xl border border-border">
+                        <Calendar
+                          mode="single"
+                          locale={en ? undefined : fr}
+                          selected={selectedDate}
+                          defaultMonth={selectedDate ?? firstAvailable}
+                          onSelect={(date) => {
+                            if (!date) return;
+                            setSelectedDate(date);
+                            setDraft((d) => ({ ...d, day: formatDay(date, en), time: "" }));
+                          }}
+                          disabled={(date) => !availability.has(dateKey(date))}
+                          modifiers={{
+                            available: (date) => availability.has(dateKey(date)),
+                          }}
+                          modifiersClassNames={{
+                            available: "font-semibold text-brand-deep",
+                          }}
+                          className="p-3 pointer-events-auto"
+                        />
                       </div>
-                    ) : (
-                      <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                        {en ? "Select a day first." : "Sélectionnez d'abord un jour."}
-                      </p>
-                    )}
-                  </Field>
+                    </Field>
+
+                    <Field label={en ? "Available times" : "Créneaux disponibles"}>
+                      {selectedDate ? (
+                        <div className="flex flex-wrap gap-2">
+                          {(availability.get(dateKey(selectedDate)) ?? []).map((time) => (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => set("time", time)}
+                              className={cn(
+                                "rounded-xl border px-4 py-2 text-sm font-semibold transition-colors",
+                                draft.time === time
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border hover:border-primary/50 hover:bg-muted",
+                              )}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                          {en
+                            ? "Select a date to see available times."
+                            : "Sélectionnez une date pour voir les créneaux."}
+                        </p>
+                      )}
+                    </Field>
+                  </div>
 
                   <p className="text-xs text-muted-foreground">
                     {en ? "Local time at the practice" : "Heure locale du lieu"} · {doctor.timezone}
                   </p>
                 </div>
               )}
+
 
               {step === 3 && (
                 <div className="space-y-6">
@@ -502,7 +594,7 @@ function Summary({
           : (doctor.practices[0]?.address ?? doctor.address),
     },
     {
-      Icon: Calendar,
+      Icon: CalendarIcon,
       label: en ? "When" : "Quand",
       value: `${draft.day} · ${draft.time}${duration ? ` (${duration} min)` : ""}`,
     },
