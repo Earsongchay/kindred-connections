@@ -308,14 +308,55 @@ function norm(value: string) {
     .trim();
 }
 
+// SF Recherche v1.1 — synonym table so "cardio" matches "Cardiologie".
+const SYNONYMS: Record<string, string[]> = {
+  cardio: ["cardiologie", "cardiology"],
+  coeur: ["cardiologie", "cardiology"],
+  heart: ["cardiologie", "cardiology"],
+  derma: ["dermatologie", "dermatology"],
+  peau: ["dermatologie", "dermatology"],
+  skin: ["dermatologie", "dermatology"],
+  pedia: ["pediatrie", "pediatrics"],
+  pediatre: ["pediatrie", "pediatrics"],
+  enfant: ["pediatrie", "pediatrics"],
+  kids: ["pediatrie", "pediatrics"],
+  child: ["pediatrie", "pediatrics"],
+  gyneco: ["gynecologie", "gynecology"],
+  femme: ["gynecologie", "gynecology"],
+  women: ["gynecologie", "gynecology"],
+  generaliste: ["medecine generale", "general medicine"],
+  gp: ["medecine generale", "general medicine"],
+  omnipraticien: ["medecine generale", "general medicine"],
+  family: ["medecine generale", "general medicine"],
+};
+
+function expandQuery(q: string): string[] {
+  if (!q) return [];
+  const terms = new Set<string>([q]);
+  for (const [key, values] of Object.entries(SYNONYMS)) {
+    if (key.startsWith(q) || q.startsWith(key)) values.forEach((v) => terms.add(v));
+  }
+  return [...terms];
+}
+
+/** Single next availability, per spec ("prochaine dispo"). */
+export function nextAvailability(d: Doctor): { day: { fr: string; en: string }; time: string } | null {
+  const slot = d.slots.find((s) => s.times.length > 0);
+  if (!slot) return null;
+  return { day: slot.day, time: slot.times[0]! };
+}
+
 export function searchDoctors(query: string, city: string): Doctor[] {
   const q = norm(query);
   const c = norm(city);
+  const terms = expandQuery(q);
   return DOCTORS.filter((d) => {
     const haystack = norm(
       [d.name, d.specialty.fr, d.specialty.en, ...d.services.flatMap((s) => [s.fr, s.en])].join(" "),
     );
     const place = norm(`${d.city} ${d.country}`);
-    return (!q || haystack.includes(q)) && (!c || place.includes(c));
+    const matchesQuery = !q || terms.some((t) => haystack.includes(t));
+    return matchesQuery && (!c || place.includes(c));
   });
 }
+
