@@ -318,12 +318,17 @@ function DoctorDetailPage() {
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {slot.times.map((time) => (
-                      <span
+                      <button
                         key={time}
-                        className="rounded-xl border border-border px-3 py-1.5 text-sm font-medium"
+                        type="button"
+                        onClick={() => {
+                          setInitialSlot({ day: en ? slot.day.en : slot.day.fr, time });
+                          setBookingOpen(true);
+                        }}
+                        className="rounded-xl border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-primary hover:bg-primary/10 hover:text-brand-deep"
                       >
                         {time}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -331,19 +336,21 @@ function DoctorDetailPage() {
             </div>
 
             <Button
-              asChild
               size="lg"
+              onClick={() => {
+                setInitialSlot(null);
+                setBookingOpen(true);
+              }}
               className="mt-6 h-12 w-full rounded-xl bg-[image:var(--gradient-brand)] text-base font-semibold text-primary-foreground hover:opacity-95"
             >
-              <Link to="/$locale/inscription" params={{ locale }}>
-                {en ? "Book an appointment" : "Prendre rendez-vous"}
-              </Link>
+              {en ? "Book an appointment" : "Prendre rendez-vous"}
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               {en
-                ? "Create your patient account to confirm the booking."
-                : "Créez votre compte patient pour confirmer le rendez-vous."}
+                ? "Free cancellation up to 24h before the appointment."
+                : "Annulation gratuite jusqu'à 24h avant le rendez-vous."}
             </p>
+
           </div>
         </aside>
       </section>
