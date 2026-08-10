@@ -20,8 +20,75 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { Doctor } from "@/lib/doctors";
+
+const WEEKDAYS: Record<string, number> = {
+  dimanche: 0,
+  sunday: 0,
+  lundi: 1,
+  monday: 1,
+  mardi: 2,
+  tuesday: 2,
+  mercredi: 3,
+  wednesday: 3,
+  jeudi: 4,
+  thursday: 4,
+  vendredi: 5,
+  friday: 5,
+  samedi: 6,
+  saturday: 6,
+};
+
+function dateKey(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
+
+function addDays(date: Date, days: number) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function formatDay(date: Date, en: boolean) {
+  return date.toLocaleDateString(en ? "en-GB" : "fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+/** Turns the doctor's weekly slot pattern into concrete upcoming dates. */
+function buildAvailability(doctor: Doctor) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const map = new Map<string, string[]>();
+
+  doctor.slots.forEach((slot, index) => {
+    if (!slot.times.length) return;
+    const label = slot.day.fr.toLowerCase();
+    let base: Date;
+    if (label.includes("aujourd")) base = today;
+    else if (label.includes("demain")) base = addDays(today, 1);
+    else {
+      const weekday = Object.entries(WEEKDAYS).find(([name]) => label.includes(name))?.[1];
+      if (weekday === undefined) base = addDays(today, index + 1);
+      else {
+        const diff = (weekday - today.getDay() + 7) % 7;
+        base = addDays(today, diff);
+      }
+    }
+    for (let week = 0; week < 8; week++) {
+      const date = addDays(base, week * 7);
+      map.set(dateKey(date), slot.times);
+    }
+  });
+
+  return map;
+}
+
 
 type Mode = "office" | "video";
 
