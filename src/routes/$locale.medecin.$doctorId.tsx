@@ -1,5 +1,7 @@
 // TODO Sprint 4 — Wire booking action to the real appointment API.
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
+
 import {
   MapPin,
   ShieldCheck,
@@ -16,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site/Header";
 import { SiteFooter } from "@/components/site/Footer";
+import { BookingDialog } from "@/components/site/BookingDialog";
+
 import { getDoctor, type Doctor } from "@/lib/doctors";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
 
@@ -64,6 +68,9 @@ function DoctorDetailPage() {
   const en = locale === "en";
   const { doctor } = Route.useLoaderData() as { doctor: Doctor };
   const search = Route.useSearch();
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [initialSlot, setInitialSlot] = useState<{ day: string; time: string } | null>(null);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
