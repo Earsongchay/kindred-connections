@@ -48,7 +48,7 @@ const ENTRIES: Entry[] = [
   { id: "e9", at: "21 juin 2026 · 09:34", actor: "Moussa T.", category: "account", action: "Rôle modifié", target: "user #1024 (Support → Admin)", ip: "10.24.1.14" },
   { id: "e10", at: "20 juin 2026 · 21:11", actor: "Système", category: "system", action: "Sauvegarde quotidienne OK", target: "base primaire" },
   { id: "e11", at: "20 juin 2026 · 14:22", actor: "Awa N.", category: "kyc", action: "Dossier validé", target: "Dr S. Koffi", ip: "10.24.1.09" },
-  { id: "e12", at: "20 juin 2026 · 09:41", actor: "Système", category: "kyc", action: "Justificatifs déposés", target: "Dr A. Diop (6 pièces)" },
+  { id: "e12", at: "19 juin 2026 · 09:41", actor: "Système", category: "kyc", action: "Justificatifs déposés", target: "Dr A. Diop (6 pièces)" },
 ];
 
 const PAGE_SIZE = 8;
