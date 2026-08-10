@@ -137,7 +137,11 @@ export function BookingDialog({ doctor, en, open, onOpenChange, initialSlot }: P
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
 
-  const availability = useMemo(() => (open ? buildAvailability(doctor) : new Map()), [open, doctor]);
+  const availability = useMemo<Map<string, string[]>>(
+    () => (open ? buildAvailability(doctor) : new Map()),
+    [open, doctor],
+  );
+
 
   const availableDates = useMemo(
     () =>
