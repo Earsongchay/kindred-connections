@@ -258,67 +258,66 @@ export function BookingDialog({ doctor, en, open, onOpenChange, initialSlot }: P
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <Field label={en ? "Pick a day" : "Choisissez un jour"}>
-                    <div className="flex flex-wrap gap-2">
-                      {doctor.slots.map((slot) => {
-                        const value = en ? slot.day.en : slot.day.fr;
-                        const selected = draft.day === value;
-                        return (
-                          <button
-                            key={slot.day.fr}
-                            type="button"
-                            onClick={() => setDraft((d) => ({ ...d, day: value, time: "" }))}
-                            className={cn(
-                              "min-w-[7rem] rounded-2xl border px-4 py-3 text-left transition-colors",
-                              selected
-                                ? "border-primary bg-primary/10"
-                                : "border-border hover:bg-muted",
-                            )}
-                          >
-                            <span className="block text-sm font-semibold">{value}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {slot.times.length} {en ? "slots" : "créneaux"}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </Field>
-
-                  <Field label={en ? "Available times" : "Créneaux disponibles"}>
-                    {draft.day ? (
-                      <div className="flex flex-wrap gap-2">
-                        {(
-                          doctor.slots.find((s) => (en ? s.day.en : s.day.fr) === draft.day)?.times ??
-                          []
-                        ).map((time) => (
-                          <button
-                            key={time}
-                            type="button"
-                            onClick={() => set("time", time)}
-                            className={cn(
-                              "rounded-xl border px-4 py-2 text-sm font-semibold transition-colors",
-                              draft.time === time
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-border hover:border-primary/50 hover:bg-muted",
-                            )}
-                          >
-                            {time}
-                          </button>
-                        ))}
+                  <div className="grid gap-6 md:grid-cols-[auto_1fr]">
+                    <Field label={en ? "Pick a date" : "Choisissez une date"}>
+                      <div className="rounded-2xl border border-border">
+                        <Calendar
+                          mode="single"
+                          locale={en ? undefined : fr}
+                          selected={selectedDate}
+                          defaultMonth={selectedDate ?? firstAvailable}
+                          onSelect={(date) => {
+                            if (!date) return;
+                            setSelectedDate(date);
+                            setDraft((d) => ({ ...d, day: formatDay(date, en), time: "" }));
+                          }}
+                          disabled={(date) => !availability.has(dateKey(date))}
+                          modifiers={{
+                            available: (date) => availability.has(dateKey(date)),
+                          }}
+                          modifiersClassNames={{
+                            available: "font-semibold text-brand-deep",
+                          }}
+                          className="p-3 pointer-events-auto"
+                        />
                       </div>
-                    ) : (
-                      <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                        {en ? "Select a day first." : "Sélectionnez d'abord un jour."}
-                      </p>
-                    )}
-                  </Field>
+                    </Field>
+
+                    <Field label={en ? "Available times" : "Créneaux disponibles"}>
+                      {selectedDate ? (
+                        <div className="flex flex-wrap gap-2">
+                          {(availability.get(dateKey(selectedDate)) ?? []).map((time) => (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => set("time", time)}
+                              className={cn(
+                                "rounded-xl border px-4 py-2 text-sm font-semibold transition-colors",
+                                draft.time === time
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border hover:border-primary/50 hover:bg-muted",
+                              )}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                          {en
+                            ? "Select a date to see available times."
+                            : "Sélectionnez une date pour voir les créneaux."}
+                        </p>
+                      )}
+                    </Field>
+                  </div>
 
                   <p className="text-xs text-muted-foreground">
                     {en ? "Local time at the practice" : "Heure locale du lieu"} · {doctor.timezone}
                   </p>
                 </div>
               )}
+
 
               {step === 3 && (
                 <div className="space-y-6">
