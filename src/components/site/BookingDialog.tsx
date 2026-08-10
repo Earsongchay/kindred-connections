@@ -132,22 +132,43 @@ export function BookingDialog({ doctor, en, open, onOpenChange, initialSlot }: P
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
+
+  const availability = useMemo(() => (open ? buildAvailability(doctor) : new Map()), [open, doctor]);
+
+  const availableDates = useMemo(
+    () =>
+      [...availability.keys()]
+        .map((k) => {
+          const [y, m, d] = k.split("-").map(Number);
+          return new Date(y, m - 1, d);
+        })
+        .sort((a, b) => a.getTime() - b.getTime()),
+    [availability],
+  );
+  const firstAvailable = availableDates[0];
 
   useEffect(() => {
     if (!open) return;
     setStep(1);
     setDone(false);
     setSubmitting(false);
+    const preset = initialSlot?.time
+      ? availableDates.find((d) => (availability.get(dateKey(d)) ?? []).includes(initialSlot.time))
+      : undefined;
+    setSelectedDate(preset);
     setDraft({
       ...EMPTY,
       reason: en ? doctor.services[0]?.en ?? "" : doctor.services[0]?.fr ?? "",
-      day: initialSlot?.day ?? "",
-      time: initialSlot?.time ?? "",
+      day: preset ? formatDay(preset, en) : "",
+      time: preset ? initialSlot?.time ?? "" : "",
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialSlot, doctor, en]);
+
 
   const price = doctor.prices[draft.priceIndex];
 
