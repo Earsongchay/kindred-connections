@@ -35,7 +35,7 @@ export const Route = createFileRoute("/$locale/medecin/$doctorId")({
     if (!loaderData) {
       return {
         meta: [
-          { title: en ? "Practitioner unavailable — FUENI" : "Praticien indisponible — FUENI" },
+          { title: en ? "Doctor unavailable — FUENI" : "Médecin indisponible — FUENI" },
           { name: "robots", content: "noindex" },
         ],
       };
