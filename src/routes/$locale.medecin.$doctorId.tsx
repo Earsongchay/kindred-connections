@@ -362,7 +362,16 @@ function DoctorDetailPage() {
         </aside>
       </section>
 
+      <BookingDialog
+        doctor={doctor}
+        en={en}
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        initialSlot={initialSlot}
+      />
+
       <SiteFooter />
+
     </div>
   );
 }
