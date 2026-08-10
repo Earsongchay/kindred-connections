@@ -115,7 +115,7 @@ function Hero() {
               void navigate({
                 to: "/$locale/recherche",
                 params: { locale },
-                search: { q: query, city },
+                search: { q: query, city, type: "" },
               });
             }}
           >

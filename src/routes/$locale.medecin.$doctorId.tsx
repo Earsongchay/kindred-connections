@@ -2,7 +2,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
   MapPin,
-  Star,
   ShieldCheck,
   Video,
   ArrowLeft,
@@ -21,6 +20,11 @@ import { getDoctor, type Doctor } from "@/lib/doctors";
 import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
 
 export const Route = createFileRoute("/$locale/medecin/$doctorId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q : "",
+    city: typeof search.city === "string" ? search.city : "",
+    type: typeof search.type === "string" ? search.type : "",
+  }),
   loader: ({ params }) => {
     const doctor = getDoctor(params.doctorId);
     if (!doctor) throw notFound();
@@ -31,7 +35,7 @@ export const Route = createFileRoute("/$locale/medecin/$doctorId")({
     if (!loaderData) {
       return {
         meta: [
-          { title: en ? "Practitioner unavailable — FUENI" : "Praticien indisponible — FUENI" },
+          { title: en ? "Doctor unavailable — FUENI" : "Médecin indisponible — FUENI" },
           { name: "robots", content: "noindex" },
         ],
       };
@@ -59,6 +63,7 @@ function DoctorDetailPage() {
   const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const en = locale === "en";
   const { doctor } = Route.useLoaderData() as { doctor: Doctor };
+  const search = Route.useSearch();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -68,11 +73,11 @@ function DoctorDetailPage() {
         <Link
           to="/$locale/recherche"
           params={{ locale }}
-          search={{ q: "", city: "" }}
+          search={search}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          {en ? "Back to search" : "Retour à la recherche"}
+          {en ? "Back to results" : "Retour aux résultats"}
         </Link>
       </div>
 
@@ -98,11 +103,6 @@ function DoctorDetailPage() {
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> {doctor.address}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Star className="h-4 w-4 fill-accent text-accent" />
-                  <span className="font-semibold text-foreground">{doctor.rating.toFixed(1)}</span> (
-                  {doctor.reviews} {en ? "reviews" : "avis"})
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <BriefcaseMedical className="h-4 w-4" /> {doctor.experience}{" "}
@@ -301,7 +301,9 @@ function DoctorDetailPage() {
 
         <aside className="lg:col-span-4">
           <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-float)]">
-            <p className="text-sm text-muted-foreground">{en ? "Consultation fee" : "Tarif de consultation"}</p>
+            <p className="text-sm text-muted-foreground">
+              {en ? "Consultation from" : "Consultation à partir de"}
+            </p>
             <p className="mt-1 text-3xl font-extrabold tracking-tight">{doctor.fee}</p>
 
             <h2 className="mt-6 inline-flex items-center gap-2 text-sm font-semibold">
