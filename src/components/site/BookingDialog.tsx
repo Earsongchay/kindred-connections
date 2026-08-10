@@ -502,7 +502,7 @@ function Summary({
           : (doctor.practices[0]?.address ?? doctor.address),
     },
     {
-      Icon: Calendar,
+      Icon: CalendarIcon,
       label: en ? "When" : "Quand",
       value: `${draft.day} · ${draft.time}${duration ? ` (${duration} min)` : ""}`,
     },
