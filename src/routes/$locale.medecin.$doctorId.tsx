@@ -1,4 +1,5 @@
 // TODO Sprint 4 — Wire booking action to the real appointment API.
+import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
   MapPin,
