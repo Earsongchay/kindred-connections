@@ -106,9 +106,20 @@ function DoctorDetailPage() {
                 {en ? doctor.specialty.en : doctor.specialty.fr}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {doctor.address}
-                </span>
+                <a href="#lieux" className="inline-flex items-center gap-1.5 hover:text-foreground">
+                  <MapPin className="h-4 w-4" />
+                  {doctor.practices.length}{" "}
+                  {en
+                    ? doctor.practices.length > 1
+                      ? "consultation locations"
+                      : "consultation location"
+                    : doctor.practices.length > 1
+                      ? "lieux de consultation"
+                      : "lieu de consultation"}
+                  {" · "}
+                  {doctor.practices.map((p) => p.city).join(" · ")}
+                </a>
+
                 <span className="inline-flex items-center gap-1.5">
                   <BriefcaseMedical className="h-4 w-4" /> {doctor.experience}{" "}
                   {en ? "years of practice" : "ans d'exercice"}
