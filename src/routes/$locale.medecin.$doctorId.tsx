@@ -64,6 +64,10 @@ function DoctorDetailPage() {
   const en = locale === "en";
   const { doctor } = Route.useLoaderData() as { doctor: Doctor };
   const search = Route.useSearch();
+  const [activeId, setActiveId] = useState(doctor.practices[0]!.id);
+  const active = doctor.practices.find((p) => p.id === activeId) ?? doctor.practices[0]!;
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
