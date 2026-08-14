@@ -393,17 +393,56 @@ function DoctorDetailPage() {
 
         <aside className="lg:col-span-4">
           <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-float)]">
-            <p className="text-sm text-muted-foreground">
-              {en ? "Consultation from" : "Consultation à partir de"}
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {en ? "Booking at" : "Rendez-vous à"}
             </p>
-            <p className="mt-1 text-3xl font-extrabold tracking-tight">{doctor.fee}</p>
+            <p className="mt-1 text-base font-bold">{active.name}</p>
+            <p className="mt-0.5 inline-flex items-start gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              {active.city}, {active.country}
+            </p>
+
+            {/* Location switcher inside booking card */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {doctor.practices.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setActiveId(p.id)}
+                  aria-pressed={p.id === active.id}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    p.id === active.id
+                      ? "border-primary bg-primary/10 text-brand-deep"
+                      : "border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {p.city}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl bg-muted/40 p-4">
+              <p className="text-sm text-muted-foreground">
+                {en ? "Consultation from" : "Consultation à partir de"}
+              </p>
+              <p className="mt-1 text-3xl font-extrabold tracking-tight">{active.fee}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {active.teleconsultation
+                  ? en
+                    ? "In person or teleconsultation"
+                    : "Sur place ou en téléconsultation"
+                  : en
+                    ? "In person only"
+                    : "Sur place uniquement"}
+              </p>
+            </div>
 
             <h2 className="mt-6 inline-flex items-center gap-2 text-sm font-semibold">
               <Clock className="h-4 w-4 text-brand-deep" />
-              {en ? "Next available slots" : "Prochaines disponibilités"}
+              {en ? "Next slots at this location" : "Prochaines dispos à ce lieu"}
             </h2>
             <div className="mt-4 space-y-4">
-              {doctor.slots.map((slot) => (
+              {active.slots.map((slot) => (
                 <div key={slot.day.fr}>
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {en ? slot.day.en : slot.day.fr}
@@ -420,6 +459,11 @@ function DoctorDetailPage() {
                   </div>
                 </div>
               ))}
+              {active.slots.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {en ? "No slots published for this location." : "Aucune dispo publiée pour ce lieu."}
+                </p>
+              )}
             </div>
 
             <Button
@@ -433,9 +477,11 @@ function DoctorDetailPage() {
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               {en
-                ? "Create your patient account to confirm the booking."
-                : "Créez votre compte patient pour confirmer le rendez-vous."}
+                ? `Create your patient account to confirm at ${active.name}.`
+                : `Créez votre compte patient pour confirmer à ${active.name}.`}
             </p>
+          </div>
+
           </div>
         </aside>
       </section>
