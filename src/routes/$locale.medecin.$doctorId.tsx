@@ -169,86 +169,162 @@ function DoctorDetailPage() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
-            <h2 className="text-xl font-bold">{en ? "Location" : "Localisation"}</h2>
-            <div className="mt-4 space-y-3">
-              {doctor.practices.map((p) => (
-                <div key={p.name} className="rounded-2xl border border-border p-4">
-                  <p className="text-sm font-semibold">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{en ? p.kind.en : p.kind.fr}</p>
-                  <p className="mt-2 inline-flex items-start gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                    {p.address}
+          <div id="lieux" className="mt-6 rounded-3xl border border-border bg-card p-8">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold">
+                  {en ? "Consultation locations" : "Lieux de consultation"}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {en
+                    ? `Hours, fees and access differ by location. Pick one to see its details (${doctor.practices.length} available).`
+                    : `Horaires, tarifs et accès varient selon le lieu. Choisissez-en un pour voir ses détails (${doctor.practices.length} disponibles).`}
+                </p>
+              </div>
+            </div>
+
+            {/* Location selector */}
+            <div className="mt-5 grid gap-3 sm:grid-cols-2" role="tablist">
+              {doctor.practices.map((p) => {
+                const isActive = p.id === active.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => setActiveId(p.id)}
+                    className={`rounded-2xl border p-4 text-left transition-colors ${
+                      isActive
+                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">{en ? p.kind.en : p.kind.fr}</p>
+                      </div>
+                      {isActive && (
+                        <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
+                          {en ? "Selected" : "Sélectionné"}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-3 inline-flex items-start gap-1.5 text-xs text-muted-foreground">
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      {p.city}, {p.country}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                      <span className="font-semibold text-brand-deep">
+                        {en ? "From" : "À partir de"} {p.fee}
+                      </span>
+                      {p.teleconsultation && (
+                        <span className="inline-flex items-center gap-1 text-muted-foreground">
+                          <Video className="h-3.5 w-3.5" />
+                          {en ? "Teleconsultation" : "Téléconsultation"}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected location details */}
+            <div className="mt-6 rounded-2xl border border-border bg-muted/20 p-5">
+              <p className="text-base font-bold">{active.name}</p>
+              <p className="mt-1 inline-flex items-start gap-1.5 text-sm text-muted-foreground">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                {active.address}
+              </p>
+
+              <div className="mt-5 grid h-44 place-items-center rounded-2xl border border-dashed border-border bg-card text-sm text-muted-foreground">
+                {en ? `Map — ${active.name}` : `Carte — ${active.name}`}
+              </div>
+
+              <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                <div>
+                  <h3 className="inline-flex items-center gap-2 text-sm font-semibold">
+                    <Clock className="h-4 w-4 text-brand-deep" />
+                    {en ? "Hours at this location" : "Horaires de ce lieu"}
+                  </h3>
+                  <ul className="mt-3 divide-y divide-border">
+                    {active.hours.map((h) => (
+                      <li
+                        key={h.day.fr}
+                        className="flex items-center justify-between gap-4 py-2 text-sm"
+                      >
+                        <span className="font-medium">{en ? h.day.en : h.day.fr}</span>
+                        <span
+                          className={
+                            h.ranges.length ? "text-muted-foreground" : "text-muted-foreground/70"
+                          }
+                        >
+                          {h.ranges.length ? h.ranges.join(", ") : en ? "Closed" : "Fermé"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {en ? "Local time" : "Heure locale"} · {active.timezone}
                   </p>
                 </div>
-              ))}
-            </div>
 
-            <div className="mt-4 grid h-44 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
-              {en ? "Practice map" : "Carte du cabinet"}
-            </div>
+                <div>
+                  <h3 className="text-sm font-semibold">
+                    {en ? "Fees at this location" : "Tarifs de ce lieu"}
+                  </h3>
+                  <ul className="mt-3 divide-y divide-border">
+                    {active.prices.map((p) => (
+                      <li key={p.label.fr} className="flex items-center justify-between gap-4 py-3">
+                        <div>
+                          <p className="text-sm font-semibold">{en ? p.label.en : p.label.fr}</p>
+                          <p className="text-xs text-muted-foreground">{p.duration} min</p>
+                        </div>
+                        <p className="text-sm font-bold">{p.amount}</p>
+                      </li>
+                    ))}
+                  </ul>
 
-            <h3 className="mt-6 text-sm font-semibold">{en ? "Accessibility" : "Accessibilité"}</h3>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {doctor.accessibility.map((a) => (
-                <li
-                  key={a.fr}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm"
-                >
-                  <Accessibility className="h-4 w-4 text-brand-deep" />
-                  {en ? a.en : a.fr}
-                </li>
-              ))}
-            </ul>
-
-            <h3 className="mt-6 text-sm font-semibold">{en ? "Practice photos" : "Photos du cabinet"}</h3>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="grid aspect-4/3 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground"
-                >
-                  <ImageIcon className="h-5 w-5" />
+                  <h3 className="mt-6 text-sm font-semibold">
+                    {en ? "Accessibility" : "Accessibilité"}
+                  </h3>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {active.accessibility.map((a) => (
+                      <li
+                        key={a.fr}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm"
+                      >
+                        <Accessibility className="h-4 w-4 text-brand-deep" />
+                        {en ? a.en : a.fr}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
+              </div>
+
+              <h3 className="mt-6 text-sm font-semibold">
+                {en ? "Photos of this location" : "Photos de ce lieu"}
+              </h3>
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {active.photos.map((photo) => (
+                  <figure
+                    key={photo.fr}
+                    className="overflow-hidden rounded-2xl border border-dashed border-border bg-card"
+                  >
+                    <div className="grid aspect-4/3 place-items-center text-muted-foreground">
+                      <ImageIcon className="h-5 w-5" />
+                    </div>
+                    <figcaption className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
+                      {en ? photo.en : photo.fr}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
-            <h2 className="text-xl font-bold">
-              {en ? "Consultation hours" : "Horaires de consultation"}
-            </h2>
-            <ul className="mt-4 divide-y divide-border">
-              {doctor.hours.map((h) => (
-                <li key={h.day.fr} className="flex items-center justify-between gap-4 py-2.5 text-sm">
-                  <span className="font-medium">{en ? h.day.en : h.day.fr}</span>
-                  <span className={h.ranges.length ? "text-muted-foreground" : "text-muted-foreground/70"}>
-                    {h.ranges.length ? h.ranges.join(", ") : en ? "Closed" : "Fermé"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-xs text-muted-foreground">
-              {en ? "Local time at the practice" : "Heure locale du lieu"} · {doctor.timezone}
-            </p>
-          </div>
-
-          <div className="mt-6 rounded-3xl border border-border bg-card p-8">
-            <h2 className="text-xl font-bold">{en ? "Consultation fees" : "Tarifs des consultations"}</h2>
-            <ul className="mt-4 divide-y divide-border">
-              {doctor.prices.map((p) => (
-                <li key={p.label.fr} className="flex items-center justify-between gap-4 py-3">
-                  <div>
-                    <p className="text-sm font-semibold">{en ? p.label.en : p.label.fr}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {p.duration} min
-                    </p>
-                  </div>
-                  <p className="text-sm font-bold">{p.amount}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
 
           <div className="mt-6 rounded-3xl border border-border bg-card p-8">
             <h2 className="text-xl font-bold">
