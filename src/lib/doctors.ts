@@ -7,10 +7,23 @@ export interface DoctorSlot {
 }
 
 export interface DoctorPractice {
+  id: string;
   name: string;
   kind: { fr: string; en: string };
   address: string;
+  city: string;
+  country: string;
+  /** "à partir de" price for this location. */
+  fee: string;
+  teleconsultation: boolean;
+  timezone: string;
+  hours: DoctorHours[];
+  slots: DoctorSlot[];
+  prices: DoctorPrice[];
+  accessibility: { fr: string; en: string }[];
+  photos: { fr: string; en: string }[];
 }
+
 
 export interface DoctorHours {
   day: { fr: string; en: string };
