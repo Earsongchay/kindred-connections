@@ -481,8 +481,6 @@ function DoctorDetailPage() {
                 : `Créez votre compte patient pour confirmer à ${active.name}.`}
             </p>
           </div>
-
-          </div>
         </aside>
       </section>
 
