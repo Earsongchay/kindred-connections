@@ -895,6 +895,58 @@ export const fr = {
       description: "Connectez-vous avec votre nouveau mot de passe. Redirection…",
       cta: "Aller à mon espace",
     },
+  appts: {
+    meta: {
+      title: "Mes rendez-vous — FUENI",
+      description: "Consultez, reportez ou annulez vos rendez-vous FUENI.",
+    },
+    title: "Mes rendez-vous",
+    subtitle: "Consultez et gérez vos rendez-vous en toute autonomie.",
+    book: "Prendre un RDV",
+    tabs: { upcoming: "À venir", past: "Passés", cancelled: "Annulés" },
+    status: { CONFIRMED: "Confirmé", CANCELLED: "Annulé", COMPLETED: "Terminé" },
+    empty: {
+      upcoming: "Vous n'avez aucun rendez-vous à venir.",
+      past: "Aucun rendez-vous passé.",
+      cancelled: "Aucun rendez-vous annulé.",
+      cta: "Prendre un RDV",
+    },
+    detail: {
+      title: "Détail du rendez-vous",
+      doctor: "Médecin",
+      when: "Date et heure",
+      place: "Lieu",
+      phone: "Téléphone du lieu",
+      reason: "Motif",
+      duration: "{{count}} min",
+      notes: "Précisions pour le médecin",
+      fee: "Tarif",
+      feeNote: "à régler sur place",
+      close: "Fermer",
+    },
+    actions: {
+      calendar: "Ajouter au calendrier",
+      reschedule: "Reporter",
+      cancel: "Annuler le rendez-vous",
+      rebook: "Reprendre rendez-vous",
+    },
+    delayNote:
+      "Vous pouvez modifier ou annuler jusqu'à 2 h avant le rendez-vous. Au-delà, contactez le médecin.",
+    lockedTooltip:
+      "Modification en ligne fermée (moins de 2 h avant le rendez-vous). Contactez le médecin.",
+    cancelDialog: {
+      title: "Annuler ce rendez-vous ?",
+      description:
+        "Le créneau sera libéré et le médecin sera prévenu. Cette action est définitive.",
+      keep: "Garder mon RDV",
+      confirm: "Confirmer l'annulation",
+    },
+    toast: {
+      cancelled: "Rendez-vous annulé. Le médecin a été prévenu.",
+      ics: "Fichier .ics téléchargé.",
+      reschedule: "Choisissez un nouveau créneau : votre rendez-vous sera déplacé.",
+    },
   },
 } as const;
+
 
