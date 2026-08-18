@@ -162,7 +162,7 @@ function AppointmentsPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t("appts.subtitle")}</p>
         </div>
         <Button asChild>
-          <Link to="/$locale/recherche" params={{ locale }}>
+          <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
             <Plus className="h-4 w-4" /> {t("appts.book")}
           </Link>
         </Button>
@@ -201,7 +201,7 @@ function AppointmentsPage() {
           <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
           <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
           <Button asChild variant="outline" className="mt-4">
-            <Link to="/$locale/recherche" params={{ locale }}>
+            <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
               {t("appts.empty.cta")}
             </Link>
           </Button>
@@ -356,7 +356,7 @@ function AppointmentsPage() {
                   </>
                 ) : (
                   <Button asChild className="w-full justify-center">
-                    <Link to="/$locale/recherche" params={{ locale }}>
+                    <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
                       <RotateCcw className="h-4 w-4" /> {t("appts.actions.rebook")}
                     </Link>
                   </Button>
