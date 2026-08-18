@@ -894,7 +894,7 @@ export const fr = {
       title: "Mot de passe réinitialisé",
       description: "Connectez-vous avec votre nouveau mot de passe. Redirection…",
       cta: "Aller à mon espace",
-    },
+  },
   appts: {
     meta: {
       title: "Mes rendez-vous — FUENI",
