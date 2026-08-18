@@ -888,5 +888,57 @@ export const en = {
       cta: "Go to my space",
     },
   },
+  appts: {
+    meta: {
+      title: "My appointments — FUENI",
+      description: "View, reschedule or cancel your FUENI appointments.",
+    },
+    title: "My appointments",
+    subtitle: "View and manage your appointments on your own.",
+    book: "Book an appointment",
+    tabs: { upcoming: "Upcoming", past: "Past", cancelled: "Cancelled" },
+    status: { CONFIRMED: "Confirmed", CANCELLED: "Cancelled", COMPLETED: "Completed" },
+    empty: {
+      upcoming: "You have no upcoming appointments.",
+      past: "No past appointments.",
+      cancelled: "No cancelled appointments.",
+      cta: "Book an appointment",
+    },
+    detail: {
+      title: "Appointment details",
+      doctor: "Practitioner",
+      when: "Date and time",
+      place: "Location",
+      phone: "Location phone",
+      reason: "Reason",
+      duration: "{{count}} min",
+      notes: "Notes for the practitioner",
+      fee: "Fee",
+      feeNote: "payable on site",
+      close: "Close",
+    },
+    actions: {
+      calendar: "Add to calendar",
+      reschedule: "Reschedule",
+      cancel: "Cancel appointment",
+      rebook: "Book again",
+    },
+    delayNote:
+      "You can reschedule or cancel up to 2 h before the appointment. After that, contact the practitioner.",
+    lockedTooltip:
+      "Online changes are closed (less than 2 h before the appointment). Please contact the practitioner.",
+    cancelDialog: {
+      title: "Cancel this appointment?",
+      description:
+        "The slot will be released and the practitioner notified. This cannot be undone.",
+      keep: "Keep my appointment",
+      confirm: "Confirm cancellation",
+    },
+    toast: {
+      cancelled: "Appointment cancelled. The practitioner has been notified.",
+      ics: ".ics file downloaded.",
+      reschedule: "Pick a new slot: your appointment will be moved.",
+    },
+  },
 } as const;
 
