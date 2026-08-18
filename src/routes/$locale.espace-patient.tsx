@@ -56,7 +56,7 @@ function PatientLayout() {
       exact: true,
     },
     {
-      to: "/$locale/espace-patient",
+      to: "/$locale/espace-patient/rendez-vous",
       label: t("patientLayout.nav.appointments"),
       Icon: CalendarDays,
     },
