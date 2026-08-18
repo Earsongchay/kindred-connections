@@ -1,170 +1,171 @@
-// TODO Sprint 3-4 — Replace mock data with the booking API (SF « Mes rendez-vous » v1.0).
+// TODO Sprint 4 — Replace with the appointments API (SF « Mes rendez-vous » v1.0).
+// Prototype dataset. Dates are fixed ISO strings so SSR and client render identically.
 
 export type AppointmentStatus = "CONFIRMED" | "CANCELLED" | "COMPLETED";
 
 export interface Appointment {
   id: string;
-  doctorSlug: string;
+  doctorId: string;
   doctorName: string;
-  specialtyFr: string;
-  specialtyEn: string;
-  /** ISO instant of the appointment start. */
+  initials: string;
+  specialty: { fr: string; en: string };
+  /** Local time at the venue, ISO without zone: yyyy-mm-ddThh:mm */
   startsAt: string;
-  /** IANA timezone of the location. */
+  durationMin: number;
+  /** IANA timezone of the venue. */
   timezone: string;
-  timezoneLabel: string;
-  locationName: string;
+  tzLabel: string;
+  placeName: string;
   address: string;
-  /** Mandatory on a bookable location (PP19) — denormalised on the appointment. */
+  /** Mandatory on a bookable place (PP19) — may be empty on legacy rows. */
   phone: string;
-  reasonFr: string;
-  reasonEn: string;
-  durationMinutes: number;
+  reason: { fr: string; en: string };
   fee: string;
-  /** Free text captured at booking (≤ 500 chars). */
-  patientNote?: string;
+  /** Free text typed at booking, max 500 chars, line breaks preserved. */
+  notes: string;
   status: AppointmentStatus;
 }
 
-/** MR1 — global modification window in MVP (per-doctor post-MVP). */
-export const MODIFY_WINDOW_HOURS = 2;
+/** Modification window before the appointment (MVP: 2 h, global — MR1). */
+export const CUTOFF_HOURS = 2;
 
-export function isWithinModifyWindow(startsAt: string, now: Date = new Date()): boolean {
-  const diffMs = new Date(startsAt).getTime() - now.getTime();
-  return diffMs > MODIFY_WINDOW_HOURS * 3600 * 1000;
+export const APPOINTMENTS: Appointment[] = [
+  {
+    id: "rdv-10241",
+    doctorId: "amina-sow",
+    doctorName: "Dr Aboubacar Diallo",
+    initials: "AD",
+    specialty: { fr: "Cardiologie", en: "Cardiology" },
+    startsAt: "2026-09-04T10:30",
+    durationMin: 30,
+    timezone: "Africa/Dakar",
+    tzLabel: "GMT+0 · Dakar",
+    placeName: "Cabinet Plateau",
+    address: "12 avenue Léopold Sédar Senghor, Plateau, Dakar",
+    phone: "+221338211234",
+    reason: { fr: "Consultation de suivi", en: "Follow-up consultation" },
+    fee: "25 000 XOF",
+    notes:
+      "Tension un peu haute depuis deux semaines.\nJe prends toujours le traitement prescrit en juin.",
+    status: "CONFIRMED",
+  },
+  {
+    id: "rdv-10238",
+    doctorId: "paul-ndiaye",
+    doctorName: "Dr Mamadou Diallo",
+    initials: "MD",
+    specialty: { fr: "Médecine générale", en: "General medicine" },
+    startsAt: "2026-08-19T08:15",
+    durationMin: 20,
+    timezone: "Africa/Dakar",
+    tzLabel: "GMT+0 · Dakar",
+    placeName: "Hôpital Principal — Consultations externes",
+    address: "1 avenue Nelson Mandela, Dakar",
+    phone: "+221338391050",
+    reason: { fr: "Première consultation", en: "First consultation" },
+    fee: "15 000 XOF",
+    notes: "",
+    status: "CONFIRMED",
+  },
+  {
+    id: "rdv-10190",
+    doctorId: "fatou-keita",
+    doctorName: "Dr Fatou Koné",
+    initials: "FK",
+    specialty: { fr: "Dermatologie", en: "Dermatology" },
+    startsAt: "2026-07-22T15:00",
+    durationMin: 30,
+    timezone: "Africa/Abidjan",
+    tzLabel: "GMT+0 · Abidjan",
+    placeName: "Clinique Sainte-Anne",
+    address: "Boulevard de Marseille, Abidjan",
+    phone: "+2252720301122",
+    reason: { fr: "Contrôle annuel", en: "Annual check-up" },
+    fee: "20 000 XOF",
+    notes: "",
+    status: "COMPLETED",
+  },
+  {
+    id: "rdv-10155",
+    doctorId: "nadia-benali",
+    doctorName: "Dr Awa Ba",
+    initials: "AB",
+    specialty: { fr: "Gynécologie", en: "Gynaecology" },
+    startsAt: "2026-06-11T09:00",
+    durationMin: 30,
+    timezone: "Africa/Dakar",
+    tzLabel: "GMT+0 · Dakar",
+    placeName: "Cabinet Point E",
+    address: "Rue de Diourbel, Point E, Dakar",
+    phone: "+221338250099",
+    reason: { fr: "Consultation de suivi", en: "Follow-up consultation" },
+    fee: "20 000 XOF",
+    notes: "Rendez-vous décalé une première fois pour raison professionnelle.",
+    status: "CANCELLED",
+  },
+];
+
+export function endOf(a: Appointment): Date {
+  const d = new Date(`${a.startsAt}:00`);
+  return new Date(d.getTime() + a.durationMin * 60_000);
 }
 
-export function formatDateTime(startsAt: string, timeZone: string, en: boolean) {
-  const d = new Date(startsAt);
-  const loc = en ? "en-GB" : "fr-FR";
-  const day = new Intl.DateTimeFormat(loc, { day: "2-digit", timeZone }).format(d);
-  const month = new Intl.DateTimeFormat(loc, { month: "short", timeZone }).format(d);
-  const time = new Intl.DateTimeFormat(loc, {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone,
-    hour12: en,
-  }).format(d);
-  const full = new Intl.DateTimeFormat(loc, {
+export function startOf(a: Appointment): Date {
+  return new Date(`${a.startsAt}:00`);
+}
+
+/** MR1 — online reschedule/cancel allowed until CUTOFF_HOURS before the start. */
+export function isWithinCutoff(a: Appointment, now: Date): boolean {
+  return startOf(a).getTime() - now.getTime() > CUTOFF_HOURS * 3_600_000;
+}
+
+export function formatDateTime(a: Appointment, locale: string): string {
+  const d = startOf(a);
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "fr-FR", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone,
-    hour12: en,
   }).format(d);
-  return { day, month: month.replace(".", "").toUpperCase(), time, full };
 }
 
-function icsStamp(date: Date): string {
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+function pad(n: number) {
+  return String(n).padStart(2, "0");
 }
 
-/** MR5 — .ics always exported in UTC so the instant is correct in any timezone. */
-export function buildIcs(a: Appointment, en: boolean): string {
-  const start = new Date(a.startsAt);
-  const end = new Date(start.getTime() + a.durationMinutes * 60000);
-  const summary = `${en ? "Appointment" : "Rendez-vous"} — ${a.doctorName}`;
-  const description = [en ? a.reasonEn : a.reasonFr, a.phone].filter(Boolean).join(" · ");
+/** MR5 — .ics export converts the venue local time to UTC. */
+export function buildIcs(a: Appointment, locale: "fr" | "en"): string {
+  const toUtc = (d: Date) => {
+    const utc = new Date(
+      Date.UTC(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate(),
+        d.getHours(),
+        d.getMinutes(),
+        0,
+      ),
+    );
+    // Venue offset is GMT+0 for the MVP launch countries.
+    return `${utc.getUTCFullYear()}${pad(utc.getUTCMonth() + 1)}${pad(utc.getUTCDate())}T${pad(
+      utc.getUTCHours(),
+    )}${pad(utc.getUTCMinutes())}00Z`;
+  };
+  const summary = `${a.doctorName} — ${a.reason[locale]}`;
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//FUENI//Appointments//EN",
-    "CALSCALE:GREGORIAN",
+    "PRODID:-//FUENI//Appointments//FR",
     "BEGIN:VEVENT",
-    `UID:${a.id}@fueni`,
-    `DTSTAMP:${icsStamp(new Date())}`,
-    `DTSTART:${icsStamp(start)}`,
-    `DTEND:${icsStamp(end)}`,
+    `UID:${a.id}@fueni.health`,
+    `DTSTART:${toUtc(startOf(a))}`,
+    `DTEND:${toUtc(endOf(a))}`,
     `SUMMARY:${summary}`,
-    `DESCRIPTION:${description}`,
-    `LOCATION:${a.locationName}, ${a.address}`,
+    `LOCATION:${a.placeName}, ${a.address}`,
+    `DESCRIPTION:${a.specialty[locale]} — ${a.fee}`,
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
 }
-
-function inHours(h: number): string {
-  return new Date(Date.now() + h * 3600 * 1000).toISOString();
-}
-
-export const APPOINTMENTS: Appointment[] = [
-  {
-    id: "rdv-1042",
-    doctorSlug: "amina-sow",
-    doctorName: "Dr Amina Sow",
-    specialtyFr: "Cardiologie",
-    specialtyEn: "Cardiology",
-    startsAt: inHours(72),
-    timezone: "Africa/Dakar",
-    timezoneLabel: "GMT (UTC+0)",
-    locationName: "Cabinet Médical Plateau",
-    address: "12 rue Carnot, Plateau, Dakar, Sénégal",
-    phone: "+221 33 842 15 20",
-    reasonFr: "Consultation générale",
-    reasonEn: "General consultation",
-    durationMinutes: 30,
-    fee: "15 000 FCFA",
-    patientNote:
-      "Douleurs thoraciques légères depuis deux semaines, surtout à l'effort.\nJe prends de l'amlodipine 5 mg depuis 6 mois.",
-    status: "CONFIRMED",
-  },
-  {
-    id: "rdv-1043",
-    doctorSlug: "fatou-keita",
-    doctorName: "Dr Fatou Keïta",
-    specialtyFr: "Médecine générale",
-    specialtyEn: "General medicine",
-    // Inside the 2 h window — actions disabled, never hidden (MR1).
-    startsAt: inHours(1.2),
-    timezone: "Africa/Abidjan",
-    timezoneLabel: "GMT (UTC+0)",
-    locationName: "Clinique Pasteur",
-    address: "Boulevard de la République, Abidjan, Côte d'Ivoire",
-    phone: "+225 27 20 31 44",
-    reasonFr: "Suivi / renouvellement",
-    reasonEn: "Follow-up / renewal",
-    durationMinutes: 20,
-    fee: "10 000 FCFA",
-    status: "CONFIRMED",
-  },
-  {
-    id: "rdv-0987",
-    doctorSlug: "kwame-mensah",
-    doctorName: "Dr Kwame Mensah",
-    specialtyFr: "Dermatologie",
-    specialtyEn: "Dermatology",
-    startsAt: inHours(-24 * 21),
-    timezone: "Africa/Accra",
-    timezoneLabel: "GMT (UTC+0)",
-    locationName: "Clinique Le Baobab",
-    address: "15 Independence Ave, Accra, Ghana",
-    phone: "+233 30 276 11 08",
-    reasonFr: "Consultation spécialisée",
-    reasonEn: "Specialist consultation",
-    durationMinutes: 40,
-    fee: "20 000 FCFA",
-    status: "COMPLETED",
-  },
-  {
-    id: "rdv-0954",
-    doctorSlug: "jean-mbala",
-    doctorName: "Dr Jean Mbala",
-    specialtyFr: "Pédiatrie",
-    specialtyEn: "Paediatrics",
-    startsAt: inHours(-24 * 40),
-    timezone: "Africa/Douala",
-    timezoneLabel: "WAT (UTC+1)",
-    locationName: "Cabinet Bonapriso",
-    address: "Rue Njo-Njo, Bonapriso, Douala, Cameroun",
-    phone: "+237 233 42 66 90",
-    reasonFr: "Consultation générale",
-    reasonEn: "General consultation",
-    durationMinutes: 30,
-    fee: "12 000 FCFA",
-    patientNote: "Rendez-vous annulé pour cause de déplacement professionnel.",
-    status: "CANCELLED",
-  },
-];

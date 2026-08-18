@@ -1,19 +1,19 @@
-// TODO Sprint 3-4 — Wire to booking API. Pure UI prototype per SF « Mes rendez-vous » v1.0.
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+// SF « Mes rendez-vous » v1.0 — écran 08-patient-mes-rdv.
+// TODO Sprint 4 — Wire to the appointments API (states, slot release, notifications).
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  AlertTriangle,
   CalendarDays,
   CalendarPlus,
+  ChevronRight,
   Clock,
   Info,
   MapPin,
-  MessageSquareText,
   Phone,
-  PlusCircle,
+  Plus,
   RotateCcw,
   Stethoscope,
-  Wallet,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,18 +34,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
-import { cn } from "@/lib/utils";
+import { BookingDialog } from "@/components/site/BookingDialog";
+import { getDoctor } from "@/lib/doctors";
 import {
   APPOINTMENTS,
-  MODIFY_WINDOW_HOURS,
-  formatDateTime,
-  isWithinModifyWindow,
   buildIcs,
+  formatDateTime,
+  isWithinCutoff,
+  startOf,
   type Appointment,
   type AppointmentStatus,
 } from "@/lib/appointments";
+import { isLocale, DEFAULT_LOCALE, type Locale } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/$locale/espace-patient/rendez-vous")({
   head: () => ({
@@ -54,12 +55,12 @@ export const Route = createFileRoute("/$locale/espace-patient/rendez-vous")({
       {
         name: "description",
         content:
-          "Consultez, reportez ou annulez vos rendez-vous médicaux FUENI et ajoutez-les à votre agenda.",
+          "Consultez, reportez ou annulez vos rendez-vous FUENI depuis votre espace patient.",
       },
       { property: "og:title", content: "Mes rendez-vous — FUENI" },
       {
         property: "og:description",
-        content: "Gérez vos rendez-vous médicaux : à venir, passés et annulés.",
+        content: "Gérez vos rendez-vous médicaux FUENI en toute autonomie.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -68,20 +69,34 @@ export const Route = createFileRoute("/$locale/espace-patient/rendez-vous")({
   component: AppointmentsPage,
 });
 
-type TabId = "upcoming" | "past" | "cancelled";
+type TabKey = "upcoming" | "past" | "cancelled";
+
+const STATUS_STYLES: Record<AppointmentStatus, string> = {
+  CONFIRMED: "bg-primary/10 text-primary",
+  CANCELLED: "bg-destructive/10 text-destructive",
+  COMPLETED: "bg-muted text-muted-foreground",
+};
 
 function AppointmentsPage() {
+  const { t } = useTranslation();
   const params = Route.useParams();
   const locale: Locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE;
   const en = locale === "en";
-  const navigate = useNavigate();
 
+  const [tab, setTab] = useState<TabKey>("upcoming");
   const [items, setItems] = useState<Appointment[]>(APPOINTMENTS);
-  const [tab, setTab] = useState<TabId>("upcoming");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [rescheduleId, setRescheduleId] = useState<string | null>(null);
+  // Computed after hydration only — keeps SSR and client markup identical.
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
-  const now = new Date();
+  const reference = now ?? new Date("2026-08-18T00:00:00");
 
   const groups = useMemo(() => {
     const upcoming: Appointment[] = [];
@@ -89,436 +104,321 @@ function AppointmentsPage() {
     const cancelled: Appointment[] = [];
     for (const a of items) {
       if (a.status === "CANCELLED") cancelled.push(a);
-      else if (a.status === "COMPLETED" || new Date(a.startsAt) < now) past.push(a);
+      else if (a.status === "COMPLETED" || startOf(a).getTime() < reference.getTime()) past.push(a);
       else upcoming.push(a);
     }
-    upcoming.sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
-    past.sort((a, b) => +new Date(b.startsAt) - +new Date(a.startsAt));
-    cancelled.sort((a, b) => +new Date(b.startsAt) - +new Date(a.startsAt));
+    const byDate = (x: Appointment, y: Appointment) =>
+      startOf(x).getTime() - startOf(y).getTime();
+    upcoming.sort(byDate);
+    past.sort((x, y) => -byDate(x, y));
+    cancelled.sort((x, y) => -byDate(x, y));
     return { upcoming, past, cancelled };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
+  }, [items, reference]);
 
-  const tabs: { id: TabId; label: string; count: number }[] = [
-    { id: "upcoming", label: en ? "Upcoming" : "À venir", count: groups.upcoming.length },
-    { id: "past", label: en ? "Past" : "Passés", count: groups.past.length },
-    { id: "cancelled", label: en ? "Cancelled" : "Annulés", count: groups.cancelled.length },
-  ];
+  const selected = items.find((a) => a.id === openId) ?? null;
+  const rescheduleDoctor = rescheduleId
+    ? getDoctor(items.find((a) => a.id === rescheduleId)?.doctorId ?? "")
+    : undefined;
 
-  const list = groups[tab];
-  const active = items.find((a) => a.id === openId) ?? null;
-
-  const statusChip = (a: Appointment) => {
-    const s: AppointmentStatus =
-      a.status === "CONFIRMED" && new Date(a.startsAt) < now ? "COMPLETED" : a.status;
-    const map: Record<AppointmentStatus, { label: string; cls: string }> = {
-      CONFIRMED: {
-        label: en ? "Confirmed" : "Confirmé",
-        cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-      },
-      CANCELLED: {
-        label: en ? "Cancelled" : "Annulé",
-        cls: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
-      },
-      COMPLETED: {
-        label: en ? "Completed" : "Terminé",
-        cls: "bg-muted text-muted-foreground",
-      },
-    };
-    return map[s];
-  };
+  const modifiable = selected ? selected.status === "CONFIRMED" && groups.upcoming.includes(selected) : false;
+  const withinCutoff = selected && now ? isWithinCutoff(selected, now) : false;
+  const canModify = modifiable && withinCutoff;
 
   const downloadIcs = (a: Appointment) => {
-    const blob = new Blob([buildIcs(a, en)], { type: "text/calendar;charset=utf-8" });
+    const blob = new Blob([buildIcs(a, locale)], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `fueni-rdv-${a.id}.ics`;
+    link.download = `${a.id}.ics`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const reschedule = (a: Appointment) => {
-    // MR2 — reopen the booking assistant for the same doctor (reason & location prefilled).
-    setOpenId(null);
-    void navigate({
-      to: "/$locale/medecin/$doctorId",
-      params: { locale, doctorId: a.doctorSlug },
-      search: { reschedule: a.id },
-    });
-  };
-
-  const cancel = (id: string) => {
-    setItems((prev) => prev.map((a) => (a.id === id ? { ...a, status: "CANCELLED" } : a)));
-    setConfirmCancel(null);
+  const cancelAppointment = () => {
+    if (!selected) return;
+    // MR4 — server releases the slot and notifies the practitioner.
+    setItems((list) =>
+      list.map((a) => (a.id === selected.id ? { ...a, status: "CANCELLED" as const } : a)),
+    );
+    setConfirmCancel(false);
     setOpenId(null);
     setTab("cancelled");
   };
 
-  const delayNote = en
-    ? `You can change or cancel up to ${MODIFY_WINDOW_HOURS} h before the appointment. After that, contact the doctor.`
-    : `Vous pouvez modifier ou annuler jusqu'à ${MODIFY_WINDOW_HOURS} h avant le rendez-vous. Au-delà, contactez le médecin.`;
+  const tabs: { key: TabKey; count: number }[] = [
+    { key: "upcoming", count: groups.upcoming.length },
+    { key: "past", count: groups.past.length },
+    { key: "cancelled", count: groups.cancelled.length },
+  ];
+
+  const list = groups[tab];
 
   return (
-    <TooltipProvider delayDuration={150}>
-      <div className="space-y-5">
-        {/* Header */}
-        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {en ? "My appointments" : "Mes rendez-vous"}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {en
-                ? "View your appointments and manage them in a few clicks."
-                : "Consultez vos rendez-vous et gérez-les en quelques clics."}
-            </p>
-          </div>
-          <Button asChild className="rounded-full">
+    <div className="max-w-3xl">
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("appts.title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("appts.subtitle")}</p>
+        </div>
+        <Button asChild>
+          <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
+            <Plus className="h-4 w-4" /> {t("appts.book")}
+          </Link>
+        </Button>
+      </div>
+
+      {/* Tabs */}
+      <div className="mt-6 flex gap-1 overflow-x-auto rounded-xl border border-border/60 bg-card p-1">
+        {tabs.map(({ key, count }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={cn(
+              "flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              tab === key
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted",
+            )}
+          >
+            {t(`appts.tabs.${key}`)}
+            <span
+              className={cn(
+                "ml-2 rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
+                tab === key ? "bg-white/20" : "bg-muted-foreground/10",
+              )}
+            >
+              {count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
+      {list.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
+          <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
+          <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
+          <Button asChild variant="outline" className="mt-4">
             <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
-              <PlusCircle className="h-4 w-4" /> {en ? "Book an appointment" : "Prendre un RDV"}
+              {t("appts.empty.cta")}
             </Link>
           </Button>
         </div>
-
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-2 rounded-2xl border border-border/60 bg-card/70 p-1.5 backdrop-blur-xl">
-          {tabs.map((tb) => (
-            <button
-              key={tb.id}
-              type="button"
-              onClick={() => setTab(tb.id)}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition",
-                tab === tb.id
-                  ? "bg-[image:var(--gradient-brand)] text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-              aria-pressed={tab === tb.id}
-            >
-              {tb.label}
-              <span
-                className={cn(
-                  "rounded-full px-1.5 py-0.5 text-[11px] font-bold",
-                  tab === tb.id ? "bg-white/20" : "bg-muted text-muted-foreground",
-                )}
+      ) : (
+        <ul className="mt-6 space-y-3">
+          {list.map((a) => (
+            <li key={a.id}>
+              <button
+                type="button"
+                onClick={() => setOpenId(a.id)}
+                className="group flex w-full items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-all hover:border-primary/40 hover:shadow-md"
               >
-                {tb.count}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* List */}
-        {list.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/70 bg-card/50 p-10 text-center">
-            <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 text-sm font-semibold">
-              {tab === "upcoming"
-                ? en
-                  ? "No upcoming appointment"
-                  : "Aucun rendez-vous à venir"
-                : tab === "past"
-                  ? en
-                    ? "No past appointment"
-                    : "Aucun rendez-vous passé"
-                  : en
-                    ? "No cancelled appointment"
-                    : "Aucun rendez-vous annulé"}
-            </p>
-            <Link
-              to="/$locale/recherche"
-              params={{ locale }}
-              search={{ q: "", city: "", type: "" }}
-              className="mt-3 inline-block text-sm font-semibold text-primary hover:underline"
-            >
-              {en ? "Book an appointment" : "Prendre un RDV"}
-            </Link>
-          </div>
-        ) : (
-          <ul className="space-y-3">
-            {list.map((a) => {
-              const chip = statusChip(a);
-              const dt = formatDateTime(a.startsAt, a.timezone, en);
-              return (
-                <li key={a.id}>
-                  <button
-                    type="button"
-                    onClick={() => setOpenId(a.id)}
-                    className="flex w-full items-center gap-4 rounded-2xl border border-border/60 bg-card/80 p-4 text-left shadow-sm backdrop-blur-xl transition hover:border-primary/40 hover:shadow-[var(--shadow-card)]"
-                  >
-                    <div className="grid h-16 w-16 flex-none place-items-center rounded-2xl bg-primary/10 text-primary">
-                      <div className="text-center leading-tight">
-                        <div className="text-xl font-bold">{dt.day}</div>
-                        <div className="text-[10px] font-semibold uppercase tracking-wide">
-                          {dt.month}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-bold">{a.doctorName}</div>
-                      <div className="truncate text-xs text-muted-foreground">
-                        {en ? a.specialtyEn : a.specialtyFr}
-                      </div>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" /> {dt.time} · {a.timezoneLabel}
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" /> {a.locationName}
-                        </span>
-                      </div>
-                    </div>
+                <div className="grid h-11 w-11 flex-none place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                  {a.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate font-semibold text-foreground">{a.doctorName}</span>
                     <span
                       className={cn(
-                        "flex-none rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                        chip.cls,
+                        "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                        STATUS_STYLES[a.status],
                       )}
                     >
-                      {chip.label}
+                      {t(`appts.status.${a.status}`)}
                     </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                  </div>
+                  <div className="mt-0.5 truncate text-sm text-muted-foreground">
+                    {a.specialty[locale]}
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {formatDateTime(a, locale)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {a.placeName}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
-        {/* Detail drawer */}
-        <Sheet open={!!active} onOpenChange={(o) => !o && setOpenId(null)}>
-          <SheetContent className="w-full overflow-y-auto sm:max-w-md">
-            {active && (
-              <DetailBody
-                a={active}
-                en={en}
-                now={now}
-                delayNote={delayNote}
-                onIcs={() => downloadIcs(active)}
-                onReschedule={() => reschedule(active)}
-                onCancel={() => setConfirmCancel(active.id)}
-                rebookHref={
-                  <Link
-                    to="/$locale/medecin/$doctorId"
-                    params={{ locale, doctorId: active.doctorSlug }}
-                    search={{ reschedule: "" }}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-brand)] px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    {en ? "Book again" : "Reprendre rendez-vous"}
-                  </Link>
-                }
-              />
-            )}
-          </SheetContent>
-        </Sheet>
+      {/* Detail drawer — carries every action (MR6). */}
+      <Sheet open={!!selected} onOpenChange={(o) => !o && setOpenId(null)}>
+        <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+          {selected && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{t("appts.detail.title")}</SheetTitle>
+                <SheetDescription>{selected.reason[locale]}</SheetDescription>
+              </SheetHeader>
 
-        {/* Cancel confirmation */}
-        <AlertDialog open={!!confirmCancel} onOpenChange={(o) => !o && setConfirmCancel(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {en ? "Cancel this appointment?" : "Annuler ce rendez-vous ?"}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {en
-                  ? "The slot will be released and the doctor notified. This cannot be undone."
-                  : "Le créneau sera libéré et le médecin notifié. Cette action est irréversible."}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{en ? "Keep it" : "Conserver"}</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => confirmCancel && cancel(confirmCancel)}
-                className="bg-rose-600 text-white hover:bg-rose-700"
-              >
-                {en ? "Cancel appointment" : "Annuler le RDV"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </TooltipProvider>
-  );
-}
+              <div className="mt-6 space-y-4 rounded-2xl border border-border/60 bg-card p-4">
+                <Row icon={Stethoscope} label={t("appts.detail.doctor")}>
+                  <div className="font-medium text-foreground">{selected.doctorName}</div>
+                  <div className="text-muted-foreground">{selected.specialty[locale]}</div>
+                </Row>
+                <Row icon={CalendarDays} label={t("appts.detail.when")}>
+                  <div className="font-medium text-foreground">
+                    {formatDateTime(selected, locale)}
+                  </div>
+                  <div className="text-muted-foreground">{selected.tzLabel}</div>
+                </Row>
+                <Row icon={MapPin} label={t("appts.detail.place")}>
+                  <div className="font-medium text-foreground">{selected.placeName}</div>
+                  <div className="text-muted-foreground">{selected.address}</div>
+                </Row>
+                {selected.phone && (
+                  <Row icon={Phone} label={t("appts.detail.phone")}>
+                    <a
+                      href={`tel:${selected.phone}`}
+                      className="font-medium text-primary underline-offset-2 hover:underline"
+                    >
+                      {selected.phone}
+                    </a>
+                  </Row>
+                )}
+                <Row icon={Clock} label={t("appts.detail.reason")}>
+                  <div className="font-medium text-foreground">{selected.reason[locale]}</div>
+                  <div className="text-muted-foreground">
+                    {t("appts.detail.duration", { count: selected.durationMin })}
+                  </div>
+                </Row>
+              </div>
 
-function Row({
-  Icon,
-  label,
-  children,
-}: {
-  Icon: typeof MapPin;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-start gap-3 border-b border-border/40 py-3 last:border-0">
-      <Icon className="mt-0.5 h-4 w-4 flex-none text-primary" />
-      <div className="min-w-0 flex-1">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          {label}
-        </div>
-        <div className="text-sm font-medium">{children}</div>
-      </div>
+              {/* Patient notes — full-width block, outside the card (MR6b). */}
+              {selected.notes.trim() && (
+                <div className="mt-4 rounded-2xl border border-border/60 bg-muted/40 p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t("appts.detail.notes")}
+                  </div>
+                  <p className="mt-2 whitespace-pre-line text-sm text-foreground">
+                    {selected.notes.slice(0, 500)}
+                  </p>
+                </div>
+              )}
+
+              {/* Fee — visually distinct */}
+              <div className="mt-4 flex items-center justify-between rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3">
+                <span className="text-sm font-semibold text-foreground">
+                  {t("appts.detail.fee")}
+                </span>
+                <span className="text-sm text-foreground">
+                  <strong>{selected.fee}</strong>{" "}
+                  <span className="text-muted-foreground">— {t("appts.detail.feeNote")}</span>
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-5 space-y-2">
+                {modifiable ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center"
+                      onClick={() => downloadIcs(selected)}
+                    >
+                      <CalendarPlus className="h-4 w-4" /> {t("appts.actions.calendar")}
+                    </Button>
+                    <Button
+                      className="w-full justify-center"
+                      disabled={!canModify}
+                      title={canModify ? undefined : t("appts.lockedTooltip")}
+                      onClick={() => {
+                        setRescheduleId(selected.id);
+                        setOpenId(null);
+                      }}
+                    >
+                      <RotateCcw className="h-4 w-4" /> {t("appts.actions.reschedule")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      disabled={!canModify}
+                      title={canModify ? undefined : t("appts.lockedTooltip")}
+                      onClick={() => setConfirmCancel(true)}
+                    >
+                      <X className="h-4 w-4" /> {t("appts.actions.cancel")}
+                    </Button>
+                    {/* Uniform delay note on every upcoming appointment (MR3). */}
+                    <p className="flex gap-2 pt-1 text-xs text-muted-foreground">
+                      <Info className="mt-0.5 h-3.5 w-3.5 flex-none" />
+                      <span>{t("appts.delayNote")}</span>
+                    </p>
+                  </>
+                ) : (
+                  <Button asChild className="w-full justify-center">
+                    <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
+                      <RotateCcw className="h-4 w-4" /> {t("appts.actions.rebook")}
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Cancel confirmation */}
+      <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("appts.cancelDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("appts.cancelDialog.description")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("appts.cancelDialog.keep")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={cancelAppointment}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("appts.cancelDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reschedule = reopen the booking assistant for the same practitioner (MR2). */}
+      {rescheduleDoctor && (
+        <BookingDialog
+          doctor={rescheduleDoctor}
+          en={en}
+          open={!!rescheduleId}
+          onOpenChange={(o) => !o && setRescheduleId(null)}
+        />
+      )}
     </div>
   );
 }
 
-function DetailBody({
-  a,
-  en,
-  now,
-  delayNote,
-  onIcs,
-  onReschedule,
-  onCancel,
-  rebookHref,
-}: {
-  a: Appointment;
-  en: boolean;
-  now: Date;
-  delayNote: string;
-  onIcs: () => void;
-  onReschedule: () => void;
-  onCancel: () => void;
-  rebookHref: React.ReactNode;
-}) {
-  const dt = formatDateTime(a.startsAt, a.timezone, en);
-  const isUpcoming = a.status === "CONFIRMED" && new Date(a.startsAt) >= now;
-  const editable = isUpcoming && isWithinModifyWindow(a.startsAt, now);
-
-  const lockedTip = en
-    ? "Less than 2 h before the appointment — contact the doctor."
-    : "Moins de 2 h avant le rendez-vous — contactez le médecin.";
-
-  return (
-    <>
-      <SheetHeader className="text-left">
-        <SheetTitle>{en ? "Appointment details" : "Détail du rendez-vous"}</SheetTitle>
-        <SheetDescription>
-          {en
-            ? "Everything about this appointment and the available actions."
-            : "Toutes les informations et les actions disponibles."}
-        </SheetDescription>
-      </SheetHeader>
-
-      <div className="space-y-4 px-4 pb-6">
-        <div className="rounded-2xl border border-border/60 bg-card/70 px-4 py-1">
-          <Row Icon={Stethoscope} label={en ? "Doctor" : "Médecin"}>
-            {a.doctorName}
-            <div className="text-xs font-normal text-muted-foreground">
-              {en ? a.specialtyEn : a.specialtyFr}
-            </div>
-          </Row>
-          <Row Icon={CalendarDays} label={en ? "Date & time" : "Date & heure"}>
-            {dt.full}
-            <div className="text-xs font-normal text-muted-foreground">
-              {en ? "Local time at the location" : "Heure locale du lieu"} · {a.timezoneLabel}
-            </div>
-          </Row>
-          <Row Icon={MapPin} label={en ? "Location" : "Lieu"}>
-            {a.locationName}
-            <div className="text-xs font-normal text-muted-foreground">{a.address}</div>
-          </Row>
-          {a.phone && (
-            <Row Icon={Phone} label={en ? "Location phone" : "Téléphone du lieu"}>
-              <a href={`tel:${a.phone.replace(/\s/g, "")}`} className="text-primary hover:underline">
-                {a.phone}
-              </a>
-            </Row>
-          )}
-          <Row Icon={Clock} label={en ? "Reason" : "Motif"}>
-            {en ? a.reasonEn : a.reasonFr}
-            <div className="text-xs font-normal text-muted-foreground">
-              {a.durationMinutes} min
-            </div>
-          </Row>
-        </div>
-
-        {/* Patient notes — full-width block, outside the card (MR6b) */}
-        {a.patientNote?.trim() && (
-          <div className="rounded-2xl border border-border/60 bg-background/60 p-4">
-            <div className="mb-2 inline-flex items-center gap-2 text-sm font-semibold">
-              <MessageSquareText className="h-4 w-4 text-primary" />
-              {en ? "Notes for the doctor" : "Précisions pour le médecin"}
-            </div>
-            <p className="whitespace-pre-line text-sm text-muted-foreground">
-              {a.patientNote.slice(0, 500)}
-            </p>
-          </div>
-        )}
-
-        {/* Fee — visually distinct */}
-        <div className="flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-4 text-sm">
-          <Wallet className="mt-0.5 h-4 w-4 flex-none text-primary" />
-          <p>
-            <span className="font-semibold">{en ? "Fee" : "Tarif"} : {a.fee}</span>{" "}
-            <span className="text-muted-foreground">
-              — {en ? "to be paid on site" : "à régler sur place"}
-            </span>
-          </p>
-        </div>
-
-        {/* Actions */}
-        {isUpcoming ? (
-          <div className="space-y-2">
-            <Button onClick={onIcs} variant="outline" className="w-full rounded-full">
-              <CalendarPlus className="h-4 w-4" /> {en ? "Add to calendar" : "Ajouter au calendrier"}
-            </Button>
-
-            <ActionWithTip disabled={!editable} tip={lockedTip}>
-              <Button
-                onClick={onReschedule}
-                disabled={!editable}
-                className="w-full rounded-full bg-[image:var(--gradient-brand)] text-primary-foreground"
-              >
-                <RotateCcw className="h-4 w-4" /> {en ? "Reschedule" : "Reporter"}
-              </Button>
-            </ActionWithTip>
-
-            <ActionWithTip disabled={!editable} tip={lockedTip}>
-              <Button
-                onClick={onCancel}
-                disabled={!editable}
-                variant="outline"
-                className="w-full rounded-full border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/30"
-              >
-                <X className="h-4 w-4" /> {en ? "Cancel" : "Annuler"}
-              </Button>
-            </ActionWithTip>
-
-            <p className="flex items-start gap-2 rounded-xl bg-muted/60 p-3 text-xs text-muted-foreground">
-              {editable ? (
-                <Info className="mt-0.5 h-3.5 w-3.5 flex-none text-primary" />
-              ) : (
-                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-none text-amber-500" />
-              )}
-              {delayNote}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">{rebookHref}</div>
-        )}
-      </div>
-    </>
-  );
-}
-
-function ActionWithTip({
-  disabled,
-  tip,
+function Row({
+  icon: Icon,
+  label,
   children,
 }: {
-  disabled: boolean;
-  tip: string;
+  icon: typeof MapPin;
+  label: string;
   children: React.ReactNode;
 }) {
-  if (!disabled) return <>{children}</>;
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="block cursor-not-allowed">{children}</span>
-      </TooltipTrigger>
-      <TooltipContent>{tip}</TooltipContent>
-    </Tooltip>
+    <div className="flex gap-3">
+      <div className="grid h-8 w-8 flex-none place-items-center rounded-full bg-muted text-muted-foreground">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 text-sm">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </div>
+        <div className="mt-0.5">{children}</div>
+      </div>
+    </div>
   );
 }

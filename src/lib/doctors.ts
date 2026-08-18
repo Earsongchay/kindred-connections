@@ -7,23 +7,10 @@ export interface DoctorSlot {
 }
 
 export interface DoctorPractice {
-  id: string;
   name: string;
   kind: { fr: string; en: string };
   address: string;
-  city: string;
-  country: string;
-  /** "à partir de" price for this location. */
-  fee: string;
-  teleconsultation: boolean;
-  timezone: string;
-  hours: DoctorHours[];
-  slots: DoctorSlot[];
-  prices: DoctorPrice[];
-  accessibility: { fr: string; en: string }[];
-  photos: { fr: string; en: string }[];
 }
-
 
 export interface DoctorHours {
   day: { fr: string; en: string };
@@ -95,105 +82,6 @@ const ACCESSIBILITY = [
   { fr: "Parking à proximité", en: "Parking nearby" },
 ];
 
-const HOSPITAL_WEEK: DoctorHours[] = [
-  { day: { fr: "Lundi", en: "Monday" }, ranges: [] },
-  { day: { fr: "Mardi", en: "Tuesday" }, ranges: ["14:00–18:30"] },
-  { day: { fr: "Mercredi", en: "Wednesday" }, ranges: [] },
-  { day: { fr: "Jeudi", en: "Thursday" }, ranges: ["14:00–18:30"] },
-  { day: { fr: "Vendredi", en: "Friday" }, ranges: [] },
-  { day: { fr: "Samedi", en: "Saturday" }, ranges: ["09:00–12:30"] },
-  { day: { fr: "Dimanche", en: "Sunday" }, ranges: [] },
-];
-
-const SECOND_CITY: Record<string, string> = {
-  Dakar: "Rufisque",
-  Abidjan: "Bouaké",
-  Bamako: "Ségou",
-  Yaoundé: "Douala",
-  Cotonou: "Porto-Novo",
-};
-
-/** "15 000 FCFA" + 5000 → "20 000 FCFA" */
-function bumpFee(fee: string, delta: number): string {
-  const digits = fee.replace(/[^\d]/g, "");
-  if (!digits) return fee;
-  const next = Number(digits) + delta;
-  const suffix = fee.replace(/[\d\s\u202f]/g, "");
-  return `${next.toLocaleString("fr-FR").replace(/\u202f/g, " ")} ${suffix}`.trim();
-}
-
-function buildPractices(d: RawDoctor): DoctorPractice[] {
-  const primaryName = d.address.split(",")[0]!.trim();
-  const secondCity = SECOND_CITY[d.city] ?? d.city;
-  const secondFee = bumpFee(d.fee, 5000);
-  const baseHours = d.hours ?? WEEK;
-  const basePrices = d.prices ?? [
-    { label: { fr: "Consultation générale", en: "General consultation" }, duration: 30, amount: d.fee },
-    { label: { fr: "Suivi / renouvellement", en: "Follow-up / renewal" }, duration: 20, amount: d.fee },
-  ];
-
-  return [
-    {
-      id: "cabinet",
-      name: primaryName,
-      kind: { fr: "Cabinet privé", en: "Private practice" },
-      address: `${d.address}, ${d.city}, ${d.country}`,
-      city: d.city,
-      country: d.country,
-      fee: d.fee,
-      teleconsultation: d.teleconsultation,
-      timezone: d.timezone ?? "WAT (UTC+1)",
-      hours: baseHours,
-      slots: d.slots,
-      prices: basePrices,
-      accessibility: d.accessibility ?? ACCESSIBILITY,
-      photos: [
-        { fr: "Salle d'attente", en: "Waiting room" },
-        { fr: "Salle de consultation", en: "Consultation room" },
-        { fr: "Entrée du cabinet", en: "Practice entrance" },
-      ],
-    },
-    {
-      id: "clinique",
-      name: `Clinique Le Baobab — ${secondCity}`,
-      kind: { fr: "Clinique partenaire", en: "Partner clinic" },
-      address: `Boulevard de la République, ${secondCity}, ${d.country}`,
-      city: secondCity,
-      country: d.country,
-      fee: secondFee,
-      teleconsultation: false,
-      timezone: d.timezone ?? "WAT (UTC+1)",
-      hours: HOSPITAL_WEEK,
-      slots: [
-        { day: { fr: "Jeudi", en: "Thursday" }, times: ["14:30", "15:15", "17:00"] },
-        { day: { fr: "Samedi", en: "Saturday" }, times: ["09:30", "11:00"] },
-      ],
-      prices: [
-        {
-          label: { fr: "Consultation spécialisée", en: "Specialist consultation" },
-          duration: 40,
-          amount: secondFee,
-        },
-        {
-          label: { fr: "Examen complémentaire", en: "Additional examination" },
-          duration: 30,
-          amount: bumpFee(d.fee, 12000),
-        },
-      ],
-      accessibility: [
-        { fr: "Accès fauteuil roulant", en: "Wheelchair access" },
-        { fr: "Ascenseur", en: "Elevator" },
-        { fr: "Parking gratuit", en: "Free parking" },
-      ],
-      photos: [
-        { fr: "Accueil de la clinique", en: "Clinic reception" },
-        { fr: "Plateau technique", en: "Medical imaging unit" },
-        { fr: "Parking", en: "Parking" },
-      ],
-    },
-  ];
-}
-
 function withDefaults(d: RawDoctor): Doctor {
   const startYear = new Date().getFullYear() - d.experience;
   return {
@@ -204,8 +92,14 @@ function withDefaults(d: RawDoctor): Doctor {
       { fr: "Médecine préventive et dépistage", en: "Preventive medicine & screening" },
       { fr: "Vaccination", en: "Vaccination" },
     ],
-    practices: d.practices ?? buildPractices(d),
-
+    practices:
+      d.practices ?? [
+        {
+          name: d.address.split(",")[0]!.trim(),
+          kind: { fr: "Cabinet privé", en: "Private practice" },
+          address: `${d.address}, ${d.city}, ${d.country}`,
+        },
+      ],
     accessibility: d.accessibility ?? ACCESSIBILITY,
     hours: d.hours ?? WEEK,
     timezone: d.timezone ?? "WAT (UTC+1)",

@@ -31,6 +31,7 @@ type NavRoute =
   | "/$locale/espace-patient"
   | "/$locale/espace-patient/profil"
   | "/$locale/espace-patient/documents"
+  | "/$locale/espace-patient/rendez-vous"
   | "/$locale/espace-patient/securite";
 
 type NavItem = {
@@ -55,7 +56,7 @@ function PatientLayout() {
       exact: true,
     },
     {
-      to: "/$locale/espace-patient",
+      to: "/$locale/espace-patient/rendez-vous",
       label: t("patientLayout.nav.appointments"),
       Icon: CalendarDays,
     },
