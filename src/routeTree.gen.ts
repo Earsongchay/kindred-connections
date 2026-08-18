@@ -35,6 +35,7 @@ import { Route as LocaleEspaceProPatientsRouteImport } from './routes/$locale.es
 import { Route as LocaleEspaceProDossiersRouteImport } from './routes/$locale.espace-pro.dossiers'
 import { Route as LocaleEspaceProAbonnementRouteImport } from './routes/$locale.espace-pro.abonnement'
 import { Route as LocaleEspacePatientSecuriteRouteImport } from './routes/$locale.espace-patient.securite'
+import { Route as LocaleEspacePatientRendezVousRouteImport } from './routes/$locale.espace-patient.rendez-vous'
 import { Route as LocaleEspacePatientProfilRouteImport } from './routes/$locale.espace-patient.profil'
 import { Route as LocaleEspacePatientDocumentsRouteImport } from './routes/$locale.espace-patient.documents'
 import { Route as LocaleAdminVerificationsRouteImport } from './routes/$locale.admin.verifications'
@@ -177,6 +178,12 @@ const LocaleEspacePatientSecuriteRoute =
     path: '/securite',
     getParentRoute: () => LocaleEspacePatientRoute,
   } as any)
+const LocaleEspacePatientRendezVousRoute =
+  LocaleEspacePatientRendezVousRouteImport.update({
+    id: '/rendez-vous',
+    path: '/rendez-vous',
+    getParentRoute: () => LocaleEspacePatientRoute,
+  } as any)
 const LocaleEspacePatientProfilRoute =
   LocaleEspacePatientProfilRouteImport.update({
     id: '/profil',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/rendez-vous': typeof LocaleEspacePatientRendezVousRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/rendez-vous': typeof LocaleEspacePatientRendezVousRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
@@ -283,6 +292,7 @@ export interface FileRoutesById {
   '/$locale/admin/verifications': typeof LocaleAdminVerificationsRoute
   '/$locale/espace-patient/documents': typeof LocaleEspacePatientDocumentsRoute
   '/$locale/espace-patient/profil': typeof LocaleEspacePatientProfilRoute
+  '/$locale/espace-patient/rendez-vous': typeof LocaleEspacePatientRendezVousRoute
   '/$locale/espace-patient/securite': typeof LocaleEspacePatientSecuriteRoute
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/rendez-vous'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/rendez-vous'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
@@ -377,6 +389,7 @@ export interface FileRouteTypes {
     | '/$locale/admin/verifications'
     | '/$locale/espace-patient/documents'
     | '/$locale/espace-patient/profil'
+    | '/$locale/espace-patient/rendez-vous'
     | '/$locale/espace-patient/securite'
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
@@ -582,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleEspacePatientSecuriteRouteImport
       parentRoute: typeof LocaleEspacePatientRoute
     }
+    '/$locale/espace-patient/rendez-vous': {
+      id: '/$locale/espace-patient/rendez-vous'
+      path: '/rendez-vous'
+      fullPath: '/$locale/espace-patient/rendez-vous'
+      preLoaderRoute: typeof LocaleEspacePatientRendezVousRouteImport
+      parentRoute: typeof LocaleEspacePatientRoute
+    }
     '/$locale/espace-patient/profil': {
       id: '/$locale/espace-patient/profil'
       path: '/profil'
@@ -632,6 +652,7 @@ const LocaleAdminRouteWithChildren = LocaleAdminRoute._addFileChildren(
 interface LocaleEspacePatientRouteChildren {
   LocaleEspacePatientDocumentsRoute: typeof LocaleEspacePatientDocumentsRoute
   LocaleEspacePatientProfilRoute: typeof LocaleEspacePatientProfilRoute
+  LocaleEspacePatientRendezVousRoute: typeof LocaleEspacePatientRendezVousRoute
   LocaleEspacePatientSecuriteRoute: typeof LocaleEspacePatientSecuriteRoute
   LocaleEspacePatientIndexRoute: typeof LocaleEspacePatientIndexRoute
 }
@@ -639,6 +660,7 @@ interface LocaleEspacePatientRouteChildren {
 const LocaleEspacePatientRouteChildren: LocaleEspacePatientRouteChildren = {
   LocaleEspacePatientDocumentsRoute: LocaleEspacePatientDocumentsRoute,
   LocaleEspacePatientProfilRoute: LocaleEspacePatientProfilRoute,
+  LocaleEspacePatientRendezVousRoute: LocaleEspacePatientRendezVousRoute,
   LocaleEspacePatientSecuriteRoute: LocaleEspacePatientSecuriteRoute,
   LocaleEspacePatientIndexRoute: LocaleEspacePatientIndexRoute,
 }
