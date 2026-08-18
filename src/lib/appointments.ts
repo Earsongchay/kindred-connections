@@ -32,7 +32,7 @@ export const CUTOFF_HOURS = 2;
 export const APPOINTMENTS: Appointment[] = [
   {
     id: "rdv-10241",
-    doctorId: "dr-aboubacar-diallo",
+    doctorId: "amina-sow",
     doctorName: "Dr Aboubacar Diallo",
     initials: "AD",
     specialty: { fr: "Cardiologie", en: "Cardiology" },
@@ -51,7 +51,7 @@ export const APPOINTMENTS: Appointment[] = [
   },
   {
     id: "rdv-10238",
-    doctorId: "dr-mamadou-diallo",
+    doctorId: "paul-ndiaye",
     doctorName: "Dr Mamadou Diallo",
     initials: "MD",
     specialty: { fr: "Médecine générale", en: "General medicine" },
@@ -69,7 +69,7 @@ export const APPOINTMENTS: Appointment[] = [
   },
   {
     id: "rdv-10190",
-    doctorId: "dr-fatou-kone",
+    doctorId: "fatou-keita",
     doctorName: "Dr Fatou Koné",
     initials: "FK",
     specialty: { fr: "Dermatologie", en: "Dermatology" },
@@ -87,7 +87,7 @@ export const APPOINTMENTS: Appointment[] = [
   },
   {
     id: "rdv-10155",
-    doctorId: "dr-awa-ba",
+    doctorId: "nadia-benali",
     doctorName: "Dr Awa Ba",
     initials: "AB",
     specialty: { fr: "Gynécologie", en: "Gynaecology" },
