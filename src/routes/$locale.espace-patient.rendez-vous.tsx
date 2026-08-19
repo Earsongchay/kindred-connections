@@ -361,9 +361,7 @@ e             " className="mt-4">
                     {/* Uniform delay note on every upcoming appointment (MR3). */}
                     <p className="flex gap-2 pt-1 text-xs text-muted-foreground">
                       <Info className="mt-0.5 h-3.5 w-3.5 flex-none" />
-                      <sp
-                     an>{t("appts.delayNote")
-                     }</span>
+                      <span>{t("appts.delayNote")}</span>
                      
                     
                     </p>
