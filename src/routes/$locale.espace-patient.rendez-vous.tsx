@@ -107,7 +107,9 @@ function AppointmentsPage() {
       else if (a.status === "COMPLETED" || startOf(a).getTime() < reference.getTime()) past.push(a);
       else upcoming.push(a);
     }
-    const byDate = (x: Appointment, y: Appointment) => coming.sort(byDate);
+    const byDate = (x: Appointment, y: Appointment) =>
+      startOf(x).getTime() - startOf(y).getTime();
+    upcoming.sort(byDate);
     past.sort((x, y) => -byDate(x, y));
     cancelled.sort((x, y) => -byDate(x, y));
     return { upcoming, past, cancelled };
@@ -119,9 +121,7 @@ function AppointmentsPage() {
     : undefined;
 
   const modifiable = selected
-    ? selected.status === "CO
-N   FIRMED" && groups.upcoming.includes(selected)
-   
+    ? selected.status === "CONFIRMED" && groups.upcoming.includes(selected)
     : false;
   const withinCutoff = selected && now ? isWithinCutoff(selected, now) : false;
   const canModify = modifiable && withinCutoff;
@@ -202,9 +202,7 @@ N   FIRMED" && groups.upcoming.includes(selected)
         <div className="mt-6 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
           <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
           <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
-          <Button
-              asChild variant="outlin
-e             " className="mt-4">
+          <Button asChild variant="outline" className="mt-4">
              
             
             <Link
@@ -361,9 +359,7 @@ e             " className="mt-4">
                     {/* Uniform delay note on every upcoming appointment (MR3). */}
                     <p className="flex gap-2 pt-1 text-xs text-muted-foreground">
                       <Info className="mt-0.5 h-3.5 w-3.5 flex-none" />
-                      <sp
-                     an>{t("appts.delayNote")
-                     }</span>
+                      <span>{t("appts.delayNote")}</span>
                      
                     
                     </p>
