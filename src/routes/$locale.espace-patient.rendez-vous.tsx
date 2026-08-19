@@ -60,7 +60,7 @@ export const Route = createFileRoute("/$locale/espace-patient/rendez-vous")({
       { property: "og:title", content: "Mes rendez-vous — FUENI" },
       {
         property: "og:description",
-        content: "Gérez vos rendez-vous médicaux FUENI en toute autonomie.",
+        content: "Gérez vos rendez-vous médicaux FUENI en toute autonomie",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -107,9 +107,7 @@ function AppointmentsPage() {
       else if (a.status === "COMPLETED" || startOf(a).getTime() < reference.getTime()) past.push(a);
       else upcoming.push(a);
     }
-    const byDate = (x: Appointment, y: Appointment) =>
-      startOf(x).getTime() - startOf(y).getTime();
-    upcoming.sort(byDate);
+    const byDate = (x: Appointment, y: Appointment) => coming.sort(byDate);
     past.sort((x, y) => -byDate(x, y));
     cancelled.sort((x, y) => -byDate(x, y));
     return { upcoming, past, cancelled };
@@ -120,7 +118,11 @@ function AppointmentsPage() {
     ? getDoctor(items.find((a) => a.id === rescheduleId)?.doctorId ?? "")
     : undefined;
 
-  const modifiable = selected ? selected.status === "CONFIRMED" && groups.upcoming.includes(selected) : false;
+  const modifiable = selected
+    ? selected.status === "CO
+N   FIRMED" && groups.upcoming.includes(selected)
+   
+    : false;
   const withinCutoff = selected && now ? isWithinCutoff(selected, now) : false;
   const canModify = modifiable && withinCutoff;
 
@@ -200,8 +202,16 @@ function AppointmentsPage() {
         <div className="mt-6 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
           <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
           <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
+          <Button
+              asChild variant="outlin
+e             " className="mt-4">
+             
+            
+            <Link
+              to="/$locale/recherche"
+              params={{ locale }}
+              search={{ q: "", city: "", type: "" }}
+            >
               {t("appts.empty.cta")}
             </Link>
           </Button>
@@ -351,12 +361,20 @@ function AppointmentsPage() {
                     {/* Uniform delay note on every upcoming appointment (MR3). */}
                     <p className="flex gap-2 pt-1 text-xs text-muted-foreground">
                       <Info className="mt-0.5 h-3.5 w-3.5 flex-none" />
-                      <span>{t("appts.delayNote")}</span>
+                      <sp
+                     an>{t("appts.delayNote")
+                     }</span>
+                     
+                    
                     </p>
                   </>
                 ) : (
                   <Button asChild className="w-full justify-center">
-                    <Link to="/$locale/recherche" params={{ locale }} search={{ q: "", city: "", type: "" }}>
+                    <Link
+                      to="/$locale/recherche"
+                      params={{ locale }}
+                      search={{ q: "", city: "", type: "" }}
+                    >
                       <RotateCcw className="h-4 w-4" /> {t("appts.actions.rebook")}
                     </Link>
                   </Button>
