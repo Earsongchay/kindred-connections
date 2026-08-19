@@ -31,6 +31,7 @@ import { Route as LocaleAdminIndexRouteImport } from './routes/$locale.admin.ind
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LocaleMedecinDoctorIdRouteImport } from './routes/$locale.medecin.$doctorId'
 import { Route as LocaleEspaceProProfilPublicRouteImport } from './routes/$locale.espace-pro.profil-public'
+import { Route as LocaleEspaceProPlanningRouteImport } from './routes/$locale.espace-pro.planning'
 import { Route as LocaleEspaceProPatientsRouteImport } from './routes/$locale.espace-pro.patients'
 import { Route as LocaleEspaceProDossiersRouteImport } from './routes/$locale.espace-pro.dossiers'
 import { Route as LocaleEspaceProAbonnementRouteImport } from './routes/$locale.espace-pro.abonnement'
@@ -156,6 +157,11 @@ const LocaleEspaceProProfilPublicRoute =
     path: '/profil-public',
     getParentRoute: () => LocaleEspaceProRoute,
   } as any)
+const LocaleEspaceProPlanningRoute = LocaleEspaceProPlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => LocaleEspaceProRoute,
+} as any)
 const LocaleEspaceProPatientsRoute = LocaleEspaceProPatientsRouteImport.update({
   id: '/patients',
   path: '/patients',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/planning': typeof LocaleEspaceProPlanningRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/$locale/medecin/$doctorId': typeof LocaleMedecinDoctorIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/planning': typeof LocaleEspaceProPlanningRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/$locale/medecin/$doctorId': typeof LocaleMedecinDoctorIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/$locale/espace-pro/abonnement': typeof LocaleEspaceProAbonnementRoute
   '/$locale/espace-pro/dossiers': typeof LocaleEspaceProDossiersRoute
   '/$locale/espace-pro/patients': typeof LocaleEspaceProPatientsRoute
+  '/$locale/espace-pro/planning': typeof LocaleEspaceProPlanningRoute
   '/$locale/espace-pro/profil-public': typeof LocaleEspaceProProfilPublicRoute
   '/$locale/medecin/$doctorId': typeof LocaleMedecinDoctorIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/planning'
     | '/$locale/espace-pro/profil-public'
     | '/$locale/medecin/$doctorId'
     | '/.mcp/invoke-tool/$tool'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/planning'
     | '/$locale/espace-pro/profil-public'
     | '/$locale/medecin/$doctorId'
     | '/.mcp/invoke-tool/$tool'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/$locale/espace-pro/abonnement'
     | '/$locale/espace-pro/dossiers'
     | '/$locale/espace-pro/patients'
+    | '/$locale/espace-pro/planning'
     | '/$locale/espace-pro/profil-public'
     | '/$locale/medecin/$doctorId'
     | '/.mcp/invoke-tool/$tool'
@@ -567,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleEspaceProProfilPublicRouteImport
       parentRoute: typeof LocaleEspaceProRoute
     }
+    '/$locale/espace-pro/planning': {
+      id: '/$locale/espace-pro/planning'
+      path: '/planning'
+      fullPath: '/$locale/espace-pro/planning'
+      preLoaderRoute: typeof LocaleEspaceProPlanningRouteImport
+      parentRoute: typeof LocaleEspaceProRoute
+    }
     '/$locale/espace-pro/patients': {
       id: '/$locale/espace-pro/patients'
       path: '/patients'
@@ -672,6 +691,7 @@ interface LocaleEspaceProRouteChildren {
   LocaleEspaceProAbonnementRoute: typeof LocaleEspaceProAbonnementRoute
   LocaleEspaceProDossiersRoute: typeof LocaleEspaceProDossiersRoute
   LocaleEspaceProPatientsRoute: typeof LocaleEspaceProPatientsRoute
+  LocaleEspaceProPlanningRoute: typeof LocaleEspaceProPlanningRoute
   LocaleEspaceProProfilPublicRoute: typeof LocaleEspaceProProfilPublicRoute
   LocaleEspaceProIndexRoute: typeof LocaleEspaceProIndexRoute
 }
@@ -680,6 +700,7 @@ const LocaleEspaceProRouteChildren: LocaleEspaceProRouteChildren = {
   LocaleEspaceProAbonnementRoute: LocaleEspaceProAbonnementRoute,
   LocaleEspaceProDossiersRoute: LocaleEspaceProDossiersRoute,
   LocaleEspaceProPatientsRoute: LocaleEspaceProPatientsRoute,
+  LocaleEspaceProPlanningRoute: LocaleEspaceProPlanningRoute,
   LocaleEspaceProProfilPublicRoute: LocaleEspaceProProfilPublicRoute,
   LocaleEspaceProIndexRoute: LocaleEspaceProIndexRoute,
 }
