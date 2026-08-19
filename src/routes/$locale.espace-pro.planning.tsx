@@ -76,7 +76,18 @@ function ProPlanningPage() {
     [events, locationId, activeLabels],
   );
 
-  const byDay = (day: Date) => visible.filter((e) => e.date === ymd(day));
+  const calendarEvents = useMemo(
+    () =>
+      visible.map((e) => ({
+        id: e.id,
+        title: e.title,
+        start: `${e.date}T${e.start}`,
+        end: `${e.date}T${e.end}`,
+        color: labelOf(e.labelId).color,
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visible, labels],
+  );
 
   // Stat cards
   const todayEvents = visible.filter((e) => e.date === TODAY);
@@ -84,33 +95,23 @@ function ProPlanningPage() {
   const nextAppt = visible.find((e) => e.date > TODAY || (e.date === TODAY && e.kind === "APPOINTMENT"));
 
   const weekStart = startOfWeek(cursor);
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  const monthStart = startOfMonthGrid(cursor);
-  const monthDays = Array.from({ length: 42 }, (_, i) => addDays(monthStart, i));
 
   const shift = (dir: -1 | 1) => {
-    if (view === "month") {
-      setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + dir, 1));
-    } else if (view === "week") {
+    if (view === "week") {
       setCursor(addDays(cursor, dir * 7));
     } else {
-      setCursor(addDays(cursor, dir * 30));
+      setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + dir, 1));
     }
   };
 
   const rangeLabel = () => {
-    if (view === "month") {
-      return new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" }).format(cursor);
-    }
     if (view === "week") {
       const end = addDays(weekStart, 6);
       const f = new Intl.DateTimeFormat(intl, { day: "numeric", month: "short" });
       return `${f.format(weekStart)} – ${f.format(end)} ${end.getFullYear()}`;
     }
-    return isEn ? "Next 30 days" : "30 prochains jours";
+    return new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" }).format(cursor);
   };
-
-  const listEvents = visible.filter((e) => e.date >= ymd(cursor) && e.date <= ymd(addDays(cursor, 30)));
 
   const addEvent = (e: ScheduleEvent) => setEvents((prev) => [...prev, e].sort(compareEvents));
   const removeEvent = (id: string) => setEvents((prev) => prev.filter((e) => e.id !== id));
