@@ -121,9 +121,7 @@ function AppointmentsPage() {
     : undefined;
 
   const modifiable = selected
-    ? selected.status === "CO
-N   FIRMED" && groups.upcoming.includes(selected)
-   
+    ? selected.status === "CONFIRMED" && groups.upcoming.includes(selected)
     : false;
   const withinCutoff = selected && now ? isWithinCutoff(selected, now) : false;
   const canModify = modifiable && withinCutoff;
