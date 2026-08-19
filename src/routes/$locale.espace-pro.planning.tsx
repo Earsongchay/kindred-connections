@@ -33,6 +33,7 @@ import {
   type ScheduleLabel,
 } from "@/lib/pro-schedule";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { PlanningCalendar } from "@/components/pro/PlanningCalendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
