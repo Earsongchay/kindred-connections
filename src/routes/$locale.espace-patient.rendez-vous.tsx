@@ -202,9 +202,7 @@ function AppointmentsPage() {
         <div className="mt-6 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
           <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
           <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
-          <Button
-              asChild variant="outlin
-e             " className="mt-4">
+          <Button asChild variant="outline" className="mt-4">
              
             
             <Link
