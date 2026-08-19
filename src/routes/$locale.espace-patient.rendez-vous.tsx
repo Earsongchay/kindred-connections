@@ -107,7 +107,9 @@ function AppointmentsPage() {
       else if (a.status === "COMPLETED" || startOf(a).getTime() < reference.getTime()) past.push(a);
       else upcoming.push(a);
     }
-    const byDate = (x: Appointment, y: Appointment) => coming.sort(byDate);
+    const byDate = (x: Appointment, y: Appointment) =>
+      startOf(x).getTime() - startOf(y).getTime();
+    upcoming.sort(byDate);
     past.sort((x, y) => -byDate(x, y));
     cancelled.sort((x, y) => -byDate(x, y));
     return { upcoming, past, cancelled };
