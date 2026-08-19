@@ -92,7 +92,9 @@ function ProPlanningPage() {
   // Stat cards
   const todayEvents = visible.filter((e) => e.date === TODAY);
   const in7 = visible.filter((e) => e.date > TODAY && e.date <= ymd(addDays(parseYmd(TODAY), 7)));
-  const nextAppt = visible.find((e) => e.date > TODAY || (e.date === TODAY && e.kind === "APPOINTMENT"));
+  const nextAppt = visible.find(
+    (e) => e.date > TODAY || (e.date === TODAY && e.kind === "APPOINTMENT"),
+  );
 
   const weekStart = startOfWeek(cursor);
 
@@ -116,19 +118,16 @@ function ProPlanningPage() {
   const addEvent = (e: ScheduleEvent) => setEvents((prev) => [...prev, e].sort(compareEvents));
   const removeEvent = (id: string) => setEvents((prev) => prev.filter((e) => e.id !== id));
 
-  const stat = (
-    Icon: typeof CalendarDays,
-    label: string,
-    value: string,
-    hint?: string,
-  ) => (
+  const stat = (Icon: typeof CalendarDays, label: string, value: string, hint?: string) => (
     <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="grid h-10 w-10 flex-none place-items-center rounded-xl bg-primary/10 text-primary">
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {label}
+          </div>
           <div className="truncate text-xl font-bold">{value}</div>
           {hint && <div className="truncate text-xs text-muted-foreground">{hint}</div>}
         </div>
@@ -148,7 +147,9 @@ function ProPlanningPage() {
           compact && "truncate",
         )}
       >
-        <span className="block truncate">{e.start} {e.title}</span>
+        <span className="block truncate">
+          {e.start} {e.title}
+        </span>
         {!compact && (
           <span className="block truncate text-[10px] font-medium opacity-80">
             {l.name[locale]}
@@ -162,7 +163,9 @@ function ProPlanningPage() {
     <div className="space-y-5">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{isEn ? "My schedule" : "Mon planning"}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {isEn ? "My schedule" : "Mon planning"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isEn
               ? "Appointments and personal events across your practice locations."
@@ -189,7 +192,11 @@ function ProPlanningPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        {stat(CalendarDays, isEn ? "Appointments today" : "Rendez-vous aujourd'hui", String(todayEvents.filter((e) => e.kind === "APPOINTMENT").length))}
+        {stat(
+          CalendarDays,
+          isEn ? "Appointments today" : "Rendez-vous aujourd'hui",
+          String(todayEvents.filter((e) => e.kind === "APPOINTMENT").length),
+        )}
         {stat(Users, isEn ? "Upcoming (7 days)" : "À venir (7 jours)", String(in7.length))}
         {stat(
           CalendarClock,
@@ -288,7 +295,11 @@ function ProPlanningPage() {
                 onClick={() =>
                   setActiveLabels((prev) => (on ? prev.filter((x) => x !== l.id) : [...prev, l.id]))
                 }
-                style={on ? { backgroundColor: `${l.color}22`, borderColor: l.color, color: l.color } : undefined}
+                style={
+                  on
+                    ? { backgroundColor: `${l.color}22`, borderColor: l.color, color: l.color }
+                    : undefined
+                }
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition",
                   !on && "border-border text-muted-foreground hover:bg-muted",
@@ -358,7 +369,9 @@ function ProPlanningPage() {
                   </span>
                 </div>
                 <h3 className="mt-3 text-lg font-bold">{selected.title}</h3>
-                {selected.reason && <p className="text-sm text-muted-foreground">{selected.reason}</p>}
+                {selected.reason && (
+                  <p className="text-sm text-muted-foreground">{selected.reason}</p>
+                )}
               </div>
 
               <dl className="space-y-3 text-sm">
@@ -384,7 +397,9 @@ function ProPlanningPage() {
               </dl>
 
               {selected.notes && (
-                <div className="rounded-2xl bg-muted/50 p-4 text-sm whitespace-pre-line">{selected.notes}</div>
+                <div className="rounded-2xl bg-muted/50 p-4 text-sm whitespace-pre-line">
+                  {selected.notes}
+                </div>
               )}
 
               <button
@@ -479,7 +494,8 @@ function CreateDialog({
     onCreate({
       id: `sch-${Date.now()}`,
       kind,
-      title: kind === "APPOINTMENT" ? (patient?.name ?? "") : title || (isEn ? "Event" : "Évènement"),
+      title:
+        kind === "APPOINTMENT" ? (patient?.name ?? "") : title || (isEn ? "Event" : "Évènement"),
       patientId: kind === "APPOINTMENT" ? patientId : undefined,
       patientName: kind === "APPOINTMENT" ? patient?.name : undefined,
       reason: kind === "APPOINTMENT" ? reason : undefined,
@@ -514,7 +530,11 @@ function CreateDialog({
             <>
               <label className="block space-y-1.5">
                 <span className="text-sm font-medium">{isEn ? "Patient" : "Patient"}</span>
-                <select className={field} value={patientId} onChange={(e) => setPatientId(e.target.value)}>
+                <select
+                  className={field}
+                  value={patientId}
+                  onChange={(e) => setPatientId(e.target.value)}
+                >
                   {PRO_PATIENTS.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -547,21 +567,40 @@ function CreateDialog({
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="block space-y-1.5">
               <span className="text-sm font-medium">{isEn ? "Date" : "Date"}</span>
-              <input type="date" className={field} value={date} onChange={(e) => setDate(e.target.value)} />
+              <input
+                type="date"
+                className={field}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
             </label>
             <label className="block space-y-1.5">
               <span className="text-sm font-medium">{isEn ? "Start" : "Début"}</span>
-              <input type="time" className={field} value={start} onChange={(e) => setStart(e.target.value)} />
+              <input
+                type="time"
+                className={field}
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+              />
             </label>
             <label className="block space-y-1.5">
               <span className="text-sm font-medium">{isEn ? "End" : "Fin"}</span>
-              <input type="time" className={field} value={end} onChange={(e) => setEnd(e.target.value)} />
+              <input
+                type="time"
+                className={field}
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
+              />
             </label>
           </div>
 
           <label className="block space-y-1.5">
             <span className="text-sm font-medium">{isEn ? "Location" : "Lieu"}</span>
-            <select className={field} value={locationId} onChange={(e) => setLocationId(e.target.value)}>
+            <select
+              className={field}
+              value={locationId}
+              onChange={(e) => setLocationId(e.target.value)}
+            >
               {SCHEDULE_LOCATIONS.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.name}
@@ -606,7 +645,11 @@ function CreateDialog({
 
           <label className="block space-y-1.5">
             <span className="text-sm font-medium">{isEn ? "Notes" : "Notes"}</span>
-            <textarea className={cn(field, "min-h-20")} value={notes} onChange={(e) => setNotes(e.target.value)} />
+            <textarea
+              className={cn(field, "min-h-20")}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
           </label>
 
           <div className="flex justify-end gap-2 pt-2">

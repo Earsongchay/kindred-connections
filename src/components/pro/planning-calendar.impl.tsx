@@ -65,7 +65,9 @@ export default function PlanningCalendarImpl({
         eventClick={(info: EventClickInfo) => onEventClick(String(info.event.id))}
         dateClick={onDateClick ? (info) => onDateClick(info.dateStr.slice(0, 10)) : undefined}
         eventTimeFormat={{ hour: "2-digit", minute: "2-digit" }}
-        noEventsText={locale === "fr" ? "Aucun évènement sur cette période." : "No events in this period."}
+        noEventsText={
+          locale === "fr" ? "Aucun évènement sur cette période." : "No events in this period."
+        }
       />
     </div>
   );
