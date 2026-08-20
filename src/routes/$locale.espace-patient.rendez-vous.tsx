@@ -421,6 +421,66 @@ function AppointmentsPage() {
   );
 }
 
+function toDateKey(a: Appointment): string {
+  return a.startsAt.slice(0, 10);
+}
+
+function toDateKeyFromDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function groupAppointmentsByDate(
+  appointments: Appointment[],
+): [string, Appointment[]][] {
+  const map = new Map<string, Appointment[]>();
+  for (const a of appointments) {
+    const key = toDateKey(a);
+    const group = map.get(key) ?? [];
+    group.push(a);
+    map.set(key, group);
+  }
+  // Preserve chronological order by key.
+  return Array.from(map.entries()).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
+function formatDateHeader(
+  dateKey: string,
+  locale: Locale,
+  reference: Date,
+  t: (key: string) => string,
+): string {
+  const d = new Date(`${dateKey}T00:00:00`);
+  const refKey = toDateKeyFromDate(reference);
+  const tomorrow = new Date(reference);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowKey = toDateKeyFromDate(tomorrow);
+
+  const fmt = (date: Date) =>
+    new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "fr-FR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+
+  if (dateKey === refKey) return t("appts.group.today");
+  if (dateKey === tomorrowKey) return `${t("appts.group.tomorrow")} · ${fmt(d)}`;
+  return fmt(d);
+}
+
+function formatDayName(a: Appointment, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "fr-FR", {
+    weekday: "short",
+  }).format(startOf(a));
+}
+
+function formatTime(a: Appointment, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(startOf(a));
+}
+
 function Row({
   icon: Icon,
   label,
