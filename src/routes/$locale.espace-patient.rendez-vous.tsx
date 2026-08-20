@@ -197,14 +197,12 @@ function AppointmentsPage() {
         ))}
       </div>
 
-      {/* List */}
+      {/* List grouped by date */}
       {list.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center">
           <CalendarDays className="mx-auto h-8 w-8 text-muted-foreground/60" />
           <p className="mt-3 text-sm text-muted-foreground">{t(`appts.empty.${tab}`)}</p>
           <Button asChild variant="outline" className="mt-4">
-             
-            
             <Link
               to="/$locale/recherche"
               params={{ locale }}
@@ -215,48 +213,58 @@ function AppointmentsPage() {
           </Button>
         </div>
       ) : (
-        <ul className="mt-6 space-y-3">
-          {list.map((a) => (
-            <li key={a.id}>
-              <button
-                type="button"
-                onClick={() => setOpenId(a.id)}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-all hover:border-primary/40 hover:shadow-md"
-              >
-                <div className="grid h-11 w-11 flex-none place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                  {a.initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate font-semibold text-foreground">{a.doctorName}</span>
-                    <span
-                      className={cn(
-                        "rounded-full px-2 py-0.5 text-[11px] font-semibold",
-                        STATUS_STYLES[a.status],
-                      )}
+        <div className="mt-6 space-y-6">
+          {groupAppointmentsByDate(list).map(([dateKey, appts]) => (
+            <section key={dateKey}>
+              <h2 className="sticky top-0 z-10 mb-3 bg-background/95 py-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur">
+                {formatDateHeader(dateKey, locale, reference, t)}
+              </h2>
+              <ul className="space-y-3">
+                {appts.map((a) => (
+                  <li key={a.id}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(a.id)}
+                      className="group flex w-full items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-all hover:border-primary/40 hover:shadow-md"
                     >
-                      {t(`appts.status.${a.status}`)}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 truncate text-sm text-muted-foreground">
-                    {a.specialty[locale]}
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" />
-                      {formatDateTime(a, locale)}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {a.placeName}
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="h-5 w-5 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-              </button>
-            </li>
+                      {/* Prominent time block */}
+                      <div className="flex h-16 w-16 flex-none flex-col items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide">
+                          {formatDayName(a, locale)}
+                        </span>
+                        <span className="text-xl font-bold leading-none">{formatTime(a, locale)}</span>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="truncate font-semibold text-foreground">{a.doctorName}</span>
+                          <span
+                            className={cn(
+                              "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                              STATUS_STYLES[a.status],
+                            )}
+                          >
+                            {t(`appts.status.${a.status}`)}
+                          </span>
+                        </div>
+                        <div className="mt-0.5 truncate text-sm text-muted-foreground">
+                          {a.specialty[locale]}
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {a.placeName}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-5 w-5 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
 
       {/* Detail drawer — carries every action (MR6). */}
