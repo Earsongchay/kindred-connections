@@ -897,6 +897,7 @@ export const en = {
     subtitle: "View and manage your appointments on your own.",
     book: "Book an appointment",
     tabs: { upcoming: "Upcoming", past: "Past", cancelled: "Cancelled" },
+    group: { today: "Today", tomorrow: "Tomorrow" },
     status: { CONFIRMED: "Confirmed", CANCELLED: "Cancelled", COMPLETED: "Completed" },
     empty: {
       upcoming: "You have no upcoming appointments.",
