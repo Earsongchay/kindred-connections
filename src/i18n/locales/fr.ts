@@ -905,6 +905,7 @@ export const fr = {
     subtitle: "Consultez et gérez vos rendez-vous en toute autonomie.",
     book: "Prendre un RDV",
     tabs: { upcoming: "À venir", past: "Passés", cancelled: "Annulés" },
+    group: { today: "Aujourd'hui", tomorrow: "Demain" },
     status: { CONFIRMED: "Confirmé", CANCELLED: "Annulé", COMPLETED: "Terminé" },
     empty: {
       upcoming: "Vous n'avez aucun rendez-vous à venir.",
