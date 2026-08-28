@@ -329,3 +329,56 @@ export const PRO_PATIENT_STATS = {
   newThisMonth: 6,
   upcoming: 4,
 };
+
+// TODO Sprint 3-4 — Remove once the real patient API is wired.
+// Deterministic filler roster so the records list can be scrolled infinitely.
+const FIRST_NAMES = [
+  "Aminata", "Cheikh", "Fatou", "Moussa", "Awa", "Ibrahima", "Khady", "Modou",
+  "Ndeye", "Alioune", "Rokhaya", "Serigne", "Bineta", "Pape", "Coumba", "Lamine",
+];
+const LAST_NAMES = [
+  "Ndiaye", "Faye", "Gueye", "Sarr", "Ba", "Cissé", "Camara", "Thiam",
+  "Seck", "Mbaye", "Diouf", "Kane",
+];
+const REASONS: Array<[string, string]> = [
+  ["Consultation générale", "General consultation"],
+  ["Suivi hypertension", "Hypertension follow-up"],
+  ["Douleurs thoraciques", "Chest pain"],
+  ["Bilan annuel", "Annual check-up"],
+];
+
+function makeDemoPatients(count: number): ProPatient[] {
+  const out: ProPatient[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const first = FIRST_NAMES[i % FIRST_NAMES.length];
+    const last = LAST_NAMES[(i * 7) % LAST_NAMES.length];
+    const [reasonFr, reasonEn] = REASONS[i % REASONS.length];
+    const day = String((i % 27) + 1).padStart(2, "0");
+    out.push({
+      id: `demo-${i + 1}-${first}-${last}`.toLowerCase(),
+      initials: `${first[0]}${last[0]}`,
+      name: `${first} ${last}`,
+      age: 21 + ((i * 3) % 55),
+      sex: i % 2 === 0 ? "F" : "M",
+      phone: `+221 7${(i % 8) + 1} ${100 + i} ${20 + (i % 70)} ${10 + (i % 80)}`,
+      lastVisit: { date: `${day} juin 2026`, reasonFr, reasonEn },
+      nextAppt: null,
+      documents: i % 4,
+      history: [
+        {
+          date: `${day} juin 2026`,
+          reasonFr,
+          reasonEn,
+          diagnosisFr: "Évolution favorable",
+          diagnosisEn: "Favorable outcome",
+          notesFr: "Examen clinique sans particularité. Contrôle dans 3 mois.",
+          notesEn: "Unremarkable clinical exam. Follow-up in 3 months.",
+          prescriptions: i % 3 === 0 ? [] : ["Paracétamol 1 g × 3/j — 5 j"],
+        },
+      ],
+    });
+  }
+  return out;
+}
+
+export const PRO_PATIENTS_ALL: ProPatient[] = [...PRO_PATIENTS, ...makeDemoPatients(60)];
