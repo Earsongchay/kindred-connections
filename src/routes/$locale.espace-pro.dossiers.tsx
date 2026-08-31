@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
+  ArrowLeft,
   FileText,
   Loader2,
   Pill,
@@ -48,6 +49,7 @@ function ProRecordsPage() {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selectedId, setSelectedId] = useState<string>(search.patient ?? PRO_PATIENTS_ALL[0].id);
   const [tab, setTab] = useState<Tab>("history");
+  const [mobileDetail, setMobileDetail] = useState(Boolean(search.patient));
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
 
@@ -88,6 +90,7 @@ function ProRecordsPage() {
     setSelectedId(p.id);
     setTab("history");
     setQuery("");
+    setMobileDetail(true);
     setNewPatientOpen(false);
   };
 
@@ -110,21 +113,26 @@ function ProRecordsPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight lg:hidden">
+        <h1 className="min-w-0 truncate text-xl font-bold tracking-tight sm:text-2xl lg:hidden">
           {isEn ? "Medical records" : "Dossiers médicaux"}
         </h1>
         <button
           type="button"
           onClick={() => setNewPatientOpen(true)}
-          className="ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-muted"
+          className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-muted"
         >
-          <UserPlus className="h-4 w-4" /> {isEn ? "New patient" : "Nouveau patient"}
+          <UserPlus className="h-4 w-4" /> <span className="hidden min-[420px]:inline">{isEn ? "New patient" : "Nouveau patient"}</span>
         </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         {/* Patient list */}
-        <aside className="flex max-h-[calc(100vh-8rem)] flex-col rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-xl">
+        <aside
+          className={cn(
+            "flex max-h-[60vh] flex-col rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-xl lg:max-h-[calc(100vh-8rem)]",
+            mobileDetail && "hidden lg:flex",
+          )}
+        >
           <div className="border-b border-border/60 p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -144,7 +152,7 @@ function ProRecordsPage() {
               <li key={p.id}>
                 <button
                   type="button"
-                  onClick={() => { setSelectedId(p.id); setTab("history"); }}
+                  onClick={() => { setSelectedId(p.id); setTab("history"); setMobileDetail(true); }}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition",
                     p.id === selected.id ? "bg-primary/10" : "hover:bg-muted",
@@ -177,13 +185,19 @@ function ProRecordsPage() {
         </aside>
 
         {/* Detail */}
-        <section className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-xl sm:p-6">
+        <section
+          className={cn(
+            "rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-xl sm:p-6",
+            !mobileDetail && "hidden lg:block",
+          )}
+        >
           <RecordDetail
             patient={selected}
             isEn={isEn}
             tab={tab}
             setTab={setTab}
             onDocument={() => setConsultOpen(true)}
+            onBack={() => setMobileDetail(false)}
           />
         </section>
       </div>
@@ -211,12 +225,14 @@ function RecordDetail({
   tab,
   setTab,
   onDocument,
+  onBack,
 }: {
   patient: ProPatient;
   isEn: boolean;
   tab: Tab;
   setTab: (t: Tab) => void;
   onDocument: () => void;
+  onBack: () => void;
 }) {
   const allergy = isEn ? patient.allergyEn : patient.allergyFr;
 
@@ -224,13 +240,21 @@ function RecordDetail({
     <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={isEn ? "Back to patient list" : "Retour à la liste des patients"}
+            className="grid h-9 w-9 flex-none place-items-center rounded-full border border-border bg-card text-muted-foreground transition hover:bg-muted lg:hidden"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
           <div className="grid h-12 w-12 flex-none place-items-center rounded-full bg-[image:var(--gradient-brand)] text-sm font-bold text-primary-foreground">
             {patient.initials}
           </div>
-          <div>
-            <div className="text-lg font-bold">{patient.name}</div>
-            <div className="text-xs text-muted-foreground">
+          <div className="min-w-0">
+            <div className="truncate text-lg font-bold">{patient.name}</div>
+            <div className="truncate text-xs text-muted-foreground">
               {patient.age} {isEn ? "yrs" : "ans"} · {patient.sex === "F" ? "F" : isEn ? "M" : "H"} · {patient.phone}
             </div>
           </div>
@@ -238,7 +262,7 @@ function RecordDetail({
         <button
           type="button"
           onClick={onDocument}
-          className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-brand)] px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-brand)] px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95 sm:w-auto"
         >
           <Stethoscope className="h-4 w-4" /> {isEn ? "Document a consultation" : "Documenter une consultation"}
         </button>
@@ -255,12 +279,12 @@ function RecordDetail({
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-1 rounded-xl bg-muted p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl bg-muted p-1">
         <RecordTab active={tab === "history"} onClick={() => setTab("history")} count={patient.history.length}>
-          {isEn ? "Consultation history" : "Historique des consultations"}
+          {isEn ? "History" : "Historique"}
         </RecordTab>
         <RecordTab active={tab === "medical"} onClick={() => setTab("medical")}>
-          {isEn ? "Medical information" : "Informations médicales"}
+          {isEn ? "Medical info" : "Infos médicales"}
         </RecordTab>
         <RecordTab active={tab === "documents"} onClick={() => setTab("documents")} count={patient.documents}>
           {isEn ? "Documents" : "Documents"}
@@ -609,7 +633,7 @@ function RecordTab({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition",
+        "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition",
         active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
       )}
     >
