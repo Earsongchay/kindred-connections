@@ -48,6 +48,7 @@ function ProRecordsPage() {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selectedId, setSelectedId] = useState<string>(search.patient ?? PRO_PATIENTS_ALL[0].id);
   const [tab, setTab] = useState<Tab>("history");
+  const [mobileDetail, setMobileDetail] = useState(Boolean(search.patient));
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
 
