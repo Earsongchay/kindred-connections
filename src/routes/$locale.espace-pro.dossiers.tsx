@@ -279,12 +279,12 @@ function RecordDetail({
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-1 rounded-xl bg-muted p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl bg-muted p-1">
         <RecordTab active={tab === "history"} onClick={() => setTab("history")} count={patient.history.length}>
-          {isEn ? "Consultation history" : "Historique des consultations"}
+          {isEn ? "History" : "Historique"}
         </RecordTab>
         <RecordTab active={tab === "medical"} onClick={() => setTab("medical")}>
-          {isEn ? "Medical information" : "Informations médicales"}
+          {isEn ? "Medical info" : "Infos médicales"}
         </RecordTab>
         <RecordTab active={tab === "documents"} onClick={() => setTab("documents")} count={patient.documents}>
           {isEn ? "Documents" : "Documents"}
