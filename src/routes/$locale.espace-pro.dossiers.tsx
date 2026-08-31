@@ -184,13 +184,19 @@ function ProRecordsPage() {
         </aside>
 
         {/* Detail */}
-        <section className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-xl sm:p-6">
+        <section
+          className={cn(
+            "rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-xl sm:p-6",
+            !mobileDetail && "hidden lg:block",
+          )}
+        >
           <RecordDetail
             patient={selected}
             isEn={isEn}
             tab={tab}
             setTab={setTab}
             onDocument={() => setConsultOpen(true)}
+            onBack={() => setMobileDetail(false)}
           />
         </section>
       </div>
