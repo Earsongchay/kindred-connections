@@ -65,7 +65,7 @@ function ProRecordsPage() {
   const hasMore = visible < filtered.length;
 
   // Infinite scroll sentinel
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLLIElement | null>(null);
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node || !hasMore) return;
