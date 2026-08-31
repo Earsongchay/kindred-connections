@@ -89,6 +89,7 @@ function ProRecordsPage() {
     setSelectedId(p.id);
     setTab("history");
     setQuery("");
+    setMobileDetail(true);
     setNewPatientOpen(false);
   };
 
