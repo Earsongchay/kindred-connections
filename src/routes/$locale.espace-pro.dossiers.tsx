@@ -112,21 +112,26 @@ function ProRecordsPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight lg:hidden">
+        <h1 className="min-w-0 truncate text-xl font-bold tracking-tight sm:text-2xl lg:hidden">
           {isEn ? "Medical records" : "Dossiers médicaux"}
         </h1>
         <button
           type="button"
           onClick={() => setNewPatientOpen(true)}
-          className="ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-muted"
+          className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-muted"
         >
-          <UserPlus className="h-4 w-4" /> {isEn ? "New patient" : "Nouveau patient"}
+          <UserPlus className="h-4 w-4" /> <span className="hidden min-[420px]:inline">{isEn ? "New patient" : "Nouveau patient"}</span>
         </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         {/* Patient list */}
-        <aside className="flex max-h-[calc(100vh-8rem)] flex-col rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-xl">
+        <aside
+          className={cn(
+            "flex max-h-[60vh] flex-col rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-xl lg:max-h-[calc(100vh-8rem)]",
+            mobileDetail && "hidden lg:flex",
+          )}
+        >
           <div className="border-b border-border/60 p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
