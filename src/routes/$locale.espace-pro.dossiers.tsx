@@ -224,12 +224,14 @@ function RecordDetail({
   tab,
   setTab,
   onDocument,
+  onBack,
 }: {
   patient: ProPatient;
   isEn: boolean;
   tab: Tab;
   setTab: (t: Tab) => void;
   onDocument: () => void;
+  onBack: () => void;
 }) {
   const allergy = isEn ? patient.allergyEn : patient.allergyFr;
 
@@ -237,13 +239,21 @@ function RecordDetail({
     <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={isEn ? "Back to patient list" : "Retour à la liste des patients"}
+            className="grid h-9 w-9 flex-none place-items-center rounded-full border border-border bg-card text-muted-foreground transition hover:bg-muted lg:hidden"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
           <div className="grid h-12 w-12 flex-none place-items-center rounded-full bg-[image:var(--gradient-brand)] text-sm font-bold text-primary-foreground">
             {patient.initials}
           </div>
-          <div>
-            <div className="text-lg font-bold">{patient.name}</div>
-            <div className="text-xs text-muted-foreground">
+          <div className="min-w-0">
+            <div className="truncate text-lg font-bold">{patient.name}</div>
+            <div className="truncate text-xs text-muted-foreground">
               {patient.age} {isEn ? "yrs" : "ans"} · {patient.sex === "F" ? "F" : isEn ? "M" : "H"} · {patient.phone}
             </div>
           </div>
@@ -251,7 +261,7 @@ function RecordDetail({
         <button
           type="button"
           onClick={onDocument}
-          className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-brand)] px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-brand)] px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-95 sm:w-auto"
         >
           <Stethoscope className="h-4 w-4" /> {isEn ? "Document a consultation" : "Documenter une consultation"}
         </button>
