@@ -151,7 +151,7 @@ function ProRecordsPage() {
               <li key={p.id}>
                 <button
                   type="button"
-                  onClick={() => { setSelectedId(p.id); setTab("history"); }}
+                  onClick={() => { setSelectedId(p.id); setTab("history"); setMobileDetail(true); }}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition",
                     p.id === selected.id ? "bg-primary/10" : "hover:bg-muted",
