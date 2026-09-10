@@ -2,6 +2,7 @@
 // Prototype dataset. All dates are fixed ISO strings so SSR and client match.
 
 export type ScheduleKind = "APPOINTMENT" | "EVENT" | "BLOCK";
+export type AppointmentStatus = "planned" | "to-close" | "done" | "no-show" | "canceled";
 
 export interface ScheduleLabel {
   id: string;
@@ -57,6 +58,7 @@ export interface ScheduleEntry {
   /** BLOCK only — groups the days of a multi-day block (PL9). */
   groupId?: string;
   fullDay?: boolean;
+  status?: AppointmentStatus;
 }
 
 /** Prototype "today" so the calendar renders identically on server and client. */
@@ -168,6 +170,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     notes: "Contrôle de la tension.",
     bookedOnline: true,
     seen: true,
+    status: "to-close",
   },
   {
     id: "sch-2",
@@ -186,6 +189,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     seen: false,
     notes:
       "Ma tension est remontée depuis une semaine.\nJe prends toujours le traitement de juin.",
+    status: "planned",
   },
   {
     id: "sch-3",
@@ -213,6 +217,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     end: "09:45",
     bookedOnline: true,
     seen: false,
+    status: "planned",
   },
   {
     id: "sch-5",
@@ -227,6 +232,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     date: "2026-08-21",
     start: "16:00",
     end: "16:30",
+    status: "planned",
   },
   {
     id: "sch-6",
@@ -256,6 +262,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     end: "11:30",
     bookedOnline: true,
     seen: false,
+    status: "planned",
   },
   {
     id: "sch-8",
@@ -280,6 +287,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     date: "2026-08-27",
     start: "15:30",
     end: "16:00",
+    status: "planned",
   },
   {
     id: "sch-10",
@@ -296,6 +304,7 @@ export const SCHEDULE_EVENTS: ScheduleEntry[] = [
     end: "21:00",
     bookedOnline: true,
     seen: false,
+    status: "planned",
   },
 ];
 
