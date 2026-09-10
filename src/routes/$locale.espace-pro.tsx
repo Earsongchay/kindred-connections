@@ -26,6 +26,7 @@ type ProRoute =
   | "/$locale/espace-pro"
   | "/$locale/espace-pro/abonnement"
   | "/$locale/espace-pro/patients"
+  | "/$locale/espace-pro/planning"
   | "/$locale/espace-pro/dossiers"
   | "/$locale/espace-pro/profil-public";
 
@@ -47,7 +48,7 @@ function ProLayout() {
     { to: "/$locale/espace-pro", label: isEn ? "Dashboard" : "Tableau de bord", Icon: LayoutDashboard, exact: true },
     { to: "/$locale/espace-pro/profil-public", label: isEn ? "My public profile" : "Mon profil public", Icon: IdCard },
     { to: "/$locale/espace-pro/patients", label: isEn ? "Patients" : "Mes patients", Icon: Users },
-    { to: "/$locale/espace-pro", label: isEn ? "Schedule" : "Mon planning", Icon: CalendarDays },
+    { to: "/$locale/espace-pro/planning", label: isEn ? "Schedule" : "Mon planning", Icon: CalendarDays },
     { to: "/$locale/espace-pro/dossiers", label: isEn ? "Medical records" : "Dossiers médicaux", Icon: FileText },
   ];
 
